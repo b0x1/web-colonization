@@ -33,14 +33,15 @@ export default class NewWorld extends Phaser.Scene {
     preload() {
         const tilelayerConfig = new TileLayerConfiguration("BaseTerrain")
         const tilesetConfig = new TilesetConfiguration("fantasytileset",
-            'assets/tiles/fantasyhextiles_v3.png')
+            'fantasyhextiles_v3.png')
 
         this.tilemapConfig = new TilemapConfiguration(
             "hexagon-tilemap",
-            'assets/tiles/hexagon-tilemap.json',
+            'hexagon-tilemap.json',
             [tilesetConfig],
             [tilelayerConfig]
         )
+        this.load.baseURL = "assets/tiles/";
         this.load.image(tilesetConfig.imageName, tilesetConfig.imageAssetPath);
         this.load.tilemapTiledJSON(this.tilemapConfig.name, this.tilemapConfig.configJSONPath);
 

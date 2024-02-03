@@ -1,9 +1,9 @@
-export class Sprite {
+export class Tile {
     constructor(public spriteId: integer) {       
     }
 }
 
-export enum terrainSpriteIndices {
+export enum terrainTileIndices {
     Grassland = 0,
     GrasslandWithShrub = 1,
     Forest = 2,
