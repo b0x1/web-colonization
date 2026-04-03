@@ -4,6 +4,7 @@ import { Tile } from '../entities/Tile';
 import { Unit } from '../entities/Unit';
 import { Colony } from '../entities/Colony';
 import { TurnPhase, UnitType } from '../entities/types';
+import { TurnEngine } from '../systems/TurnEngine';
 
 export interface GameState {
   players: Player[];
@@ -21,7 +22,7 @@ export interface GameState {
   foundColony: (unitId: string) => void;
 }
 
-export const useGameStore = create<GameState>((set) => ({
+export const useGameStore = create<GameState>((set, get) => ({
   players: [],
   currentPlayerId: '',
   turn: 1,
@@ -85,7 +86,7 @@ export const useGameStore = create<GameState>((set) => ({
       return state;
     }),
 
-  endTurn: () =>
+  endTurn: () => {
     set((state) => {
       const phases: TurnPhase[] = [
         TurnPhase.MOVEMENT,
@@ -97,7 +98,8 @@ export const useGameStore = create<GameState>((set) => ({
       const currentPhaseIndex = phases.indexOf(state.phase);
 
       if (currentPhaseIndex < phases.length - 1) {
-        return { phase: phases[currentPhaseIndex + 1] };
+        const nextPhase = phases[currentPhaseIndex + 1];
+        return { phase: nextPhase };
       }
 
       // End of turn phase reached, cycle to next player
@@ -133,7 +135,24 @@ export const useGameStore = create<GameState>((set) => ({
         players: updatedPlayers,
         selectedUnitId: null,
       };
-    }),
+    });
+
+    // Check if we need to auto-advance phases
+    const state = get();
+    if (state.phase === TurnPhase.PRODUCTION) {
+      const updatedPlayers = TurnEngine.runProduction(state.players, state.map);
+      set({ players: updatedPlayers });
+      state.endTurn();
+    } else if (state.phase === TurnPhase.TRADE) {
+      state.endTurn();
+    } else if (state.phase === TurnPhase.AI) {
+      const updatedPlayers = TurnEngine.runAITurn(state.players, state.map);
+      set({ players: updatedPlayers });
+      state.endTurn();
+    } else if (state.phase === TurnPhase.END_TURN) {
+      state.endTurn();
+    }
+  },
 
   foundColony: (unitId) =>
     set((state) => {

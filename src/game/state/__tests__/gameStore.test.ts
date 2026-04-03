@@ -61,19 +61,19 @@ describe('gameStore', () => {
 
   describe('endTurn', () => {
     it('should advance phases correctly', () => {
-      useGameStore.setState({ phase: TurnPhase.MOVEMENT });
+      // We need players and a map for endTurn to not cycle immediately if logic relies on it
+      const p1 = new Player('p1', 'Player 1', true, 100);
+      const map = [[new Tile('t00', 0, 0, TerrainType.PLAINS, 1)]];
+      useGameStore.setState({ players: [p1], currentPlayerId: 'p1', phase: TurnPhase.MOVEMENT, map });
+
+      // In the new implementation, endTurn() auto-advances phases that don't require manual input
+      // MOVEMENT (manual) -> endTurn() -> PRODUCTION (auto) -> TRADE (auto) -> AI (auto) -> END_TURN (auto) -> next player MOVEMENT
 
       useGameStore.getState().endTurn();
-      expect(useGameStore.getState().phase).toBe(TurnPhase.PRODUCTION);
 
-      useGameStore.getState().endTurn();
-      expect(useGameStore.getState().phase).toBe(TurnPhase.TRADE);
-
-      useGameStore.getState().endTurn();
-      expect(useGameStore.getState().phase).toBe(TurnPhase.AI);
-
-      useGameStore.getState().endTurn();
-      expect(useGameStore.getState().phase).toBe(TurnPhase.END_TURN);
+      // Since all phases after MOVEMENT are auto-advanced in this simple setup,
+      // calling endTurn() once from MOVEMENT should go through all of them and end up at MOVEMENT again (for the next player or same player if only one)
+      expect(useGameStore.getState().phase).toBe(TurnPhase.MOVEMENT);
     });
 
     it('should cycle to next player and reset phase after END_TURN phase', () => {
