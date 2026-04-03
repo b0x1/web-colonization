@@ -7,7 +7,6 @@ import { GoodType, UnitType } from '../../entities/types';
 describe('Europe Trade', () => {
   beforeEach(() => {
     // Reset store state before each test
-    const { players } = useGameStore.getState();
     const p1 = new Player('p1', 'Player 1', true, 1000);
     const ship = new Unit('ship1', 'p1', UnitType.SHIP, 0, 0, 1);
     ship.cargo.set(GoodType.LUMBER, 50);

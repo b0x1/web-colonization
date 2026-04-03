@@ -164,7 +164,7 @@ export const useGameStore = create<GameState>((set, get) => ({
     // Check if we need to auto-advance phases
     const state = get();
     if (state.phase === TurnPhase.PRODUCTION) {
-      const updatedPlayers = TurnEngine.runProduction(state.players, state.map);
+      const updatedPlayers = TurnEngine.runProduction(state.players);
       set({ players: updatedPlayers });
       state.endTurn();
     } else if (state.phase === TurnPhase.TRADE) {
