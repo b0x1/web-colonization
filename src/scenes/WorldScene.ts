@@ -13,8 +13,6 @@ export class WorldScene extends Phaser.Scene {
   private zoomKeys!: {
     plus: Phaser.Input.Keyboard.Key;
     minus: Phaser.Input.Keyboard.Key;
-    plusEqual: Phaser.Input.Keyboard.Key;
-    minusKey: Phaser.Input.Keyboard.Key;
   };
 
   private readonly TILE_SIZE = 32;
@@ -94,8 +92,6 @@ export class WorldScene extends Phaser.Scene {
       this.zoomKeys = {
         plus: this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.PLUS),
         minus: this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.MINUS),
-        plusEqual: this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.EQUALS),
-        minusKey: this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.DASH),
       };
     }
   }
@@ -117,10 +113,10 @@ export class WorldScene extends Phaser.Scene {
     }
 
     const zoomSpeed = 0.02;
-    if (this.zoomKeys?.plus?.isDown || this.zoomKeys?.plusEqual?.isDown) {
+    if (this.zoomKeys?.plus?.isDown) {
       cam.zoom += zoomSpeed;
     }
-    if (this.zoomKeys?.minus?.isDown || this.zoomKeys?.minusKey?.isDown) {
+    if (this.zoomKeys?.minus?.isDown) {
       cam.zoom -= zoomSpeed;
     }
 

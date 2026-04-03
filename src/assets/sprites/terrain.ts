@@ -25,7 +25,7 @@ export const RESOURCE_COLORS: Record<ResourceType, number> = {
 };
 
 export function generateTerrainTextures(scene: Phaser.Scene, tileSize: number) {
-  const graphics = scene.make.graphics({ x: 0, y: 0, add: false });
+  const graphics = scene.make.graphics({ x: 0, y: 0 });
 
   // Generate Terrain Textures
   Object.entries(TERRAIN_COLORS).forEach(([type, color]) => {
@@ -53,7 +53,7 @@ export function generateTerrainTextures(scene: Phaser.Scene, tileSize: number) {
       graphics.lineStyle(2, 0x000000, 0.2);
       graphics.beginPath();
       graphics.moveTo(5, 25);
-      graphics.quadraticCurveTo(16, 5, 27, 25);
+      graphics.arc(21.5, 15, 12.5, 3.93, 0.64);
       graphics.strokePath();
     } else if (type === TerrainType.MOUNTAINS) {
       graphics.fillStyle(0x333333, 1);
