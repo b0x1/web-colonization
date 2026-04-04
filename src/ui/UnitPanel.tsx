@@ -3,6 +3,7 @@ import { useGameStore } from '../game/state/gameStore';
 
 export const UnitPanel: React.FC = () => {
   const { selectedUnitId, players, endTurn, isMainMenuOpen } = useGameStore();
+  const foundColony = useGameStore((state) => state.foundColony);
 
   if (isMainMenuOpen) return null;
 
@@ -11,8 +12,6 @@ export const UnitPanel: React.FC = () => {
     .find((u) => u.id === selectedUnitId);
 
   if (!unit) return null;
-
-  const foundColony = useGameStore((state) => state.foundColony);
 
   return (
     <div

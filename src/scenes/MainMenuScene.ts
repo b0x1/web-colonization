@@ -67,7 +67,9 @@ export class MainMenuScene extends Phaser.Scene {
     title.setDepth(101);
 
     this.scale.on('resize', (gameSize: Phaser.Structs.Size) => {
-      this.cameras.main.setViewport(0, 0, gameSize.width, gameSize.height);
+      if (this.cameras && this.cameras.main) {
+        this.cameras.main.setViewport(0, 0, gameSize.width, gameSize.height);
+      }
       overlay.clear();
       overlay.fillStyle(0x000000, 0.6);
       overlay.fillRect(0, 0, gameSize.width, gameSize.height);
