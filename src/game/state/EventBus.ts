@@ -1,7 +1,7 @@
-type Callback = (...args: any[]) => void;
+type Callback = (...args: unknown[]) => void;
 
 class EventBus {
-  private listeners: Map<string, Callback[]> = new Map();
+  private listeners = new Map<string, Callback[]>();
 
   on(event: string, callback: Callback) {
     if (!this.listeners.has(event)) {
@@ -16,12 +16,12 @@ class EventBus {
     if (eventListeners) {
       this.listeners.set(
         event,
-        eventListeners.filter((cb) => cb !== callback)
+        eventListeners.filter((cb) => cb !== callback),
       );
     }
   }
 
-  emit(event: string, ...args: any[]) {
+  emit(event: string, ...args: unknown[]) {
     this.listeners.get(event)?.forEach((callback) => callback(...args));
   }
 }

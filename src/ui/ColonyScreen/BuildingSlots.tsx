@@ -3,12 +3,42 @@ import { BuildingType } from '../../game/entities/types';
 import { useGameStore } from '../../game/state/gameStore';
 
 const BUILDINGS_LIST = [
-  { type: BuildingType.LUMBER_MILL, name: 'Lumber Mill', bonus: '+2 LUMBER/turn', cost: 100 },
-  { type: BuildingType.IRON_WORKS, name: 'Iron Works', bonus: '+2 ORE/turn', cost: 150 },
-  { type: BuildingType.SCHOOLHOUSE, name: 'Schoolhouse', bonus: 'Unlocks PIONEER', cost: 120 },
-  { type: BuildingType.WAREHOUSE, name: 'Warehouse', bonus: '400 Storage', cost: 80 },
-  { type: BuildingType.STOCKADE, name: 'Stockade', bonus: '+2 Defense', cost: 200 },
-  { type: BuildingType.PRINTING_PRESS, name: 'Printing Press', bonus: '+1 Growth', cost: 180 },
+  {
+    type: BuildingType.LUMBER_MILL,
+    name: 'Lumber Mill',
+    bonus: '+2 LUMBER/turn',
+    cost: 100,
+  },
+  {
+    type: BuildingType.IRON_WORKS,
+    name: 'Iron Works',
+    bonus: '+2 ORE/turn',
+    cost: 150,
+  },
+  {
+    type: BuildingType.SCHOOLHOUSE,
+    name: 'Schoolhouse',
+    bonus: 'Unlocks PIONEER',
+    cost: 120,
+  },
+  {
+    type: BuildingType.WAREHOUSE,
+    name: 'Warehouse',
+    bonus: '400 Storage',
+    cost: 80,
+  },
+  {
+    type: BuildingType.STOCKADE,
+    name: 'Stockade',
+    bonus: '+2 Defense',
+    cost: 200,
+  },
+  {
+    type: BuildingType.PRINTING_PRESS,
+    name: 'Printing Press',
+    bonus: '+1 Growth',
+    cost: 180,
+  },
 ];
 
 interface Props {
@@ -17,7 +47,11 @@ interface Props {
   playerGold: number;
 }
 
-export const BuildingSlots: React.FC<Props> = ({ colonyId, ownedBuildings, playerGold }) => {
+export const BuildingSlots: React.FC<Props> = ({
+  colonyId,
+  ownedBuildings,
+  playerGold,
+}) => {
   const buyBuilding = useGameStore((state) => state.buyBuilding);
 
   return (
@@ -36,7 +70,9 @@ export const BuildingSlots: React.FC<Props> = ({ colonyId, ownedBuildings, playe
             }`}
           >
             <div>
-              <div className="font-black text-[0.8rem] uppercase tracking-wider text-slate-200">{b.name}</div>
+              <div className="font-black text-[0.8rem] uppercase tracking-wider text-slate-200">
+                {b.name}
+              </div>
               <div className="text-[0.7rem] text-slate-400 mt-1">{b.bonus}</div>
             </div>
 

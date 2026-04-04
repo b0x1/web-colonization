@@ -2,7 +2,13 @@ import React from 'react';
 import { useGameStore } from '../game/state/gameStore';
 
 export const ColonyPanel: React.FC = () => {
-  const { selectedColonyId, players, selectColony, setColonyScreenOpen, isMainMenuOpen } = useGameStore();
+  const {
+    selectedColonyId,
+    players,
+    selectColony,
+    setColonyScreenOpen,
+    isMainMenuOpen,
+  } = useGameStore();
 
   if (isMainMenuOpen) return null;
 
@@ -32,13 +38,18 @@ export const ColonyPanel: React.FC = () => {
         </div>
         <p className="text-gray-300 mb-4">Population: {colony.population}</p>
         <div className="mb-6">
-          <h3 className="text-lg font-semibold mb-2 border-b border-white/10 pb-1">Inventory:</h3>
+          <h3 className="text-lg font-semibold mb-2 border-b border-white/10 pb-1">
+            Inventory:
+          </h3>
           {colony.inventory.size === 0 ? (
             <p className="text-gray-400 italic">Empty</p>
           ) : (
             <ul className="grid grid-cols-2 gap-2">
               {Array.from(colony.inventory.entries()).map(([good, amount]) => (
-                <li key={good} className="text-sm bg-slate-700/50 p-2 rounded border border-white/5 flex justify-between">
+                <li
+                  key={good}
+                  className="text-sm bg-slate-700/50 p-2 rounded border border-white/5 flex justify-between"
+                >
                   <span className="capitalize">{good.toLowerCase()}:</span>
                   <span className="font-mono font-bold">{amount}</span>
                 </li>

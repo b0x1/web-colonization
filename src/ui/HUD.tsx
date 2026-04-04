@@ -10,7 +10,7 @@ export const HUD: React.FC = () => {
     setEuropeScreenOpen,
     setSaveModalOpen,
     setReportsModalOpen,
-    isMainMenuOpen
+    isMainMenuOpen,
   } = useGameStore();
 
   if (isMainMenuOpen) return null;
@@ -37,7 +37,9 @@ export const HUD: React.FC = () => {
         >
           Sail to Europe
         </button>
-        <div className="text-slate-300">Turn: <span className="text-white">{turn}</span></div>
+        <div className="text-slate-300">
+          Turn: <span className="text-white">{turn}</span>
+        </div>
       </div>
 
       <div className="flex items-center gap-6">
@@ -48,7 +50,8 @@ export const HUD: React.FC = () => {
           Reports
         </button>
         <div className="min-w-[100px] font-mono font-bold bg-slate-900/50 px-3 py-1 rounded border border-white/10">
-          GOLD: <span className="text-yellow-400">{currentPlayer?.gold ?? 0}</span>
+          GOLD:{' '}
+          <span className="text-yellow-400">{currentPlayer?.gold ?? 0}</span>
         </div>
       </div>
     </div>

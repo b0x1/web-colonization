@@ -5,7 +5,13 @@ import { WorkforcePanel } from './WorkforcePanel';
 import { InventoryPanel } from './InventoryPanel';
 
 export const ColonyScreen: React.FC = () => {
-  const { isColonyScreenOpen, selectedColonyId, players, setColonyScreenOpen, currentPlayerId } = useGameStore();
+  const {
+    isColonyScreenOpen,
+    selectedColonyId,
+    players,
+    setColonyScreenOpen,
+    currentPlayerId,
+  } = useGameStore();
 
   if (!isColonyScreenOpen || !selectedColonyId) return null;
 
@@ -20,7 +26,9 @@ export const ColonyScreen: React.FC = () => {
         {/* Header */}
         <div className="col-span-2 flex justify-between items-center border-b border-slate-700 pb-4 mb-2">
           <div>
-            <h1 className="text-4xl font-black m-0 uppercase tracking-tight text-blue-400">{colony.name}</h1>
+            <h1 className="text-4xl font-black m-0 uppercase tracking-tight text-blue-400">
+              {colony.name}
+            </h1>
             <div className="text-slate-400 font-bold flex items-center gap-2">
               <span className="w-2 h-2 bg-green-500 rounded-full animate-pulse"></span>
               Population: {colony.population}
@@ -36,7 +44,11 @@ export const ColonyScreen: React.FC = () => {
 
         {/* Main Content */}
         <div className="flex flex-col gap-5">
-          <BuildingSlots colonyId={colony.id} ownedBuildings={colony.buildings} playerGold={player.gold} />
+          <BuildingSlots
+            colonyId={colony.id}
+            ownedBuildings={colony.buildings}
+            playerGold={player.gold}
+          />
           <InventoryPanel
             inventory={colony.inventory}
             workforce={colony.workforce}
@@ -46,11 +58,16 @@ export const ColonyScreen: React.FC = () => {
         </div>
 
         <div className="h-full">
-          <WorkforcePanel colonyId={colony.id} units={colony.units} workforce={colony.workforce} />
+          <WorkforcePanel
+            colonyId={colony.id}
+            units={colony.units}
+            workforce={colony.workforce}
+          />
         </div>
 
         <div className="col-span-2 text-right text-slate-400 text-sm font-mono pt-4 border-t border-slate-700">
-            Available Gold: <span className="text-yellow-400 font-bold">{player.gold}g</span>
+          Available Gold:{' '}
+          <span className="text-yellow-400 font-bold">{player.gold}g</span>
         </div>
       </div>
     </div>

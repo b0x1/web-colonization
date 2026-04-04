@@ -4,7 +4,13 @@ import { Player } from '../../entities/Player';
 import { Tile } from '../../entities/Tile';
 import { Colony } from '../../entities/Colony';
 import { Unit } from '../../entities/Unit';
-import { TerrainType, GoodType, UnitType, JobType, Nation } from '../../entities/types';
+import {
+  TerrainType,
+  GoodType,
+  UnitType,
+  JobType,
+  Nation,
+} from '../../entities/types';
 
 describe('TurnEngine', () => {
   const createMap = (width: number, height: number): Tile[][] => {
@@ -78,22 +84,22 @@ describe('TurnEngine', () => {
     });
 
     it('should not found a colony if there is an adjacent friendly colony', () => {
-        const map = createMap(10, 10);
-        map[2][2].terrainType = TerrainType.PLAINS;
+      const map = createMap(10, 10);
+      map[2][2].terrainType = TerrainType.PLAINS;
 
-        const ai = new Player('p1', 'AI', false, 0, Nation.NETHERLANDS);
-        const colony = new Colony('c1', 'p1', 'Col1', 3, 3, 1);
-        ai.colonies.push(colony);
-        const unit = new Unit('u1', 'p1', UnitType.COLONIST, 2, 2, 1);
-        ai.units.push(unit);
+      const ai = new Player('p1', 'AI', false, 0, Nation.NETHERLANDS);
+      const colony = new Colony('c1', 'p1', 'Col1', 3, 3, 1);
+      ai.colonies.push(colony);
+      const unit = new Unit('u1', 'p1', UnitType.COLONIST, 2, 2, 1);
+      ai.units.push(unit);
 
-        const updatedPlayers = TurnEngine.runAITurn([ai], map);
-        const updatedAI = updatedPlayers[0];
+      const updatedPlayers = TurnEngine.runAITurn([ai], map);
+      const updatedAI = updatedPlayers[0];
 
-        expect(updatedAI.colonies.length).toBe(1); // Only the existing one
-        expect(updatedAI.units.length).toBe(1);
-        expect(updatedAI.units[0].x).toBe(2);
-        expect(updatedAI.units[0].y).toBe(2);
-      });
+      expect(updatedAI.colonies.length).toBe(1); // Only the existing one
+      expect(updatedAI.units.length).toBe(1);
+      expect(updatedAI.units[0].x).toBe(2);
+      expect(updatedAI.units[0].y).toBe(2);
+    });
   });
 });

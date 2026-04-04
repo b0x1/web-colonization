@@ -24,7 +24,10 @@ describe('gameStore', () => {
       player.units = [unit];
 
       const map = [
-        [new Tile('t00', 0, 0, TerrainType.PLAINS, 1), new Tile('t10', 1, 0, TerrainType.PLAINS, 1)],
+        [
+          new Tile('t00', 0, 0, TerrainType.PLAINS, 1),
+          new Tile('t10', 1, 0, TerrainType.PLAINS, 1),
+        ],
       ];
 
       useGameStore.setState({ players: [player], currentPlayerId: 'p1', map });
@@ -44,7 +47,10 @@ describe('gameStore', () => {
       player.units = [unit];
 
       const map = [
-        [new Tile('t00', 0, 0, TerrainType.PLAINS, 1), new Tile('t10', 1, 0, TerrainType.PLAINS, 2)],
+        [
+          new Tile('t00', 0, 0, TerrainType.PLAINS, 1),
+          new Tile('t10', 1, 0, TerrainType.PLAINS, 2),
+        ],
       ];
 
       useGameStore.setState({ players: [player], currentPlayerId: 'p1', map });
@@ -64,7 +70,12 @@ describe('gameStore', () => {
       // We need players and a map for endTurn to not cycle immediately if logic relies on it
       const p1 = new Player('p1', 'Player 1', true, 100, Nation.ENGLAND);
       const map = [[new Tile('t00', 0, 0, TerrainType.PLAINS, 1)]];
-      useGameStore.setState({ players: [p1], currentPlayerId: 'p1', phase: TurnPhase.MOVEMENT, map });
+      useGameStore.setState({
+        players: [p1],
+        currentPlayerId: 'p1',
+        phase: TurnPhase.MOVEMENT,
+        map,
+      });
 
       // In the new implementation, endTurn() auto-advances phases that don't require manual input
       // MOVEMENT (manual) -> endTurn() -> PRODUCTION (auto) -> TRADE (auto) -> AI (auto) -> END_TURN (auto) -> next player MOVEMENT
@@ -83,7 +94,7 @@ describe('gameStore', () => {
       useGameStore.setState({
         players: [p1, p2],
         currentPlayerId: 'p1',
-        phase: TurnPhase.END_TURN
+        phase: TurnPhase.END_TURN,
       });
 
       useGameStore.getState().endTurn();
@@ -101,7 +112,7 @@ describe('gameStore', () => {
         players: [p1, p2],
         currentPlayerId: 'p2',
         phase: TurnPhase.END_TURN,
-        turn: 1
+        turn: 1,
       });
 
       useGameStore.getState().endTurn();
@@ -121,25 +132,27 @@ describe('gameStore', () => {
       unit2.maxMoves = 2;
       p2.units = [unit2];
 
-      const map = [
-        [new Tile('t00', 0, 0, TerrainType.PLAINS, 1)],
-      ];
+      const map = [[new Tile('t00', 0, 0, TerrainType.PLAINS, 1)]];
 
       useGameStore.setState({
         players: [p1, p2],
         currentPlayerId: 'p1',
         phase: TurnPhase.END_TURN,
-        map
+        map,
       });
 
       useGameStore.getState().endTurn();
 
       // New current player is p2
-      const updatedP2 = useGameStore.getState().players.find(p => p.id === 'p2')!;
+      const updatedP2 = useGameStore
+        .getState()
+        .players.find((p) => p.id === 'p2')!;
       expect(updatedP2.units[0].movesRemaining).toBe(2);
 
       // Moves for p1 should NOT have been reset yet (they reset when it's p1's turn again)
-      const updatedP1 = useGameStore.getState().players.find(p => p.id === 'p1')!;
+      const updatedP1 = useGameStore
+        .getState()
+        .players.find((p) => p.id === 'p1')!;
       expect(updatedP1.units[0].movesRemaining).toBe(0);
     });
   });

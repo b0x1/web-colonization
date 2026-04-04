@@ -4,7 +4,14 @@ import { Unit } from '../../entities/Unit';
 import { NativeSettlement } from '../../entities/NativeSettlement';
 import { Tile } from '../../entities/Tile';
 import { Colony } from '../../entities/Colony';
-import { UnitType, TerrainType, BuildingType, Attitude, GoodType, Tribe } from '../../entities/types';
+import {
+  UnitType,
+  TerrainType,
+  BuildingType,
+  Attitude,
+  GoodType,
+  Tribe,
+} from '../../entities/types';
 
 describe('CombatSystem', () => {
   let attacker: Unit;
@@ -18,7 +25,15 @@ describe('CombatSystem', () => {
   beforeEach(() => {
     attacker = new Unit('u1', 'p1', UnitType.SOLDIER, 0, 0, 3);
     defenderUnit = new Unit('u2', 'p2', UnitType.COLONIST, 1, 1, 3);
-    settlement = new NativeSettlement('s1', 'Village', Tribe.IROQUOIS, 1, 1, 5, Attitude.NEUTRAL);
+    settlement = new NativeSettlement(
+      's1',
+      'Village',
+      Tribe.IROQUOIS,
+      1,
+      1,
+      5,
+      Attitude.NEUTRAL,
+    );
     colony = new Colony('c1', 'p2', 'New Town', 1, 1, 1);
 
     flatTile = new Tile('t1', 1, 1, TerrainType.PLAINS, 1);
@@ -50,7 +65,11 @@ describe('CombatSystem', () => {
     // Attacker soldier: 3 * 0.5 = 1.5
     // Defender soldier on hills: (3 * 1.5) * 0.5 = 2.25
     const defenderSoldier = new Unit('u3', 'p2', UnitType.SOLDIER, 1, 1, 3);
-    const result = CombatSystem.resolveCombat(attacker, defenderSoldier, hillTile);
+    const result = CombatSystem.resolveCombat(
+      attacker,
+      defenderSoldier,
+      hillTile,
+    );
 
     expect(result.winner).toBe('defender');
 
@@ -62,7 +81,11 @@ describe('CombatSystem', () => {
 
     // Attacker soldier: 3 * 0.5 = 1.5
     // Defender colonist on mountains: (1 * 2.0) * 0.5 = 1.0
-    const result = CombatSystem.resolveCombat(attacker, defenderUnit, mountainTile);
+    const result = CombatSystem.resolveCombat(
+      attacker,
+      defenderUnit,
+      mountainTile,
+    );
 
     expect(result.winner).toBe('attacker');
 
@@ -79,14 +102,24 @@ describe('CombatSystem', () => {
     // Our implementation:
     // if (defenderColony && defenderColony.buildings.includes(BuildingType.STOCKADE)) { defenderModifier *= 1.5; }
 
-    const result = CombatSystem.resolveCombat(attacker, defenderUnit, flatTile, colony);
+    const result = CombatSystem.resolveCombat(
+      attacker,
+      defenderUnit,
+      flatTile,
+      colony,
+    );
     expect(result.winner).toBe('attacker');
 
     // Let's test a case where defender wins due to stockade
     // Attacker colonist: 1 * 0.5 = 0.5
     // Defender colonist with stockade: (1 * 1.5) * 0.5 = 0.75
     const attackerColonist = new Unit('u4', 'p1', UnitType.COLONIST, 0, 0, 3);
-    const result2 = CombatSystem.resolveCombat(attackerColonist, defenderUnit, flatTile, colony);
+    const result2 = CombatSystem.resolveCombat(
+      attackerColonist,
+      defenderUnit,
+      flatTile,
+      colony,
+    );
     expect(result2.winner).toBe('defender');
 
     randomSpy.mockRestore();
@@ -99,14 +132,24 @@ describe('CombatSystem', () => {
     // Attacker soldier: 3 * 0.5 = 1.5
     // Defender colonist in colony with stockade: (1 * 1.5) * 0.5 = 0.75
     // Attacker wins
-    const result = CombatSystem.resolveCombat(attacker, defenderUnit, flatTile, colony);
+    const result = CombatSystem.resolveCombat(
+      attacker,
+      defenderUnit,
+      flatTile,
+      colony,
+    );
     expect(result.winner).toBe('attacker');
 
     // Attacker colonist: 1 * 0.5 = 0.5
     // Defender colonist with stockade: 0.75
     // Defender wins
     const attackerColonist = new Unit('u4', 'p1', UnitType.COLONIST, 0, 0, 3);
-    const result2 = CombatSystem.resolveCombat(attackerColonist, defenderUnit, flatTile, colony);
+    const result2 = CombatSystem.resolveCombat(
+      attackerColonist,
+      defenderUnit,
+      flatTile,
+      colony,
+    );
     expect(result2.winner).toBe('defender');
 
     randomSpy.mockRestore();
@@ -124,7 +167,11 @@ describe('CombatSystem', () => {
     // Attacker colonist: 1 * 0.5 = 0.5
     // Native settlement base 2 * 1.2 * 0.5 = 1.2
     const attackerColonist = new Unit('u4', 'p1', UnitType.COLONIST, 0, 0, 3);
-    const result2 = CombatSystem.resolveCombat(attackerColonist, settlement, flatTile);
+    const result2 = CombatSystem.resolveCombat(
+      attackerColonist,
+      settlement,
+      flatTile,
+    );
     expect(result2.winner).toBe('defender');
 
     randomSpy.mockRestore();
@@ -140,7 +187,11 @@ describe('CombatSystem', () => {
     // Actually attackerRoll > defenderRoll is what I wrote.
 
     randomSpy.mockReturnValueOnce(1.0).mockReturnValueOnce(0.9);
-    const result = CombatSystem.resolveCombat(attackerShip, defenderShip, flatTile);
+    const result = CombatSystem.resolveCombat(
+      attackerShip,
+      defenderShip,
+      flatTile,
+    );
     expect(result.winner).toBe('attacker');
 
     randomSpy.mockRestore();

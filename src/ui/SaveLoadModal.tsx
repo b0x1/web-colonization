@@ -12,11 +12,14 @@ export const SaveLoadModal: React.FC = () => {
   const gameState = useGameStore((state) => state);
   const resetGame = useGameStore((state) => state.resetGame);
 
-  const [saves, setSaves] = useState<SaveMeta[]>([]);
+  const [saves, setSaves] = useState<SaveMeta[]>(() =>
+    isSaveModalOpen ? SaveSystem.listSaves() : [],
+  );
 
   useEffect(() => {
     if (isSaveModalOpen) {
-      setSaves(SaveSystem.listSaves());
+      const allSaves = SaveSystem.listSaves();
+      setSaves(allSaves);
     }
   }, [isSaveModalOpen]);
 
@@ -47,11 +50,17 @@ export const SaveLoadModal: React.FC = () => {
     <div className="absolute inset-0 bg-black/80 flex items-center justify-center z-[2000] pointer-events-auto backdrop-blur-sm">
       <div className="bg-slate-800 text-white p-6 rounded-xl w-[500px] max-h-[80vh] overflow-y-auto border border-slate-500 shadow-2xl">
         <div className="flex justify-between items-center mb-6">
-          <h2 className="text-2xl font-black uppercase tracking-tight">Save / Load Game</h2>
+          <h2 className="text-2xl font-black uppercase tracking-tight">
+            Save / Load Game
+          </h2>
           <div className="flex gap-2">
             <button
               onClick={() => {
-                if (confirm('Are you sure you want to return to the main menu? Unsaved progress will be lost.')) {
+                if (
+                  confirm(
+                    'Are you sure you want to return to the main menu? Unsaved progress will be lost.',
+                  )
+                ) {
                   resetGame();
                   setSaveModalOpen(false);
                 }
@@ -70,11 +79,15 @@ export const SaveLoadModal: React.FC = () => {
         </div>
 
         <div className="mb-8">
-          <h3 className="text-lg font-bold mb-3 text-blue-400 border-b border-slate-700 pb-1">Autosave</h3>
+          <h3 className="text-lg font-bold mb-3 text-blue-400 border-b border-slate-700 pb-1">
+            Autosave
+          </h3>
           {autoSave ? (
             <div className="flex justify-between items-center p-4 bg-slate-900/50 rounded-lg border border-slate-700 hover:border-slate-500 transition-colors">
               <div>
-                <div className="font-bold">Turn {autoSave.turn} - {autoSave.playerName}</div>
+                <div className="font-bold">
+                  Turn {autoSave.turn} - {autoSave.playerName}
+                </div>
                 <div className="text-xs text-slate-400 mt-1">
                   {new Date(autoSave.timestamp).toLocaleString()}
                 </div>
@@ -87,11 +100,15 @@ export const SaveLoadModal: React.FC = () => {
               </button>
             </div>
           ) : (
-            <div className="p-4 text-slate-500 italic bg-slate-900/30 rounded-lg border border-slate-800">No autosave found</div>
+            <div className="p-4 text-slate-500 italic bg-slate-900/30 rounded-lg border border-slate-800">
+              No autosave found
+            </div>
           )}
         </div>
 
-        <h3 className="text-lg font-bold mb-3 text-blue-400 border-b border-slate-700 pb-1">Manual Saves</h3>
+        <h3 className="text-lg font-bold mb-3 text-blue-400 border-b border-slate-700 pb-1">
+          Manual Saves
+        </h3>
         <div className="space-y-3">
           {slots.map((slot) => {
             const save = saves.find((s) => s.slotName === slot);
@@ -104,13 +121,17 @@ export const SaveLoadModal: React.FC = () => {
                   <div className="font-black text-slate-300">Slot {slot}</div>
                   {save ? (
                     <>
-                      <div className="font-bold">Turn {save.turn} - {save.playerName}</div>
+                      <div className="font-bold">
+                        Turn {save.turn} - {save.playerName}
+                      </div>
                       <div className="text-xs text-slate-400 mt-1">
                         {new Date(save.timestamp).toLocaleString()}
                       </div>
                     </>
                   ) : (
-                    <div className="text-sm text-slate-500 italic mt-1">Empty</div>
+                    <div className="text-sm text-slate-500 italic mt-1">
+                      Empty
+                    </div>
                   )}
                 </div>
                 <div className="flex gap-2">

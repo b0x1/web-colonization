@@ -110,7 +110,13 @@ export class SaveSystem {
 
   private static hydrateState(data: SaveData): any {
     const players = data.players.map((pData) => {
-      const player = new Player(pData.id, pData.name, pData.isHuman, pData.gold, pData.nation);
+      const player = new Player(
+        pData.id,
+        pData.name,
+        pData.isHuman,
+        pData.gold,
+        pData.nation,
+      );
       player.units = pData.units.map((uData: any) => {
         const unit = new Unit(
           uData.id,
@@ -118,7 +124,7 @@ export class SaveSystem {
           uData.type,
           uData.x,
           uData.y,
-          uData.movesRemaining
+          uData.movesRemaining,
         );
         unit.cargo = uData.cargo;
         unit.maxMoves = uData.maxMoves;
@@ -131,7 +137,7 @@ export class SaveSystem {
           cData.name,
           cData.x,
           cData.y,
-          cData.population
+          cData.population,
         );
         colony.buildings = cData.buildings;
         colony.inventory = cData.inventory;
@@ -144,7 +150,7 @@ export class SaveSystem {
             uData.type,
             uData.x,
             uData.y,
-            uData.movesRemaining
+            uData.movesRemaining,
           );
           unit.cargo = uData.cargo;
           unit.maxMoves = uData.maxMoves;
@@ -163,10 +169,10 @@ export class SaveSystem {
           tData.y,
           tData.terrainType,
           tData.movementCost,
-          tData.hasResource
+          tData.hasResource,
         );
         return tile;
-      })
+      }),
     );
 
     const nativeSettlements = data.nativeSettlements.map((sData) => {
@@ -178,7 +184,7 @@ export class SaveSystem {
         sData.y,
         sData.population,
         sData.attitude,
-        sData.goods
+        sData.goods,
       );
       return settlement;
     });
