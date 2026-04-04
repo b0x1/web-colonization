@@ -40,12 +40,12 @@ export const EuropeScreen: React.FC = () => {
           marginBottom: '20px',
         }}
       >
-        <h2>Old World Trade</h2>
+        <h2>Europe Trade</h2>
         <button
           onClick={() => setEuropeScreenOpen(false)}
           style={{ padding: '10px 20px', cursor: 'pointer' }}
         >
-          Return to Map
+          Return to Colony
         </button>
       </div>
 

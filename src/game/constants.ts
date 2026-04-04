@@ -1,5 +1,3 @@
-import { BuildingType, UnitType } from './entities/types';
-
 export const MAP_CONSTANTS = {
   TILE_SIZE: 32,
   WIDTH: 80,
@@ -13,8 +11,8 @@ export const MAP_CONSTANTS = {
 export const UNIT_CONSTANTS = {
   DEFAULT_MOVES: 3,
   SHIP_MOVES: 6,
-  FRONTIERSMAN_MOVES: 3,
-  MILITIA_MOVES: 3,
+  PIONEER_MOVES: 3,
+  SOLDIER_MOVES: 3,
   ANIMATION_DURATION: 200,
 } as const;
 
@@ -26,16 +24,16 @@ export const COLONY_CONSTANTS = {
 } as const;
 
 export const BUILDING_COSTS = {
-  SAWMILL: 100,
+  LUMBER_MILL: 100,
   IRON_WORKS: 150,
   SCHOOLHOUSE: 120,
   WAREHOUSE: 80,
-  FORTIFICATION: 200,
-  PUBLISHING_HOUSE: 180,
+  STOCKADE: 200,
+  PRINTING_PRESS: 180,
 } as const;
 
 export const RECRUITMENT_COSTS = {
-  SETTLER: 500,
-  MILITIA: 800,
-  FRONTIERSMAN: 650,
+  COLONIST: 500,
+  SOLDIER: 800,
+  PIONEER: 650,
 } as const;

@@ -23,7 +23,7 @@ describe('TurnEngine', () => {
     it('should calculate food based on workforce and population consumption', () => {
       const player = new Player('p1', 'Player 1', true, 0);
       const colony = new Colony('c1', 'p1', 'Colony 1', 2, 2, 1);
-      const unit = new Unit('u1', 'p1', UnitType.SETTLER, 2, 2, 1);
+      const unit = new Unit('u1', 'p1', UnitType.COLONIST, 2, 2, 1);
       colony.units.push(unit);
       colony.workforce.set(unit.id, JobType.FARMER);
       player.colonies.push(colony);
@@ -47,7 +47,7 @@ describe('TurnEngine', () => {
 
       const human = new Player('p1', 'Human', true, 0);
       const ai = new Player('p2', 'AI', false, 0);
-      const unit = new Unit('u1', 'p2', UnitType.MILITIA, 0, 0, 1);
+      const unit = new Unit('u1', 'p2', UnitType.SOLDIER, 0, 0, 1);
       ai.units.push(unit);
 
       const updatedPlayers = TurnEngine.runAITurn([human, ai], map);
@@ -60,12 +60,12 @@ describe('TurnEngine', () => {
       expect(updatedUnit.movesRemaining).toBe(0);
     });
 
-    it('should found a colony if AI SETTLER is on PLAINS and no adjacent friendly colony', () => {
+    it('should found a colony if AI COLONIST is on PLAINS and no adjacent friendly colony', () => {
       const map = createMap(10, 10);
       map[2][2].terrainType = TerrainType.PLAINS;
 
       const ai = new Player('p1', 'AI', false, 0);
-      const unit = new Unit('u1', 'p1', UnitType.SETTLER, 2, 2, 1);
+      const unit = new Unit('u1', 'p1', UnitType.COLONIST, 2, 2, 1);
       ai.units.push(unit);
 
       const updatedPlayers = TurnEngine.runAITurn([ai], map);
@@ -84,7 +84,7 @@ describe('TurnEngine', () => {
         const ai = new Player('p1', 'AI', false, 0);
         const colony = new Colony('c1', 'p1', 'Col1', 3, 3, 1);
         ai.colonies.push(colony);
-        const unit = new Unit('u1', 'p1', UnitType.SETTLER, 2, 2, 1);
+        const unit = new Unit('u1', 'p1', UnitType.COLONIST, 2, 2, 1);
         ai.units.push(unit);
 
         const updatedPlayers = TurnEngine.runAITurn([ai], map);

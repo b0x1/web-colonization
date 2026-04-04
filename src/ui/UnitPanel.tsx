@@ -1,6 +1,5 @@
 import React from 'react';
 import { useGameStore } from '../game/state/gameStore';
-import { UnitType } from '../game/entities/types';
 
 export const UnitPanel: React.FC = () => {
   const { selectedUnitId, players, endTurn } = useGameStore();
@@ -43,7 +42,7 @@ export const UnitPanel: React.FC = () => {
           </ul>
         )}
       </div>
-      {unit.type === UnitType.SETTLER && (
+      {unit.type === 'COLONIST' && (
         <button
           onClick={() => foundColony(unit.id)}
           style={{

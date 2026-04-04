@@ -23,7 +23,7 @@ export const NativeTradeModal: React.FC = () => {
 
   if (!settlement || !unit) return null;
 
-  const canLearn = unit.type === UnitType.SETTLER && settlement.attitude === Attitude.FRIENDLY;
+  const canLearn = unit.type === UnitType.COLONIST && settlement.attitude === Attitude.FRIENDLY;
   const cargoGoods = Array.from(unit.cargo.entries()).filter(([_, amount]) => amount > 0);
 
   return (
@@ -74,13 +74,13 @@ export const NativeTradeModal: React.FC = () => {
 
       {canLearn && (
         <div style={{ marginTop: '20px' }}>
-          <h4>Learn Frontier Skills</h4>
-          <p>The locals are willing to share their knowledge.</p>
+          <h4>Learn Land Skills</h4>
+          <p>The natives are willing to teach you their ways.</p>
           <button
             onClick={() => learnFromNativeSettlement(settlement.id, unit.id)}
             style={{ padding: '5px 10px', cursor: 'pointer' }}
           >
-            Train as Frontiersman
+            Train as Pioneer
           </button>
         </div>
       )}

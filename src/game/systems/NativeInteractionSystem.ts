@@ -75,14 +75,14 @@ export class NativeInteractionSystem {
       throw new Error('Settlement is not friendly enough to teach');
     }
 
-    if (unit.type !== UnitType.SETTLER) {
-      throw new Error('Only settlers can learn from natives');
+    if (unit.type !== UnitType.COLONIST) {
+      throw new Error('Only colonists can learn from natives');
     }
 
     const updatedUnit = new Unit(
       unit.id,
       unit.ownerId,
-      UnitType.FRONTIERSMAN,
+      UnitType.PIONEER,
       unit.x,
       unit.y,
       unit.movesRemaining

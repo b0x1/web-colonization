@@ -123,9 +123,9 @@ export function generateUnitTextures(scene: Phaser.Scene, tileSize: number) {
   const graphics = scene.make.graphics({ x: 0, y: 0 });
 
   const units = [
-    { type: UnitType.SETTLER, color: 0xffffff, label: 'S', shape: 'circle' },
-    { type: UnitType.MILITIA, color: 0xff0000, label: 'M', shape: 'circle' },
-    { type: UnitType.FRONTIERSMAN, color: 0x8b4513, label: 'F', shape: 'circle' },
+    { type: UnitType.COLONIST, color: 0xffffff, label: 'C', shape: 'circle' },
+    { type: UnitType.SOLDIER, color: 0xff0000, label: 'S', shape: 'circle' },
+    { type: UnitType.PIONEER, color: 0x8b4513, label: 'P', shape: 'circle' },
     { type: UnitType.SHIP, color: 0x0000ff, label: 'Sh', shape: 'square' },
   ];
 

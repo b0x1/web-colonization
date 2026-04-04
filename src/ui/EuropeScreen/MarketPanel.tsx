@@ -3,7 +3,7 @@ import { useGameStore } from '../../game/state/gameStore';
 import { GoodType } from '../../game/entities/types';
 
 export const MarketPanel: React.FC = () => {
-  const { oldWorldPrices, players, currentPlayerId, selectedUnitId, sellGood, buyGood } =
+  const { europePrices, players, currentPlayerId, selectedUnitId, sellGood, buyGood } =
     useGameStore();
   const player = players.find((p) => p.id === currentPlayerId);
   const selectedUnit = player?.units.find((u) => u.id === selectedUnitId);
@@ -33,7 +33,7 @@ export const MarketPanel: React.FC = () => {
         </thead>
         <tbody>
           {Object.values(GoodType).map((good) => {
-            const price = oldWorldPrices[good];
+            const price = europePrices[good];
             const cargo = selectedUnit.cargo.get(good) || 0;
             return (
               <tr key={good} style={{ borderBottom: '1px solid rgba(255, 255, 255, 0.1)' }}>
