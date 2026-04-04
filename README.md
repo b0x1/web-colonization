@@ -2,7 +2,7 @@
 
 An open-source turn-based strategy game inspired by the classic
 genre-defining work of art Sid Meier's Colonization,
-implemetend by a meat blob prompting [Claude](https://claude.ai) to prompt
+implemented by a meat blob prompting [Claude](https://claude.ai) to prompt
 [Jules](https://jules.google.com/).
 
 ## Tech Stack
