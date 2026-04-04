@@ -17,7 +17,9 @@ async function get_config(type) {
   }
 }
 
-const CONFIGS = [await get_config('terrain'), await get_config('units')];
+const CONFIGS = await Promise.all(
+  ['resources', 'terrain', 'units'].map(key => get_config(key))
+);
 
 async function checkCache(inputDir, hashCacheFile) {
   const allFiles = [];
