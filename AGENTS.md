@@ -7,7 +7,7 @@ refactoring behaviour for this project. Read it fully before planning any task.
 
 ## Project overview
 
-A browser-based remake of Sid Meier's Colonization built with:
+A browser-based strategy game inspired by classic 17th-century colonial strategy games built with:
 - **Phaser 3** — game rendering, input, scenes, tweens
 - **React 18** — all UI panels, modals, HUD overlays
 - **Zustand** — shared state bridge between Phaser and React

@@ -8,9 +8,9 @@ export const RecruitPanel: React.FC = () => {
   const selectedUnit = player?.units.find((u) => u.id === selectedUnitId);
 
   const unitsToRecruit = [
-    { type: UnitType.COLONIST, cost: 500, requirement: 'None' },
-    { type: UnitType.SOLDIER, cost: 800, requirement: '50 Muskets' },
-    { type: UnitType.PIONEER, cost: 650, requirement: 'None' },
+    { type: UnitType.SETTLER, cost: 500, requirement: 'None' },
+    { type: UnitType.MILITIA, cost: 800, requirement: '50 Firearms' },
+    { type: UnitType.FRONTIERSMAN, cost: 650, requirement: 'None' },
   ];
 
   if (!selectedUnit || selectedUnit.type !== UnitType.SHIP) return null;
@@ -27,9 +27,9 @@ export const RecruitPanel: React.FC = () => {
       <div style={{ display: 'flex', gap: '20px' }}>
         {unitsToRecruit.map((u) => {
           const canAffordGold = (player?.gold || 0) >= u.cost;
-          const hasMuskets =
-            u.type !== UnitType.SOLDIER || (selectedUnit.cargo.get(GoodType.MUSKETS) || 0) >= 50;
-          const canRecruit = canAffordGold && hasMuskets;
+          const hasFirearms =
+            u.type !== UnitType.MILITIA || (selectedUnit.cargo.get(GoodType.FIREARMS) || 0) >= 50;
+          const canRecruit = canAffordGold && hasFirearms;
 
           return (
             <div

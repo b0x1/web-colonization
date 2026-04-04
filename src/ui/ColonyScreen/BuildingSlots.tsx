@@ -3,12 +3,12 @@ import { BuildingType } from '../../game/entities/types';
 import { useGameStore } from '../../game/state/gameStore';
 
 const BUILDINGS_LIST = [
-  { type: BuildingType.LUMBER_MILL, name: 'Lumber Mill', bonus: '+2 LUMBER/turn', cost: 100 },
+  { type: BuildingType.SAWMILL, name: 'Sawmill', bonus: '+2 LUMBER/turn', cost: 100 },
   { type: BuildingType.IRON_WORKS, name: 'Iron Works', bonus: '+2 ORE/turn', cost: 150 },
-  { type: BuildingType.SCHOOLHOUSE, name: 'Schoolhouse', bonus: 'Unlocks PIONEER', cost: 120 },
+  { type: BuildingType.SCHOOLHOUSE, name: 'Schoolhouse', bonus: 'Unlocks FRONTIERSMAN', cost: 120 },
   { type: BuildingType.WAREHOUSE, name: 'Warehouse', bonus: '400 Storage', cost: 80 },
-  { type: BuildingType.STOCKADE, name: 'Stockade', bonus: '+2 Defense', cost: 200 },
-  { type: BuildingType.PRINTING_PRESS, name: 'Printing Press', bonus: '+1 Growth', cost: 180 },
+  { type: BuildingType.FORTIFICATION, name: 'Fortification', bonus: '+2 Defense', cost: 200 },
+  { type: BuildingType.PUBLISHING_HOUSE, name: 'Publishing House', bonus: '+1 Growth', cost: 180 },
 ];
 
 interface Props {

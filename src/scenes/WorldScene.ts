@@ -82,10 +82,10 @@ export class WorldScene extends Phaser.Scene {
       const startX = 40;
       const startY = 30;
       humanPlayer.units = [
-        new Unit('u1', 'player-1', UnitType.COLONIST, startX, startY, 3),
-        new Unit('u2', 'player-1', UnitType.COLONIST, startX, startY, 3),
-        new Unit('u3', 'player-1', UnitType.SOLDIER, startX + 1, startY, 3),
-        new Unit('u4', 'player-1', UnitType.PIONEER, startX, startY + 1, 3),
+        new Unit('u1', 'player-1', UnitType.SETTLER, startX, startY, 3),
+        new Unit('u2', 'player-1', UnitType.SETTLER, startX, startY, 3),
+        new Unit('u3', 'player-1', UnitType.MILITIA, startX + 1, startY, 3),
+        new Unit('u4', 'player-1', UnitType.FRONTIERSMAN, startX, startY + 1, 3),
       ];
 
       let shipX = startX;
@@ -151,12 +151,12 @@ export class WorldScene extends Phaser.Scene {
 
           if (selectedUnit) {
             if (
-              selectedUnit.type === UnitType.SOLDIER &&
+              selectedUnit.type === UnitType.MILITIA &&
               nativeSettlementAtTile.attitude === Attitude.HOSTILE
             ) {
               useGameStore.getState().attackNativeSettlement(nativeSettlementAtTile.id, selectedUnitId);
             } else if (
-              selectedUnit.type === UnitType.COLONIST &&
+              selectedUnit.type === UnitType.SETTLER &&
               nativeSettlementAtTile.attitude !== Attitude.HOSTILE
             ) {
               useGameStore.getState().setNativeTradeModalOpen(true, nativeSettlementAtTile.id);

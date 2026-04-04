@@ -34,7 +34,7 @@ export const HUD: React.FC = () => {
         onClick={() => setEuropeScreenOpen(true)}
         style={{ cursor: hasShip ? 'pointer' : 'not-allowed' }}
       >
-        Sail to Europe
+        Return Home
       </button>
     </div>
   );

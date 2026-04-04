@@ -21,7 +21,7 @@ export interface GameState {
   isEuropeScreenOpen: boolean;
   isNativeTradeModalOpen: boolean;
   activeSettlementId: string | null;
-  europePrices: Record<GoodType, number>;
+  oldWorldPrices: Record<GoodType, number>;
   map: Tile[][];
   nativeSettlements: NativeSettlement[];
 
@@ -54,15 +54,15 @@ export const useGameStore = create<GameState>((set, get) => ({
   isEuropeScreenOpen: false,
   isNativeTradeModalOpen: false,
   activeSettlementId: null,
-  europePrices: {
+  oldWorldPrices: {
     [GoodType.FOOD]: 1,
     [GoodType.LUMBER]: 2,
     [GoodType.ORE]: 3,
-    [GoodType.TOBACCO]: 4,
-    [GoodType.COTTON]: 3,
-    [GoodType.FURS]: 5,
-    [GoodType.TRADE_GOODS]: 6,
-    [GoodType.MUSKETS]: 8,
+    [GoodType.LEAF_CROP]: 4,
+    [GoodType.FIBER_CROP]: 3,
+    [GoodType.PELTS]: 5,
+    [GoodType.TOOLS]: 6,
+    [GoodType.FIREARMS]: 8,
   },
   map: [],
   nativeSettlements: [],
@@ -200,7 +200,7 @@ export const useGameStore = create<GameState>((set, get) => ({
       if (!player) return state;
 
       const unit = player.units.find((u) => u.id === unitId);
-      if (!unit || unit.type !== UnitType.COLONIST) return state;
+      if (!unit || unit.type !== UnitType.SETTLER) return state;
 
       const newColony = new Colony(
         `colony-${Date.now()}-${Math.floor(Math.random() * 1000)}`,
@@ -234,10 +234,10 @@ export const useGameStore = create<GameState>((set, get) => ({
       const buildingCosts: Record<string, number> = {
         ...BUILDING_COSTS,
         [BuildingType.TOWN_HALL]: 0,
-        [BuildingType.CARPENTERS_SHOP]: 0,
+        [BuildingType.WOOD_WORKSHOP]: 0,
         [BuildingType.BLACKSMITHS_HOUSE]: 0,
         [BuildingType.BLACKSMITHS_SHOP]: 0,
-        [BuildingType.STABLES]: 0,
+        [BuildingType.CORRAL]: 0,
       };
 
       const cost = buildingCosts[building] || 0;
@@ -307,7 +307,7 @@ export const useGameStore = create<GameState>((set, get) => ({
       const actualSellAmount = Math.min(amount, cargoAmount);
       if (actualSellAmount <= 0) return state;
 
-      const price = state.europePrices[good];
+      const price = state.oldWorldPrices[good];
       const goldGained = actualSellAmount * price;
 
       const updatedPlayers = state.players.map((p) => {
@@ -330,12 +330,12 @@ export const useGameStore = create<GameState>((set, get) => ({
         return p;
       });
 
-      const newPrices = { ...state.europePrices };
+      const newPrices = { ...state.oldWorldPrices };
       if (actualSellAmount > 20) {
         newPrices[good] = Math.max(1, price - 1);
       }
 
-      return { players: updatedPlayers, europePrices: newPrices };
+      return { players: updatedPlayers, oldWorldPrices: newPrices };
     }),
 
   buyGood: (unitId, good, amount) =>
@@ -346,7 +346,7 @@ export const useGameStore = create<GameState>((set, get) => ({
       const unit = player.units.find((u) => u.id === unitId);
       if (!unit) return state;
 
-      const price = state.europePrices[good];
+      const price = state.oldWorldPrices[good];
       const cost = amount * price;
       if (player.gold < cost) return state;
 
@@ -489,11 +489,11 @@ export const useGameStore = create<GameState>((set, get) => ({
       const goldCost = costs[unitType] || 0;
       if (player.gold < goldCost) return state;
 
-      let musketsToConsume = 0;
-      if (unitType === UnitType.SOLDIER) {
-        musketsToConsume = 50;
-        const currentMuskets = selectedUnit.cargo.get(GoodType.MUSKETS) || 0;
-        if (currentMuskets < musketsToConsume) return state;
+      let firearmsToConsume = 0;
+      if (unitType === UnitType.MILITIA) {
+        firearmsToConsume = 50;
+        const currentFirearms = selectedUnit.cargo.get(GoodType.FIREARMS) || 0;
+        if (currentFirearms < firearmsToConsume) return state;
       }
 
       const updatedPlayers = state.players.map((p) => {
@@ -508,13 +508,13 @@ export const useGameStore = create<GameState>((set, get) => ({
           );
 
           const updatedUnits = p.units.map((u) => {
-            if (u.id === selectedUnit.id && musketsToConsume > 0) {
+            if (u.id === selectedUnit.id && firearmsToConsume > 0) {
               const updatedShip = new Unit(u.id, u.ownerId, u.type, u.x, u.y, u.movesRemaining);
               updatedShip.maxMoves = u.maxMoves;
               updatedShip.cargo = new Map(u.cargo);
               updatedShip.cargo.set(
-                GoodType.MUSKETS,
-                (u.cargo.get(GoodType.MUSKETS) || 0) - musketsToConsume,
+                GoodType.FIREARMS,
+                (u.cargo.get(GoodType.FIREARMS) || 0) - firearmsToConsume,
               );
               return updatedShip;
             }

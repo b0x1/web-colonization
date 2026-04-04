@@ -1,6 +1,6 @@
 # Web Colonization
 
-A browser-based re-implementation of the classic Sid Meier's Colonization,
+A browser-based strategy game inspired by classic 17th-century colonial strategy games,
 implemetend by a meat blob prompting [Claude](https://claude.ai) to prompt [Jules](https://jules.google.com/).
 
 ## Tech Stack

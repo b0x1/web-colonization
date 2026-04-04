@@ -17,12 +17,12 @@ export const InventoryPanel: React.FC<Props> = ({ inventory, workforce, building
       if (job === JobType.FARMER && good === GoodType.FOOD) prod += 3;
       if (job === JobType.LUMBERJACK && good === GoodType.LUMBER) prod += 3;
       if (job === JobType.MINER && good === GoodType.ORE) prod += 3;
-      if (job === JobType.TOBACCONIST && good === GoodType.TOBACCO) prod += 3;
-      if (job === JobType.WEAVER && good === GoodType.TRADE_GOODS) prod += 3;
+      if (job === JobType.TOBACCONIST && good === GoodType.LEAF_CROP) prod += 3;
+      if (job === JobType.WEAVER && good === GoodType.TOOLS) prod += 3;
     });
 
     // Building bonuses
-    if (good === GoodType.LUMBER && buildings.includes(BuildingType.LUMBER_MILL)) prod += 2;
+    if (good === GoodType.LUMBER && buildings.includes(BuildingType.SAWMILL)) prod += 2;
     if (good === GoodType.ORE && buildings.includes(BuildingType.IRON_WORKS)) prod += 2;
 
     // Food consumption

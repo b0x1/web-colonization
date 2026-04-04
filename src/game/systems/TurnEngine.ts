@@ -48,10 +48,10 @@ export class TurnEngine {
               good = GoodType.ORE;
               break;
             case JobType.TOBACCONIST:
-              good = GoodType.TOBACCO;
+              good = GoodType.LEAF_CROP;
               break;
             case JobType.WEAVER:
-              good = GoodType.TRADE_GOODS;
+              good = GoodType.TOOLS;
               break;
           }
 
@@ -61,7 +61,7 @@ export class TurnEngine {
         });
 
         // 2. Add Building Bonuses
-        if (newColony.buildings.includes(BuildingType.LUMBER_MILL)) {
+        if (newColony.buildings.includes(BuildingType.SAWMILL)) {
           newColony.inventory.set(
             GoodType.LUMBER,
             (newColony.inventory.get(GoodType.LUMBER) || 0) + 2,
@@ -72,7 +72,7 @@ export class TurnEngine {
         }
 
         // 3. Population Growth & Food Consumption
-        if (newColony.buildings.includes(BuildingType.PRINTING_PRESS)) {
+        if (newColony.buildings.includes(BuildingType.PUBLISHING_HOUSE)) {
           // The issue says +1 population growth/turn
           // For simplicity, we just add it to population
           newColony.population += 1;
@@ -89,23 +89,6 @@ export class TurnEngine {
             newColony.inventory.set(good, cap);
           }
         });
-
-        // (Keeping the original tile production logic if any - but wait, the instructions imply job-based now)
-        // Original code had this:
-        /*
-        for (let dy = -1; dy <= 1; dy++) {
-          for (let dx = -1; dx <= 1; dx++) {
-            const tx = colony.x + dx;
-            const ty = colony.y + dy;
-            if (ty >= 0 && ty < map.length && tx >= 0 && tx < map[ty].length) {
-              const tile = map[ty][tx];
-              this.addTileProduction(newColony, tile);
-            }
-          }
-        }
-        */
-        // Based on the prompt "WorkforcePanel: list of colonist units assigned to this colony. Each colonist has a dropdown to assign their job",
-        // it seems I should replace the tile-based production with job-based production.
 
         return newColony;
       });
@@ -152,8 +135,8 @@ export class TurnEngine {
 
         let unitRemoved = false;
 
-        // Check if colonist can found a colony
-        if (unit.type === UnitType.COLONIST) {
+        // Check if settler can found a colony
+        if (unit.type === UnitType.SETTLER) {
           const currentTile = map[unit.y][unit.x];
           if (currentTile.terrainType === TerrainType.PLAINS) {
             const hasAdjacentFriendlyColony = player.colonies.some(

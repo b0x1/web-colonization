@@ -2,11 +2,11 @@ export const GoodType = {
   FOOD: 'FOOD',
   LUMBER: 'LUMBER',
   ORE: 'ORE',
-  TOBACCO: 'TOBACCO',
-  COTTON: 'COTTON',
-  FURS: 'FURS',
-  TRADE_GOODS: 'TRADE_GOODS',
-  MUSKETS: 'MUSKETS',
+  LEAF_CROP: 'LEAF_CROP',
+  FIBER_CROP: 'FIBER_CROP',
+  PELTS: 'PELTS',
+  TOOLS: 'TOOLS',
+  FIREARMS: 'FIREARMS',
 } as const;
 export type GoodType = (typeof GoodType)[keyof typeof GoodType];
 
@@ -19,9 +19,9 @@ export const ResourceType = {
 export type ResourceType = (typeof ResourceType)[keyof typeof ResourceType];
 
 export const UnitType = {
-  COLONIST: 'COLONIST',
-  SOLDIER: 'SOLDIER',
-  PIONEER: 'PIONEER',
+  SETTLER: 'SETTLER',
+  MILITIA: 'MILITIA',
+  FRONTIERSMAN: 'FRONTIERSMAN',
   SHIP: 'SHIP',
 } as const;
 export type UnitType = (typeof UnitType)[keyof typeof UnitType];
@@ -45,16 +45,16 @@ export type TerrainType = (typeof TerrainType)[keyof typeof TerrainType];
 
 export const BuildingType = {
   TOWN_HALL: 'TOWN_HALL',
-  CARPENTERS_SHOP: 'CARPENTERS_SHOP',
-  LUMBER_MILL: 'LUMBER_MILL',
+  WOOD_WORKSHOP: 'WOOD_WORKSHOP',
+  SAWMILL: 'SAWMILL',
   BLACKSMITHS_HOUSE: 'BLACKSMITHS_HOUSE',
   BLACKSMITHS_SHOP: 'BLACKSMITHS_SHOP',
   IRON_WORKS: 'IRON_WORKS',
-  STABLES: 'STABLES',
+  CORRAL: 'CORRAL',
   WAREHOUSE: 'WAREHOUSE',
   SCHOOLHOUSE: 'SCHOOLHOUSE',
-  STOCKADE: 'STOCKADE',
-  PRINTING_PRESS: 'PRINTING_PRESS',
+  FORTIFICATION: 'FORTIFICATION',
+  PUBLISHING_HOUSE: 'PUBLISHING_HOUSE',
 } as const;
 export type BuildingType = (typeof BuildingType)[keyof typeof BuildingType];
 
@@ -77,10 +77,10 @@ export const TurnPhase = {
 export type TurnPhase = (typeof TurnPhase)[keyof typeof TurnPhase];
 
 export const Tribe = {
-  AZTEC: 'AZTEC',
-  IROQUOIS: 'IROQUOIS',
-  CHEROKEE: 'CHEROKEE',
-  SIOUX: 'SIOUX',
+  NAHUATL: 'NAHUATL',
+  HAUDENOSAUNEE: 'HAUDENOSAUNEE',
+  TSALAGI: 'TSALAGI',
+  LAKOTA: 'LAKOTA',
 } as const;
 export type Tribe = (typeof Tribe)[keyof typeof Tribe];
 
