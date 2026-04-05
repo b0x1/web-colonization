@@ -9,6 +9,6 @@ export class NativeSettlement {
     public readonly y: number,
     public population: number,
     public attitude: Attitude,
-    public goods: Map<GoodType, number> = new Map(),
+    public goods: Map<GoodType, number> = new Map()
   ) {}
 }

@@ -73,13 +73,10 @@ export const MiniMap: React.FC = () => {
   if (isMainMenuOpen) return null;
 
   const handlePointerAction = (e: React.PointerEvent<HTMLDivElement>) => {
-    if (!canvasRef.current || (e.buttons !== 1 && e.type !== 'pointerdown'))
-      return;
+    if (!canvasRef.current || (e.buttons !== 1 && e.type !== 'pointerdown')) return;
 
     const rect = canvasRef.current.getBoundingClientRect();
-    const x = Math.floor(
-      ((e.clientX - rect.left) / rect.width) * map[0].length,
-    );
+    const x = Math.floor(((e.clientX - rect.left) / rect.width) * map[0].length);
     const y = Math.floor(((e.clientY - rect.top) / rect.height) * map.length);
 
     if (x >= 0 && x < map[0].length && y >= 0 && y < map.length) {

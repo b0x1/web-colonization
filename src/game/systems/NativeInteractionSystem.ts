@@ -6,7 +6,7 @@ export class NativeInteractionSystem {
   static trade(
     settlement: NativeSettlement,
     unit: Unit,
-    goodOffered: GoodType,
+    goodOffered: GoodType
   ): {
     updatedSettlement: NativeSettlement;
     updatedUnit: Unit;
@@ -25,31 +25,18 @@ export class NativeInteractionSystem {
     const updatedSettlementGoods = new Map(settlement.goods);
     updatedSettlementGoods.set(
       goodOffered,
-      (updatedSettlementGoods.get(goodOffered) || 0) + amountOffered,
+      (updatedSettlementGoods.get(goodOffered) || 0) + amountOffered
     );
 
     // Native gives a random good from their inventory
-    const nativeGoods = Array.from(settlement.goods.keys()).filter(
-      (g) => (settlement.goods.get(g) || 0) > 0,
-    );
-    const goodReceived =
-      nativeGoods[Math.floor(Math.random() * nativeGoods.length)] ||
-      GoodType.FOOD;
-    const amountReceived = Math.min(
-      20,
-      settlement.goods.get(goodReceived) || 10,
-    );
+    const nativeGoods = Array.from(settlement.goods.keys()).filter(g => (settlement.goods.get(g) || 0) > 0);
+    const goodReceived = nativeGoods[Math.floor(Math.random() * nativeGoods.length)] || GoodType.FOOD;
+    const amountReceived = Math.min(20, settlement.goods.get(goodReceived) || 10);
 
-    updatedUnitCargo.set(
-      goodReceived,
-      (updatedUnitCargo.get(goodReceived) || 0) + amountReceived,
-    );
+    updatedUnitCargo.set(goodReceived, (updatedUnitCargo.get(goodReceived) || 0) + amountReceived);
     updatedSettlementGoods.set(
       goodReceived,
-      Math.max(
-        0,
-        (updatedSettlementGoods.get(goodReceived) || 0) - amountReceived,
-      ),
+      Math.max(0, (updatedSettlementGoods.get(goodReceived) || 0) - amountReceived)
     );
 
     const updatedSettlement = new NativeSettlement(
@@ -60,7 +47,7 @@ export class NativeInteractionSystem {
       settlement.y,
       settlement.population,
       this.shiftAttitude(settlement.attitude),
-      updatedSettlementGoods,
+      updatedSettlementGoods
     );
 
     const updatedUnit = new Unit(
@@ -69,7 +56,7 @@ export class NativeInteractionSystem {
       unit.type,
       unit.x,
       unit.y,
-      unit.movesRemaining,
+      unit.movesRemaining
     );
     updatedUnit.cargo = updatedUnitCargo;
     updatedUnit.maxMoves = unit.maxMoves;
@@ -79,7 +66,7 @@ export class NativeInteractionSystem {
 
   static learn(
     settlement: NativeSettlement,
-    unit: Unit,
+    unit: Unit
   ): {
     updatedSettlement: NativeSettlement;
     updatedUnit: Unit;
@@ -98,7 +85,7 @@ export class NativeInteractionSystem {
       UnitType.PIONEER,
       unit.x,
       unit.y,
-      unit.movesRemaining,
+      unit.movesRemaining
     );
     updatedUnit.cargo = new Map(unit.cargo);
     updatedUnit.maxMoves = unit.maxMoves;
@@ -111,7 +98,7 @@ export class NativeInteractionSystem {
       settlement.y,
       settlement.population,
       Attitude.NEUTRAL,
-      new Map(settlement.goods),
+      new Map(settlement.goods)
     );
 
     return { updatedSettlement, updatedUnit };

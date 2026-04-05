@@ -5,8 +5,7 @@ import { GoodType } from '../game/entities/types';
 type ReportTab = 'units' | 'settlements' | 'resources';
 
 export const ReportsModal: React.FC = () => {
-  const { isReportsModalOpen, setReportsModalOpen, players, currentPlayerId } =
-    useGameStore();
+  const { isReportsModalOpen, setReportsModalOpen, players, currentPlayerId } = useGameStore();
   const [activeTab, setActiveTab] = useState<ReportTab>('units');
 
   if (!isReportsModalOpen) return null;
@@ -26,33 +25,19 @@ export const ReportsModal: React.FC = () => {
         </thead>
         <tbody>
           {player.units.map((unit) => (
-            <tr
-              key={unit.id}
-              className="border-b border-slate-700 hover:bg-slate-700/30 transition-colors"
-            >
+            <tr key={unit.id} className="border-b border-slate-700 hover:bg-slate-700/30 transition-colors">
               <td className="p-3">{unit.type}</td>
-              <td className="p-3">
-                {unit.x}, {unit.y}
-              </td>
-              <td className="p-3 font-mono">
-                {unit.movesRemaining} / {unit.maxMoves}
-              </td>
+              <td className="p-3">{unit.x}, {unit.y}</td>
+              <td className="p-3 font-mono">{unit.movesRemaining} / {unit.maxMoves}</td>
             </tr>
           ))}
-          {player.colonies
-            .flatMap((c) => c.units)
-            .map((unit) => (
-              <tr
-                key={unit.id}
-                className="border-b border-slate-700 italic text-slate-400 hover:bg-slate-700/30 transition-colors"
-              >
-                <td className="p-3">{unit.type} (In Colony)</td>
-                <td className="p-3">
-                  {unit.x}, {unit.y}
-                </td>
-                <td className="p-3 font-mono text-xs opacity-50">N/A</td>
-              </tr>
-            ))}
+          {player.colonies.flatMap(c => c.units).map((unit) => (
+            <tr key={unit.id} className="border-b border-slate-700 italic text-slate-400 hover:bg-slate-700/30 transition-colors">
+              <td className="p-3">{unit.type} (In Colony)</td>
+              <td className="p-3">{unit.x}, {unit.y}</td>
+              <td className="p-3 font-mono text-xs opacity-50">N/A</td>
+            </tr>
+          ))}
         </tbody>
       </table>
     </div>
@@ -70,15 +55,10 @@ export const ReportsModal: React.FC = () => {
         </thead>
         <tbody>
           {player.colonies.map((colony) => (
-            <tr
-              key={colony.id}
-              className="border-b border-slate-700 hover:bg-slate-700/30 transition-colors"
-            >
+            <tr key={colony.id} className="border-b border-slate-700 hover:bg-slate-700/30 transition-colors">
               <td className="p-3 font-semibold text-blue-300">{colony.name}</td>
               <td className="p-3">{colony.population}</td>
-              <td className="p-3 text-sm text-slate-300">
-                {colony.buildings.join(', ') || 'None'}
-              </td>
+              <td className="p-3 text-sm text-slate-300">{colony.buildings.join(', ') || 'None'}</td>
             </tr>
           ))}
         </tbody>
@@ -93,29 +73,17 @@ export const ReportsModal: React.FC = () => {
         <table className="w-full text-left border-collapse">
           <thead>
             <tr className="border-b border-slate-600 bg-slate-800/50">
-              <th className="p-3 font-bold sticky left-0 bg-slate-800">
-                Colony
-              </th>
-              {goods.map((good) => (
-                <th
-                  key={good}
-                  className="p-3 text-[10px] uppercase tracking-wider font-bold text-slate-400"
-                >
-                  {good}
-                </th>
+              <th className="p-3 font-bold sticky left-0 bg-slate-800">Colony</th>
+              {goods.map(good => (
+                <th key={good} className="p-3 text-[10px] uppercase tracking-wider font-bold text-slate-400">{good}</th>
               ))}
             </tr>
           </thead>
           <tbody>
             {player.colonies.map((colony) => (
-              <tr
-                key={colony.id}
-                className="border-b border-slate-700 hover:bg-slate-700/30 transition-colors"
-              >
-                <td className="p-3 font-bold sticky left-0 bg-slate-800 text-blue-300">
-                  {colony.name}
-                </td>
-                {goods.map((good) => (
+              <tr key={colony.id} className="border-b border-slate-700 hover:bg-slate-700/30 transition-colors">
+                <td className="p-3 font-bold sticky left-0 bg-slate-800 text-blue-300">{colony.name}</td>
+                {goods.map(good => (
                   <td key={good} className="p-3 font-mono">
                     {colony.inventory.get(good) || 0}
                   </td>
@@ -132,9 +100,7 @@ export const ReportsModal: React.FC = () => {
     <div className="absolute inset-0 bg-black/80 flex items-center justify-center z-[2500] pointer-events-auto backdrop-blur-sm">
       <div className="bg-slate-800 text-white p-6 rounded-xl w-[90vw] max-w-5xl h-[85vh] flex flex-col border border-slate-500 shadow-2xl">
         <div className="flex justify-between items-center mb-6">
-          <h2 className="text-3xl font-black uppercase tracking-tight">
-            Reports
-          </h2>
+          <h2 className="text-3xl font-black uppercase tracking-tight">Reports</h2>
           <button
             onClick={() => setReportsModalOpen(false)}
             className="px-4 py-2 bg-red-600 hover:bg-red-700 text-white font-bold rounded transition-colors cursor-pointer"

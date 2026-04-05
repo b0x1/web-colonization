@@ -36,9 +36,6 @@ describe('Colony', () => {
     const colony = new Colony('col-1', 'p-1', 'A', 0, 0, 1);
     colony.productionQueue.push(UnitType.SOLDIER);
     colony.productionQueue.push(BuildingType.WAREHOUSE);
-    expect(colony.productionQueue).toEqual([
-      UnitType.SOLDIER,
-      BuildingType.WAREHOUSE,
-    ]);
+    expect(colony.productionQueue).toEqual([UnitType.SOLDIER, BuildingType.WAREHOUSE]);
   });
 });

@@ -2,14 +2,7 @@ import { Player } from '../entities/Player';
 import { Tile } from '../entities/Tile';
 import { Colony } from '../entities/Colony';
 import { Unit } from '../entities/Unit';
-import {
-  TerrainType,
-  GoodType,
-  ResourceType,
-  UnitType,
-  JobType,
-  BuildingType,
-} from '../entities/types';
+import { TerrainType, GoodType, ResourceType, UnitType, JobType, BuildingType } from '../entities/types';
 import { eventBus } from '../state/EventBus';
 import { SaveSystem } from './SaveSystem';
 import type { GameState } from '../state/gameStore';
@@ -22,23 +15,10 @@ export class TurnEngine {
 
   static runProduction(players: Player[]): Player[] {
     const updatedPlayers = players.map((player) => {
-      const newPlayer = new Player(
-        player.id,
-        player.name,
-        player.isHuman,
-        player.gold,
-        player.nation,
-      );
+      const newPlayer = new Player(player.id, player.name, player.isHuman, player.gold, player.nation);
       // Deep clone units
       newPlayer.units = player.units.map((u) => {
-        const nu = new Unit(
-          u.id,
-          u.ownerId,
-          u.type,
-          u.x,
-          u.y,
-          u.movesRemaining,
-        );
+        const nu = new Unit(u.id, u.ownerId, u.type, u.x, u.y, u.movesRemaining);
         nu.cargo = new Map(u.cargo);
         nu.maxMoves = u.maxMoves;
         return nu;
@@ -62,7 +42,7 @@ export class TurnEngine {
         // 1. Process Workforce Production
         newColony.workforce.forEach((job) => {
           let good: GoodType | null = null;
-          const amount = 3;
+          let amount = 3;
 
           switch (job) {
             case JobType.FARMER:
@@ -83,10 +63,7 @@ export class TurnEngine {
           }
 
           if (good) {
-            newColony.inventory.set(
-              good,
-              (newColony.inventory.get(good) || 0) + amount,
-            );
+            newColony.inventory.set(good, (newColony.inventory.get(good) || 0) + amount);
           }
         });
 
@@ -98,10 +75,7 @@ export class TurnEngine {
           );
         }
         if (newColony.buildings.includes(BuildingType.IRON_WORKS)) {
-          newColony.inventory.set(
-            GoodType.ORE,
-            (newColony.inventory.get(GoodType.ORE) || 0) + 2,
-          );
+          newColony.inventory.set(GoodType.ORE, (newColony.inventory.get(GoodType.ORE) || 0) + 2);
         }
 
         // 3. Population Growth & Food Consumption
@@ -113,15 +87,10 @@ export class TurnEngine {
 
         const foodNeeded = newColony.population * 2;
         const currentFood = newColony.inventory.get(GoodType.FOOD) || 0;
-        newColony.inventory.set(
-          GoodType.FOOD,
-          Math.max(0, currentFood - foodNeeded),
-        );
+        newColony.inventory.set(GoodType.FOOD, Math.max(0, currentFood - foodNeeded));
 
         // 4. Inventory Cap
-        const cap = newColony.buildings.includes(BuildingType.WAREHOUSE)
-          ? 400
-          : 200;
+        const cap = newColony.buildings.includes(BuildingType.WAREHOUSE) ? 400 : 200;
         newColony.inventory.forEach((amount, good) => {
           if (amount > cap) {
             newColony.inventory.set(good, cap);
@@ -161,14 +130,7 @@ export class TurnEngine {
     const updatedPlayers = players.map((p) => {
       const np = new Player(p.id, p.name, p.isHuman, p.gold, p.nation);
       np.units = p.units.map((u) => {
-        const nu = new Unit(
-          u.id,
-          u.ownerId,
-          u.type,
-          u.x,
-          u.y,
-          u.movesRemaining,
-        );
+        const nu = new Unit(u.id, u.ownerId, u.type, u.x, u.y, u.movesRemaining);
         nu.cargo = new Map(u.cargo);
         nu.maxMoves = u.maxMoves;
         return nu;
@@ -265,8 +227,7 @@ export class TurnEngine {
       for (let x = 0; x < map[y].length; x++) {
         const tile = map[y][x];
         const isTargetType =
-          tile.terrainType === TerrainType.PLAINS ||
-          tile.hasResource === ResourceType.FOREST;
+          tile.terrainType === TerrainType.PLAINS || tile.hasResource === ResourceType.FOREST;
         if (!isTargetType) continue;
 
         const isColonized = allColonies.some((c) => c.x === x && c.y === y);

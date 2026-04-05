@@ -3,9 +3,9 @@ import type { Unit } from './Unit';
 
 export class Colony {
   public buildings: BuildingType[] = [];
-  public inventory = new Map<GoodType, number>();
+  public inventory: Map<GoodType, number> = new Map();
   public productionQueue: (UnitType | BuildingType)[] = [];
-  public workforce = new Map<string, JobType>();
+  public workforce: Map<string, JobType> = new Map();
   public units: Unit[] = [];
 
   constructor(

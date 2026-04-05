@@ -6,13 +6,7 @@ import { UnitType, Nation } from '../types';
 
 describe('Player', () => {
   it('should initialize with correct values', () => {
-    const player = new Player(
-      'player-1',
-      'Human Player',
-      true,
-      500,
-      Nation.ENGLAND,
-    );
+    const player = new Player('player-1', 'Human Player', true, 500, Nation.ENGLAND);
     expect(player.id).toBe('player-1');
     expect(player.name).toBe('Human Player');
     expect(player.isHuman).toBe(true);

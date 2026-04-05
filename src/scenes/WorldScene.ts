@@ -63,12 +63,8 @@ export class WorldScene extends Phaser.Scene {
     const mapWidth = tiles[0].length;
     const mapHeight = tiles.length;
     const nativeSettlements = state.nativeSettlements;
-    const colonies = state.players.flatMap((p) => p.colonies);
-    this.tileMap = new TileMap(
-      mapWidth,
-      mapHeight,
-      tiles.map((row) => row.map((t) => t.terrainType)),
-    );
+    const colonies = state.players.flatMap(p => p.colonies);
+    this.tileMap = new TileMap(mapWidth, mapHeight, tiles.map(row => row.map(t => t.terrainType)));
 
     this.terrainRenderer.renderTileMap(tiles, nativeSettlements, colonies);
 
@@ -76,13 +72,8 @@ export class WorldScene extends Phaser.Scene {
     this.input.mouse?.disableContextMenu();
 
     this.input.on('pointerdown', (pointer: Phaser.Input.Pointer) => {
-      const worldPoint = pointer.positionToCamera(
-        this.cameras.main,
-      ) as Phaser.Math.Vector2;
-      const { x, y } = this.terrainRenderer.worldToTile(
-        worldPoint.x,
-        worldPoint.y,
-      );
+      const worldPoint = pointer.positionToCamera(this.cameras.main) as Phaser.Math.Vector2;
+      const { x, y } = this.terrainRenderer.worldToTile(worldPoint.x, worldPoint.y);
 
       if (x < 0 || x >= mapWidth || y < 0 || y >= mapHeight) {
         return;
@@ -100,9 +91,7 @@ export class WorldScene extends Phaser.Scene {
           .flatMap((p) => p.colonies)
           .find((c) => c.x === x && c.y === y);
 
-        const nativeSettlementAtTile = state.nativeSettlements.find(
-          (s) => s.x === x && s.y === y,
-        );
+        const nativeSettlementAtTile = state.nativeSettlements.find((s) => s.x === x && s.y === y);
 
         if (unitAtTile) {
           console.log(`Selecting unit ${unitAtTile.id} at ${x}, ${y}`);
@@ -124,19 +113,12 @@ export class WorldScene extends Phaser.Scene {
                 selectedUnit.type === UnitType.SOLDIER &&
                 nativeSettlementAtTile.attitude === Attitude.HOSTILE
               ) {
-                useGameStore
-                  .getState()
-                  .attackNativeSettlement(
-                    nativeSettlementAtTile.id,
-                    selectedUnitId,
-                  );
+                useGameStore.getState().attackNativeSettlement(nativeSettlementAtTile.id, selectedUnitId);
               } else if (
                 selectedUnit.type === UnitType.COLONIST &&
                 nativeSettlementAtTile.attitude !== Attitude.HOSTILE
               ) {
-                useGameStore
-                  .getState()
-                  .setNativeTradeModalOpen(true, nativeSettlementAtTile.id);
+                useGameStore.getState().setNativeTradeModalOpen(true, nativeSettlementAtTile.id);
               }
             }
           }
@@ -166,23 +148,13 @@ export class WorldScene extends Phaser.Scene {
               .flatMap((p) => p.colonies)
               .find((c) => c.x === x && c.y === y);
 
-            const settlementAtTile = state.nativeSettlements.find(
-              (s) => s.x === x && s.y === y,
-            );
+            const settlementAtTile = state.nativeSettlements.find((s) => s.x === x && s.y === y);
 
-            if (
-              selectedUnit.type === UnitType.SOLDIER &&
-              (enemyUnitAtTile ||
-                enemyColonyAtTile ||
-                (settlementAtTile &&
-                  settlementAtTile.attitude === Attitude.HOSTILE))
-            ) {
+            if (selectedUnit.type === UnitType.SOLDIER && (enemyUnitAtTile || enemyColonyAtTile || (settlementAtTile && settlementAtTile.attitude === Attitude.HOSTILE))) {
               useGameStore.getState().resolveCombat(selectedUnit.id, x, y);
             } else if (state.selectedUnitId) {
               // Movement logic
-              const isReachable = this.reachableTiles.some(
-                (t) => t.x === x && t.y === y,
-              );
+              const isReachable = this.reachableTiles.some((t) => t.x === x && t.y === y);
               if (isReachable) {
                 this.handleMove(state.selectedUnitId, x, y);
               } else {
@@ -203,19 +175,15 @@ export class WorldScene extends Phaser.Scene {
       if (!this.scene.isActive('WorldScene')) return;
 
       // Only re-render the map if it, native settlements, or colonies have changed
-      const colonies = state.players.flatMap((p) => p.colonies);
-      const prevColonies = prevState.players.flatMap((p) => p.colonies);
+      const colonies = state.players.flatMap(p => p.colonies);
+      const prevColonies = prevState.players.flatMap(p => p.colonies);
       if (
         state.map !== prevState.map ||
         state.nativeSettlements !== prevState.nativeSettlements ||
         colonies.length !== prevColonies.length ||
         !colonies.every((c, i) => c === prevColonies[i])
       ) {
-        this.terrainRenderer.renderTileMap(
-          state.map,
-          state.nativeSettlements,
-          colonies,
-        );
+        this.terrainRenderer.renderTileMap(state.map, state.nativeSettlements, colonies);
       }
 
       this.renderUnits();
@@ -225,10 +193,7 @@ export class WorldScene extends Phaser.Scene {
         .find((u) => u.id === state.selectedUnitId);
 
       if (selectedUnit) {
-        this.reachableTiles = MovementSystem.getReachableTiles(
-          selectedUnit,
-          state.map,
-        );
+        this.reachableTiles = MovementSystem.getReachableTiles(selectedUnit, state.map);
         this.terrainRenderer.updateReachableHighlights(this.reachableTiles);
       } else {
         this.reachableTiles = [];
@@ -244,25 +209,12 @@ export class WorldScene extends Phaser.Scene {
     });
 
     this.input.on('pointermove', (pointer: Phaser.Input.Pointer) => {
-      const worldPoint = pointer.positionToCamera(
-        this.cameras.main,
-      ) as Phaser.Math.Vector2;
-      const { x, y } = this.terrainRenderer.worldToTile(
-        worldPoint.x,
-        worldPoint.y,
-      );
+      const worldPoint = pointer.positionToCamera(this.cameras.main) as Phaser.Math.Vector2;
+      const { x, y } = this.terrainRenderer.worldToTile(worldPoint.x, worldPoint.y);
 
       if (x >= 0 && x < mapWidth && y >= 0 && y < mapHeight) {
-        const settlement = useGameStore
-          .getState()
-          .nativeSettlements.find((s) => s.x === x && s.y === y);
-        this.terrainRenderer.showTooltip(
-          x,
-          y,
-          worldPoint.x,
-          worldPoint.y,
-          settlement?.name,
-        );
+        const settlement = useGameStore.getState().nativeSettlements.find((s) => s.x === x && s.y === y);
+        this.terrainRenderer.showTooltip(x, y, worldPoint.x, worldPoint.y, settlement?.name);
       } else {
         this.terrainRenderer.hideTooltip();
       }
@@ -311,9 +263,7 @@ export class WorldScene extends Phaser.Scene {
     if (this.isAnimating) return;
 
     const state = useGameStore.getState();
-    const unit = state.players
-      .flatMap((p) => p.units)
-      .find((u) => u.id === unitId);
+    const unit = state.players.flatMap((p) => p.units).find((u) => u.id === unitId);
     if (!unit) return;
 
     const fromX = unit.x;
@@ -331,18 +281,8 @@ export class WorldScene extends Phaser.Scene {
     });
   }
 
-  private animateUnitMove(
-    unit: Unit,
-    fromX: number,
-    fromY: number,
-    toX: number,
-    toY: number,
-    onComplete: () => void,
-  ) {
-    const { x: startX, y: startY } = this.terrainRenderer.tileToWorld(
-      fromX,
-      fromY,
-    );
+  private animateUnitMove(unit: Unit, fromX: number, fromY: number, toX: number, toY: number, onComplete: () => void) {
+    const { x: startX, y: startY } = this.terrainRenderer.tileToWorld(fromX, fromY);
     const { x: endX, y: endY } = this.terrainRenderer.tileToWorld(toX, toY);
 
     // Hide original unit sprite before animation starts
@@ -350,8 +290,8 @@ export class WorldScene extends Phaser.Scene {
     this.unitSprites.getChildren().forEach((child: any) => {
       if (
         child instanceof Phaser.GameObjects.Image &&
-        child.texture.key === 'units' &&
-        child.frame.name === unit.type &&
+          child.texture.key === 'units' &&
+          child.frame.name === unit.type &&
         child.x === startX + this.TILE_SIZE / 2 &&
         child.y === startY + this.TILE_SIZE / 2
       ) {
@@ -363,7 +303,7 @@ export class WorldScene extends Phaser.Scene {
       startX + this.TILE_SIZE / 2,
       startY + this.TILE_SIZE / 2,
       'units',
-      unit.type,
+      unit.type
     );
     tempSprite.setDepth(300);
 
@@ -428,12 +368,10 @@ export class WorldScene extends Phaser.Scene {
           badgeBg.setDepth(200);
           this.unitBadges.add(badgeBg);
 
-          const badgeText = this.add
-            .text(badgeX, badgeY, units.length.toString(), {
-              fontSize: '10px',
-              color: '#ffffff',
-            })
-            .setOrigin(0.5);
+          const badgeText = this.add.text(badgeX, badgeY, units.length.toString(), {
+            fontSize: '10px',
+            color: '#ffffff',
+          }).setOrigin(0.5);
           badgeText.setDepth(201);
           this.unitBadges.add(badgeText);
         }

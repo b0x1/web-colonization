@@ -76,16 +76,16 @@ describe('Europe Trade', () => {
 
     // Give ship 50 muskets
     useGameStore.setState((state) => {
-      const p1 = state.players[0];
-      p1.units[0].cargo.set(GoodType.MUSKETS, 50);
-      return { players: [p1] };
+        const p1 = state.players[0];
+        p1.units[0].cargo.set(GoodType.MUSKETS, 50);
+        return { players: [p1] };
     });
 
     recruitUnit(UnitType.SOLDIER);
 
     const { players } = useGameStore.getState();
     const player = players[0];
-    const ship = player.units.find((u) => u.type === UnitType.SHIP)!;
+    const ship = player.units.find(u => u.type === UnitType.SHIP)!;
 
     // Initial gold 1000, SOLDIER costs 800g = 200g left
     expect(player.gold).toBe(200);
@@ -93,7 +93,7 @@ describe('Europe Trade', () => {
     expect(ship.cargo.get(GoodType.MUSKETS)).toBe(0);
     // New SOLDIER unit added
     expect(player.units.length).toBe(2);
-    expect(player.units.some((u) => u.type === UnitType.SOLDIER)).toBe(true);
+    expect(player.units.some(u => u.type === UnitType.SOLDIER)).toBe(true);
   });
 
   it('should NOT recruit a SOLDIER if ship lacks MUSKETS', () => {

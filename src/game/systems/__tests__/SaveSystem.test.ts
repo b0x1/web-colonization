@@ -5,31 +5,16 @@ import { Unit } from '../../entities/Unit';
 import { Colony } from '../../entities/Colony';
 import { Tile } from '../../entities/Tile';
 import { NativeSettlement } from '../../entities/NativeSettlement';
-import {
-  GoodType,
-  UnitType,
-  TerrainType,
-  Tribe,
-  Attitude,
-  JobType,
-  TurnPhase,
-  Nation,
-} from '../../entities/types';
+import { GoodType, UnitType, TerrainType, Tribe, Attitude, JobType, TurnPhase, Nation } from '../../entities/types';
 
 // Mock localStorage
 const localStorageMock = (() => {
   let store: Record<string, string> = {};
   return {
     getItem: (key: string) => store[key] || null,
-    setItem: (key: string, value: string) => {
-      store[key] = value;
-    },
-    removeItem: (key: string) => {
-      delete store[key];
-    },
-    clear: () => {
-      store = {};
-    },
+    setItem: (key: string, value: string) => { store[key] = value; },
+    removeItem: (key: string) => { delete store[key]; },
+    clear: () => { store = {}; },
   };
 })();
 Object.defineProperty(window, 'localStorage', { value: localStorageMock });
@@ -54,15 +39,7 @@ describe('SaveSystem Serialization Round-trip', () => {
 
     const tile = new Tile('10-10', 10, 10, TerrainType.PLAINS, 1);
 
-    const settlement = new NativeSettlement(
-      's1',
-      'Settlement 1',
-      Tribe.APACHE,
-      15,
-      15,
-      5,
-      Attitude.NEUTRAL,
-    );
+    const settlement = new NativeSettlement('s1', 'Settlement 1', Tribe.APACHE, 15, 15, 5, Attitude.NEUTRAL);
     settlement.goods.set(GoodType.TRADE_GOODS, 20);
 
     const mockState: any = {
@@ -113,9 +90,7 @@ describe('SaveSystem Serialization Round-trip', () => {
 
     // Check NativeSettlement instance and Map
     expect(loadedState.nativeSettlements[0]).toBeInstanceOf(NativeSettlement);
-    expect(
-      loadedState.nativeSettlements[0].goods.get(GoodType.TRADE_GOODS),
-    ).toBe(20);
+    expect(loadedState.nativeSettlements[0].goods.get(GoodType.TRADE_GOODS)).toBe(20);
   });
 
   it('should manage manifest correctly', () => {

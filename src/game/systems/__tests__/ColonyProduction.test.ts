@@ -1,4 +1,4 @@
-import { describe, it, expect } from 'vitest';
+import { describe, it, expect} from 'vitest';
 import { TurnEngine } from '../TurnEngine';
 import { Player } from '../../entities/Player';
 import { Colony } from '../../entities/Colony';
@@ -47,17 +47,13 @@ describe('Colony Production and Building Logic', () => {
 
     // No warehouse, cap is 200
     let updatedPlayers = TurnEngine.runProduction([player]);
-    expect(updatedPlayers[0].colonies[0].inventory.get(GoodType.FOOD)).toBe(
-      200,
-    );
+    expect(updatedPlayers[0].colonies[0].inventory.get(GoodType.FOOD)).toBe(200);
 
     // With warehouse, cap is 400
     colony.buildings.push(BuildingType.WAREHOUSE);
     colony.inventory.set(GoodType.FOOD, 350);
     updatedPlayers = TurnEngine.runProduction([player]);
-    expect(updatedPlayers[0].colonies[0].inventory.get(GoodType.FOOD)).toBe(
-      350 - 2,
-    ); // 350 - (1 pop * 2 food) = 348
+    expect(updatedPlayers[0].colonies[0].inventory.get(GoodType.FOOD)).toBe(350 - 2); // 350 - (1 pop * 2 food) = 348
   });
 
   it('processes printing press population growth', () => {
@@ -81,7 +77,7 @@ describe('Colony Production and Building Logic', () => {
       [BuildingType.WAREHOUSE]: 80,
       [BuildingType.STOCKADE]: 200,
       [BuildingType.PRINTING_PRESS]: 180,
-    };
+      };
 
     expect(buildingCosts[BuildingType.LUMBER_MILL]).toBe(100);
     expect(buildingCosts[BuildingType.IRON_WORKS]).toBe(150);

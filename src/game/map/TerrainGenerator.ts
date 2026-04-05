@@ -70,9 +70,7 @@ export class TerrainGenerator {
       MAP_CONSTANTS.NATIVE_SETTLEMENT_MIN_COUNT +
       Math.floor(
         Math.random() *
-          (MAP_CONSTANTS.NATIVE_SETTLEMENT_MAX_COUNT -
-            MAP_CONSTANTS.NATIVE_SETTLEMENT_MIN_COUNT +
-            1),
+          (MAP_CONSTANTS.NATIVE_SETTLEMENT_MAX_COUNT - MAP_CONSTANTS.NATIVE_SETTLEMENT_MIN_COUNT + 1),
       );
 
     const margin = MAP_CONSTANTS.NATIVE_SETTLEMENT_EDGE_MARGIN;
@@ -84,10 +82,7 @@ export class TerrainGenerator {
       const x = margin + Math.floor(Math.random() * (this.width - 2 * margin));
       const y = margin + Math.floor(Math.random() * (this.height - 2 * margin));
 
-      if (
-        terrain[y][x] === TerrainType.OCEAN ||
-        terrain[y][x] === TerrainType.COAST
-      ) {
+      if (terrain[y][x] === TerrainType.OCEAN || terrain[y][x] === TerrainType.COAST) {
         continue;
       }
 

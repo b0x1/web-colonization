@@ -1,7 +1,7 @@
 import type { GoodType, UnitType } from './types';
 
 export class Unit {
-  public cargo = new Map<GoodType, number>();
+  public cargo: Map<GoodType, number> = new Map();
   public maxMoves: number;
 
   constructor(
