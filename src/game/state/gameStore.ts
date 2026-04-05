@@ -38,7 +38,7 @@ export interface GameState {
   endTurn: () => void;
   foundSettlement: (unitId: string) => void;
   buyBuilding: (settlementId: string, building: BuildingType) => void;
-  assignJob: (settlementId: string, unitId: string, job: JobType | string) => void;
+  assignJob: (settlementId: string, unitId: string, job: JobType | string | null) => void;
   sellGood: (unitId: string, good: GoodType, amount: number) => void;
   buyGood: (unitId: string, good: GoodType, amount: number) => void;
   recruitUnit: (unitType: UnitType) => void;
@@ -305,7 +305,11 @@ export const useGameStore = create<GameState>()(
         for (const p of state.players) {
           const settlement = p.settlements.find((s) => s.id === settlementId);
           if (settlement) {
-            settlement.workforce.set(unitId, job as JobType);
+            if (job === null) {
+              settlement.workforce.delete(unitId);
+            } else {
+              settlement.workforce.set(unitId, job as JobType);
+            }
             return;
           }
         }

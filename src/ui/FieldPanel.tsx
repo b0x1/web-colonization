@@ -3,7 +3,7 @@ import { useGameStore } from '../game/state/gameStore';
 import { TerrainType } from '../game/entities/types';
 
 export const FieldPanel: React.FC = () => {
-  const { selectedTile, map } = useGameStore();
+  const { selectedTile, map, selectedUnitId, players } = useGameStore();
 
   if (!selectedTile) return null;
 
@@ -22,7 +22,6 @@ export const FieldPanel: React.FC = () => {
 
   const defenseBonus = getDefenseBonus(tile.terrainType);
 
-  const { selectedUnitId, players } = useGameStore();
   const allUnits = players.flatMap(p => p.units);
   const unitsAtTile = allUnits.filter(u => u.x === selectedTile.x && u.y === selectedTile.y);
   const showAboveUnitPanel = selectedUnitId || unitsAtTile.length > 1;

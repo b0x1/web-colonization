@@ -18,7 +18,7 @@ export const AvailableUnits: React.FC<Props> = ({ settlementId, units }) => {
     e.preventDefault();
     const unitId = e.dataTransfer.getData('unitId');
     if (unitId) {
-      assignJob(settlementId, unitId, null as any); // Remove from workforce/map
+      assignJob(settlementId, unitId, null); // Remove from workforce/map
     }
   };
 
