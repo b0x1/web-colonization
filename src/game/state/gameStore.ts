@@ -757,7 +757,7 @@ export const useGameStore = create<GameState>((set, get) => ({
           tile.hasResource = ResourceType.FOREST;
         } else if (type === TerrainType.PLAINS && Math.random() < 0.05) {
           tile.hasResource = ResourceType.ORE_DEPOSIT;
-        } else if (type === TerrainType.PLAINS && Math.random() < 0.05) {
+        } else if (type === TerrainType.PLAINS && Math.random() < 0.1) {
           tile.hasResource = ResourceType.FERTILE_LAND;
         }
         return tile;
@@ -841,5 +841,6 @@ export const useGameStore = create<GameState>((set, get) => ({
 }));
 
 if (typeof window !== 'undefined') {
-  (window as any).useGameStore = useGameStore;
+  (window as unknown as { useGameStore: typeof useGameStore }).useGameStore =
+    useGameStore;
 }

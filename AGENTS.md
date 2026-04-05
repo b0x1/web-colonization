@@ -9,9 +9,9 @@ refactoring behaviour for this project. Read it fully before planning any task.
 
 A turn-based strategy game inspired by Sid Meier's Colonization built with:
 - **Phaser 3** — game rendering, input, scenes, tweens
-- **React 18** — all UI panels, modals, HUD overlays
+- **React 19** — all UI panels, modals, HUD overlays, utilizing the **React Compiler**
 - **Zustand** — shared state bridge between Phaser and React
-- **TypeScript (strict)** — all code, no `any`
+- **TypeScript 6 (strict)** — all code, no `any`
 - **Vite** — build and dev server
 - **Vitest** — unit tests
 

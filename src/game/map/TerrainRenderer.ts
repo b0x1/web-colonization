@@ -1,7 +1,8 @@
 import Phaser from 'phaser';
 import { Tile } from '../entities/Tile';
 import { NativeSettlement } from '../entities/NativeSettlement';
-import { TerrainType, ResourceType } from '../entities/types';
+import { TerrainType } from '../entities/types';
+import type { Colony } from '../entities/Colony';
 
 export class TerrainRenderer {
   private scene: Phaser.Scene;
@@ -52,7 +53,11 @@ export class TerrainRenderer {
     };
   }
 
-  public renderTileMap(tiles: Tile[][], nativeSettlements: NativeSettlement[] = [], colonies: any[] = []) {
+  public renderTileMap(
+    tiles: Tile[][],
+    nativeSettlements: NativeSettlement[] = [],
+    colonies: Colony[] = [],
+  ) {
     const height = tiles.length;
     const width = tiles[0]?.length || 0;
 
@@ -129,7 +134,7 @@ export class TerrainRenderer {
     });
   }
 
-  private renderColonies(colonies: any[]) {
+  private renderColonies(colonies: Colony[]) {
     if (this.colonyGraphics) {
       this.colonyGraphics.destroy(true, true);
     }

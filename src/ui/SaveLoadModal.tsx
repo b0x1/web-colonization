@@ -12,11 +12,14 @@ export const SaveLoadModal: React.FC = () => {
   const gameState = useGameStore((state) => state);
   const resetGame = useGameStore((state) => state.resetGame);
 
-  const [saves, setSaves] = useState<SaveMeta[]>([]);
+  const [saves, setSaves] = useState<SaveMeta[]>(() =>
+    isSaveModalOpen ? SaveSystem.listSaves() : [],
+  );
 
   useEffect(() => {
     if (isSaveModalOpen) {
-      setSaves(SaveSystem.listSaves());
+      const allSaves = SaveSystem.listSaves();
+      setSaves(allSaves);
     }
   }, [isSaveModalOpen]);
 
