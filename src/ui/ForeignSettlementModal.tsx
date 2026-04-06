@@ -20,14 +20,12 @@ export const ForeignSettlementModal: React.FC = () => {
   const isOwned = settlement.ownerId === currentPlayerId;
   if (isOwned && !useUIStore.getState().isDebugMode) return null;
 
-  const owner = players.find(p => p.id === settlement.ownerId);
-
   // For NPC settlements, the ownerId is formatted as "npc-NATION" in TerrainGenerator.ts
   const npcIdMatch = settlement.ownerId.match(/^npc-(.*)$/);
   const npcOriginNation = npcIdMatch ? npcIdMatch[1] : null;
 
-  const nationName = owner ? owner.name : (npcOriginNation || settlement.culture);
-  const nation = owner ? owner.nation : (npcOriginNation || 'IROQUOIS');
+  const nationName =  npcOriginNation || settlement.culture;
+  const nation = npcOriginNation || 'IROQUOIS';
 
   return (
     <div className="absolute left-5 bottom-80 w-64 bg-black/90 text-white p-5 rounded-xl pointer-events-auto shadow-2xl border border-blue-500/30 backdrop-blur-md font-sans z-50">

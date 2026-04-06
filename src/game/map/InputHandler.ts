@@ -3,7 +3,6 @@ import type { TerrainRenderer } from './TerrainRenderer';
 import { useGameStore } from '../state/gameStore';
 import { useUIStore } from '../state/uiStore';
 import { UnitType, Attitude } from '../entities/types';
-import type { Unit } from '../entities/Unit';
 
 export class InputHandler {
   constructor(private scene: Phaser.Scene, private terrainRenderer: TerrainRenderer) {}
@@ -69,11 +68,6 @@ export class InputHandler {
     useGameStore.getState().selectTile(tile as any);
 
     if (settlementAtTile && unitsAtTile.length > 0) {
-      // Always trigger modal when there is a settlement + units (even foreign ones)
-      useGameStore.getState().selectUnit(null);
-      this.scene.events.emit('unitSelected', null as any);
-    } else if (settlementAtTile && player && settlementAtTile.ownerId === player.id) {
-       // Just the settlement but it's ours, still show selector to select city
        useGameStore.getState().selectUnit(null);
        this.scene.events.emit('unitSelected', null as any);
     } else if (unitsAtTile.length === 1) {
