@@ -142,6 +142,7 @@ export class GameSystem {
         units: [],
         attitude: 'NEUTRAL',
         goods: new Map(),
+        hammers: 0,
       };
       humanPlayer.settlements.push(startSettlement);
     }
@@ -188,6 +189,7 @@ export class GameSystem {
       maxMoves: moves,
       isSkipping: false,
       cargo: new Map(),
+      turnsInJob: 0,
     };
   }
 }

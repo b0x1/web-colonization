@@ -67,8 +67,14 @@ export const useGameStore = create<GameState>()(
       [GoodType.TOBACCO]: 4,
       [GoodType.COTTON]: 3,
       [GoodType.FURS]: 5,
+      [GoodType.SUGAR]: 3,
+      [GoodType.RUM]: 8,
+      [GoodType.CLOTH]: 8,
+      [GoodType.COATS]: 10,
+      [GoodType.CIGARS]: 10,
+      [GoodType.TOOLS]: 5,
       [GoodType.TRADE_GOODS]: 6,
-      [GoodType.MUSKETS]: 8,
+      [GoodType.MUSKETS]: 12,
     },
     map: [],
     selectedTile: null,
@@ -261,13 +267,14 @@ export const useGameStore = create<GameState>()(
           population: 1,
           culture: nationData.culture,
           organization: nationData.organization,
-          buildings: [],
+          buildings: [BuildingType.TOWN_HALL, BuildingType.CARPENTERS_SHOP, BuildingType.BLACKSMITHS_HOUSE],
           inventory: new Map(),
           productionQueue: [],
           workforce: new Map([[unit.id, JobType.FARMER]]),
           units: [unit],
           attitude: 'NEUTRAL',
           goods: new Map(),
+          hammers: 0,
         };
 
         player.units.splice(unitIndex, 1);
@@ -280,23 +287,15 @@ export const useGameStore = create<GameState>()(
 
     buyBuilding: (settlementId, building) =>
       set((state) => {
-        const buildingCosts: Record<string, number> = {
-          ...BUILDING_COSTS,
-          [BuildingType.TOWN_HALL]: 0,
-          [BuildingType.CARPENTERS_SHOP]: 0,
-          [BuildingType.BLACKSMITHS_HOUSE]: 0,
-          [BuildingType.BLACKSMITHS_SHOP]: 0,
-          [BuildingType.STABLES]: 0,
-        };
-
-        const cost = buildingCosts[building] || 0;
         const player = state.players.find((p) => p.id === state.currentPlayerId);
-        if (!player || player.gold < cost) return;
+        if (!player) return;
 
         const settlement = player.settlements.find((s) => s.id === settlementId);
         if (settlement) {
-          settlement.buildings.push(building);
-          player.gold -= cost;
+          // Instead of instant buy, add to productionQueue if not already there or built
+          if (!settlement.buildings.includes(building) && !settlement.productionQueue.includes(building)) {
+             settlement.productionQueue.push(building);
+          }
         }
       }),
 
@@ -537,6 +536,7 @@ export const useGameStore = create<GameState>()(
           maxMoves: 1,
           isSkipping: false,
           cargo: new Map(),
+          turnsInJob: 0,
         });
       }),
 
