@@ -1,7 +1,6 @@
 import React from 'react';
 import { useGameStore } from '../../game/state/gameStore';
-import { JobType } from '../../game/entities/types';
-import { Sprite } from './Sprite';
+import { Sprite } from '../Sprite';
 
 interface Props {
   settlementId: string;

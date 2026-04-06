@@ -1,6 +1,6 @@
 import React from 'react';
 import { GoodType } from '../game/entities/types';
-import { Sprite } from './SettlementScreen/Sprite';
+import { Sprite } from './Sprite';
 
 interface ResourceIconProps {
   good: GoodType;

@@ -2,7 +2,6 @@ import React, { useEffect } from 'react';
 import { useGameStore } from '../../game/state/gameStore';
 import { useUIStore } from '../../game/state/uiStore';
 import { BuildingSlots } from './BuildingSlots';
-import { WorkforcePanel } from './WorkforcePanel';
 import { MapGrid } from './MapGrid';
 import { AvailableUnits } from './AvailableUnits';
 import { InventoryPanel } from './InventoryPanel';
