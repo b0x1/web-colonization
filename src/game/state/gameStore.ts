@@ -18,6 +18,7 @@ import { SettlementSystem } from '../systems/SettlementSystem';
 import { UnitSystem } from '../systems/UnitSystem';
 import { EconomySystem } from '../systems/EconomySystem';
 import { MovementSystem } from '../systems/MovementSystem';
+import { useUIStore } from './uiStore';
 
 enableMapSet();
 
@@ -129,6 +130,9 @@ export const useGameStore = create<GameState>()(
       set((state) => {
         state.selectedSettlementId = settlementId;
         state.selectedUnitId = null;
+        if (settlementId) {
+          useUIStore.getState().setSettlementScreenOpen(true);
+        }
       }),
 
     moveUnit: (unitId, toX, toY) =>
