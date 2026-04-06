@@ -1,7 +1,6 @@
 import React from 'react';
 import { useGameStore } from '../../game/state/gameStore';
-import { JobType } from '../../game/entities/types';
-import { Sprite } from './Sprite';
+import { Sprite } from '../Sprite';
 
 interface Props {
   settlementId: string;
@@ -48,13 +47,19 @@ export const MapGrid: React.FC<Props> = ({ settlementId }) => {
             onDrop={(e) => handleDrop(e, tile.x, tile.y)}
             className={`aspect-square relative flex items-center justify-center border border-white/5 overflow-hidden group hover:border-blue-500/50 transition-colors ${isSettlementTile ? 'bg-blue-900/20' : 'bg-slate-800'}`}
           >
-            <Sprite type={tile.terrainType} category="terrain" size={200} />
-            {tile.hasResource && (
-              <Sprite type={tile.hasResource} category="resources" size={200} />
+            {!isSettlementTile ? (
+              <>
+                <Sprite type={tile.terrainType} category="terrain" size={200} />
+                {tile.hasResource && (
+                  <Sprite type={tile.hasResource} category="resources" size={200} />
+                )}
+              </>
+            ) : (
+              <Sprite type="colony" category="other" size={200} />
             )}
 
             <div className="text-[8px] absolute top-0.5 left-1 font-bold text-white uppercase bg-black/50 px-1 rounded shadow-sm z-10">
-              {tile.terrainType.slice(0, 3)}
+              {!isSettlementTile ? tile.terrainType.slice(0, 3) : 'CITY'}
             </div>
             {workers.length > 0 && (
               <div className="flex flex-wrap gap-0.5 justify-center p-1">
