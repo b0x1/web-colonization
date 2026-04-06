@@ -1,9 +1,12 @@
 import React from 'react';
-import { BuildingType, UnitType } from '../../game/entities/types';
+import { BuildingType, JobType } from '../../game/entities/types';
 import { useGameStore } from '../../game/state/gameStore';
-import { BUILDING_COSTS, UNIT_BUILD_COSTS } from '../../game/constants';
+import { JOB_PRODUCTION_RULES } from '../../game/rules/ProductionRules';
 
 const BUILDINGS_LIST = [
+  { type: BuildingType.TOWN_HALL, name: 'Town Hall', bonus: 'Governance' },
+  { type: BuildingType.CARPENTERS_SHOP, name: 'Carpenter\'s Shop', bonus: 'Lumber -> Hammers' },
+  { type: BuildingType.BLACKSMITHS_HOUSE, name: 'Blacksmith\'s House', bonus: 'Ore -> Tools' },
   { type: BuildingType.LUMBER_MILL, name: 'Lumber Mill', bonus: '+2 LUMBER/turn' },
   { type: BuildingType.IRON_WORKS, name: 'Iron Works', bonus: '+2 ORE/turn' },
   { type: BuildingType.SCHOOLHOUSE, name: 'Schoolhouse', bonus: 'Education' },
@@ -17,105 +20,64 @@ const BUILDINGS_LIST = [
   { type: BuildingType.ARMORY, name: 'Armory', bonus: 'Tools -> Muskets' },
 ];
 
-const UNITS_LIST = [
-  { type: UnitType.COLONIST, name: 'Colonist', bonus: 'Basic worker' },
-  { type: UnitType.PIONEER, name: 'Pioneer', bonus: 'Improve tiles' },
-  { type: UnitType.SOLDIER, name: 'Soldier', bonus: 'Defense/Attack' },
-];
-
 interface Props {
   settlementId: string;
   ownedBuildings: BuildingType[];
-  playerGold: number;
 }
 
-export const BuildingSlots: React.FC<Props> = ({ settlementId, ownedBuildings, playerGold }) => {
-  const buyBuilding = useGameStore((state) => state.buyBuilding);
+export const BuildingSlots: React.FC<Props> = ({ settlementId, ownedBuildings }) => {
+  const { assignJob, players } = useGameStore();
+  const settlement = players.flatMap(p => p.settlements).find(s => s.id === settlementId);
+
+  if (!settlement) return null;
+
+  const handleDrop = (e: React.DragEvent, jobType: JobType) => {
+    e.preventDefault();
+    const unitId = e.dataTransfer.getData('unitId');
+    if (unitId) {
+      assignJob(settlementId, unitId, jobType);
+    }
+  };
 
   return (
-    <div className="flex flex-col gap-4">
-      <div className="grid grid-cols-3 gap-2.5 p-2.5 bg-slate-900/50 rounded-lg border border-slate-700">
-        {BUILDINGS_LIST.map((b) => {
-          const isBuilt = ownedBuildings.includes(b.type);
-          const cost = BUILDING_COSTS[b.type];
-          const settlement = useGameStore.getState().players.flatMap(p => p.settlements).find(s => s.id === settlementId);
-          const isQueued = settlement?.productionQueue.includes(b.type);
+    <div className="grid grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3">
+      {BUILDINGS_LIST.filter(b => ownedBuildings.includes(b.type)).map((b) => {
+        const associatedJob = Object.values(JOB_PRODUCTION_RULES).find(rule => rule.requiredBuildings.includes(b.type))?.jobType;
+        const workers = Array.from(settlement.workforce.entries())
+          .filter(([_, assignment]) => assignment === associatedJob)
+          .map(([id]) => settlement.units.find(u => u.id === id))
+          .filter(Boolean);
 
-          return (
-            <div
-              key={b.type}
-              className={`p-2.5 rounded shadow-sm flex flex-col justify-between min-h-[100px] border transition-all ${
-                isBuilt
-                  ? 'bg-green-900/40 border-green-700'
-                  : isQueued
-                  ? 'bg-blue-900/40 border-blue-700'
-                  : 'bg-slate-800 border-slate-700'
-              }`}
-            >
-              <div>
-                <div className="font-black text-[0.8rem] uppercase tracking-wider text-slate-200">{b.name}</div>
-                <div className="text-[0.7rem] text-slate-400 mt-1">{b.bonus}</div>
-                {!isBuilt && cost && (
-                    <div className="text-[0.6rem] text-slate-500 mt-1 font-mono">
-                        Cost: {cost.hammers}H {cost.tools > 0 ? `, ${cost.tools}T` : ''}
-                    </div>
-                )}
-              </div>
+        return (
+          <div
+            key={b.type}
+            onDragOver={(e) => e.preventDefault()}
+            onDrop={(e) => associatedJob && handleDrop(e, associatedJob)}
+            className="p-3 bg-slate-800/80 rounded-lg border border-slate-700 shadow-lg min-h-[120px] flex flex-col justify-between hover:border-blue-500/50 transition-colors"
+          >
+            <div>
+              <div className="font-black text-xs uppercase tracking-widest text-blue-400 mb-1">{b.name}</div>
+              <div className="text-[10px] text-slate-400 italic mb-2">{b.bonus}</div>
+            </div>
 
-              {!isBuilt ? (
-                <button
-                  onClick={() => buyBuilding(settlementId, b.type)}
-                  disabled={isQueued}
-                  className={`mt-2 py-1.5 px-2 text-[0.75rem] font-bold rounded transition-colors shadow-inner ${
-                    !isQueued
-                      ? 'bg-yellow-600 hover:bg-yellow-500 text-white cursor-pointer'
-                      : 'bg-slate-700 text-slate-500 cursor-not-allowed opacity-50'
-                  }`}
-                >
-                  {isQueued ? 'Queued' : 'Add to Queue'}
-                </button>
+            <div className="flex flex-wrap gap-1 mt-auto pt-2 border-t border-slate-700/50">
+              {workers.length > 0 ? (
+                workers.map(unit => (
+                  <div
+                    key={unit!.id}
+                    title={`${unit!.type}${unit!.specialty ? ` (Expert ${unit!.specialty})` : ''}`}
+                    className="w-6 h-6 bg-blue-600 rounded-full border border-blue-400 shadow-sm flex items-center justify-center text-[8px] font-black cursor-help"
+                  >
+                    {unit!.type[0]}
+                  </div>
+                ))
               ) : (
-                <div className="mt-2 py-1 text-[0.7rem] font-black text-green-400 text-center bg-green-950/50 rounded border border-green-800/30 uppercase tracking-widest">
-                  Built
-                </div>
+                <div className="text-[8px] text-slate-600 uppercase font-bold tracking-tighter">Empty</div>
               )}
             </div>
-          );
-        })}
-      </div>
-
-      <div className="grid grid-cols-3 gap-2.5 p-2.5 bg-slate-900/50 rounded-lg border border-slate-700">
-        {UNITS_LIST.map((u) => {
-          const cost = UNIT_BUILD_COSTS[u.type];
-          const settlement = useGameStore.getState().players.flatMap(p => p.settlements).find(s => s.id === settlementId);
-          // For units, multiple can be in queue, but we just check if it's currently selected?
-          // Actually building multiple units is fine. Let's just allow adding.
-
-          return (
-            <div
-              key={u.type}
-              className="p-2.5 rounded shadow-sm flex flex-col justify-between min-h-[100px] border bg-slate-800 border-slate-700"
-            >
-              <div>
-                <div className="font-black text-[0.8rem] uppercase tracking-wider text-slate-200">{u.name}</div>
-                <div className="text-[0.7rem] text-slate-400 mt-1">{u.bonus}</div>
-                {cost && (
-                    <div className="text-[0.6rem] text-slate-500 mt-1 font-mono">
-                        Cost: {cost.hammers}H {cost.tools > 0 ? `, ${cost.tools}T` : ''} {cost.muskets > 0 ? `, ${cost.muskets}M` : ''}
-                    </div>
-                )}
-              </div>
-
-              <button
-                onClick={() => buyBuilding(settlementId, u.type as any)}
-                className="mt-2 py-1.5 px-2 text-[0.75rem] font-bold rounded transition-colors shadow-inner bg-yellow-600 hover:bg-yellow-500 text-white cursor-pointer"
-              >
-                Add Unit
-              </button>
-            </div>
-          );
-        })}
-      </div>
+          </div>
+        );
+      })}
     </div>
   );
 };
