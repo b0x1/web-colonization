@@ -1,27 +1,49 @@
-import React from 'react';
-import terrainManifest from '../../assets/data/terrain.json';
-import resourceManifest from '../../assets/data/resources.json';
-import otherManifest from '../../assets/data/other.json';
+import React, { useState, useEffect } from 'react';
 
 interface SpriteProps {
   type: string;
-  category: 'terrain' | 'resources' | 'other';
+  category: 'terrain' | 'resources' | 'other' | 'flags';
   size?: number;
   className?: string;
 }
 
+const manifestCache: Record<string, any> = {};
+
 export const Sprite: React.FC<SpriteProps> = ({ type, category, size = 64, className = '' }) => {
-  const manifest = category === 'terrain' ? terrainManifest : (category === 'resources' ? resourceManifest : otherManifest);
-  const coords = (manifest as any)[type];
+  const [manifest, setManifest] = useState<any>(manifestCache[category]);
+
+  useEffect(() => {
+    if (manifestCache[category]) {
+      setManifest(manifestCache[category]);
+      return;
+    }
+
+    fetch(`/webcol/${category}.json`)
+      .then((res) => res.json())
+      .then((data) => {
+        manifestCache[category] = data;
+        setManifest(data);
+      });
+  }, [category]);
+
+  const coords = manifest?.[type];
 
   if (!coords) return null;
 
-  // Calculate total spritesheet size based on manifest (all are 64x64 blocks)
-  // For terrain: 4 cols (0, 64, 128, 192) x 4 rows (0, 64, 128, 192) based on public/terrain.json
-  // For resources: 3 cols x 3 rows based on public/resources.json
-  // For other: 3 cols x 2 rows
-  const totalWidth = category === 'terrain' ? 256 : 192;
-  const totalHeight = category === 'terrain' ? 256 : (category === 'resources' ? 192 : 128);
+  // Dynamically calculate total sheet size if not already in cache
+  const calculateSheetSize = (m: any) => {
+    let maxX = 0;
+    let maxY = 0;
+    Object.values(m).forEach((v: any) => {
+      maxX = Math.max(maxX, v.x + v.w);
+      maxY = Math.max(maxY, v.y + v.h);
+    });
+    return { w: maxX, h: maxY };
+  };
+
+  const sheetSize = calculateSheetSize(manifest);
+  const totalWidth = sheetSize.w;
+  const totalHeight = sheetSize.h;
 
   const scale = size / 64;
 
