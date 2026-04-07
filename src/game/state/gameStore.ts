@@ -5,7 +5,15 @@ import type { Player } from '../entities/Player';
 import type { Tile } from '../entities/Tile';
 import type { Unit } from '../entities/Unit';
 import type { Settlement } from '../entities/Settlement';
-import { BuildingType, GoodType, JobType, Nation, TurnPhase, UnitType, Attitude } from '../entities/types';
+import {
+  BuildingType,
+  GoodType,
+  JobType,
+  Nation,
+  TurnPhase,
+  UnitType,
+  Attitude,
+} from '../entities/types';
 import { TurnEngine } from '../systems/TurnEngine';
 import { AISystem } from '../systems/AISystem';
 import { BUILDING_COSTS, RECRUITMENT_COSTS } from '../constants';
@@ -43,17 +51,30 @@ export interface GameState {
   endTurn: () => void;
   foundSettlement: (unitId: string) => void;
   buyBuilding: (settlementId: string, building: BuildingType) => void;
-  assignJob: (settlementId: string, unitId: string, job: JobType | string | null) => void;
+  assignJob: (
+    settlementId: string,
+    unitId: string,
+    job: JobType | string | null,
+  ) => void;
   sellGood: (unitId: string, good: GoodType, amount: number) => void;
   buyGood: (unitId: string, good: GoodType, amount: number) => void;
   recruitUnit: (unitType: UnitType) => void;
-  tradeWithSettlement: (settlementId: string, unitId: string, goodOffered: GoodType) => void;
+  tradeWithSettlement: (
+    settlementId: string,
+    unitId: string,
+    goodOffered: GoodType,
+  ) => void;
   learnFromSettlement: (settlementId: string, unitId: string) => void;
   attackSettlement: (settlementId: string, unitId: string) => void;
   resolveCombat: (attackerId: string, targetX: number, targetY: number) => void;
   clearCombatResult: () => void;
   loadGameState: (state: Partial<GameState>) => void;
-  initGame: (params: { playerName: string; nation: Nation; mapSize: 'Small' | 'Medium' | 'Large'; aiCount: number }) => void;
+  initGame: (params: {
+    playerName: string;
+    nation: Nation;
+    mapSize: 'Small' | 'Medium' | 'Large';
+    aiCount: number;
+  }) => void;
   resetGame: () => void;
 }
 
@@ -87,16 +108,22 @@ export const useGameStore = create<GameState>()(
 
     selectUnit: (unitId) =>
       set((state) => {
-        const player = state.players.find((p) => p.id === state.currentPlayerId);
+        const player = state.players.find(
+          (p) => p.id === state.currentPlayerId,
+        );
         if (player) {
           // 1. Tuck away previously selected unit if it's on a settlement tile
           if (state.selectedUnitId) {
-            const prevUnitIdx = player.units.findIndex(u => u.id === state.selectedUnitId);
+            const prevUnitIdx = player.units.findIndex(
+              (u) => u.id === state.selectedUnitId,
+            );
             if (prevUnitIdx !== -1) {
               const prevUnit = player.units[prevUnitIdx];
-              const settlement = player.settlements.find(s => s.x === prevUnit.x && s.y === prevUnit.y);
+              const settlement = player.settlements.find(
+                (s) => s.x === prevUnit.x && s.y === prevUnit.y,
+              );
               if (settlement) {
-                if (!settlement.units.some(u => u.id === prevUnit.id)) {
+                if (!settlement.units.some((u) => u.id === prevUnit.id)) {
                   settlement.units.push({ ...prevUnit });
                 }
                 player.units.splice(prevUnitIdx, 1);
@@ -107,12 +134,12 @@ export const useGameStore = create<GameState>()(
           // 2. If the new unit is in a settlement, move it to player.units
           if (unitId) {
             for (const s of player.settlements) {
-              const uIdx = s.units.findIndex(u => u.id === unitId);
+              const uIdx = s.units.findIndex((u) => u.id === unitId);
               if (uIdx !== -1) {
                 // Only move out if it's NOT in the workforce (available)
                 if (!s.workforce.has(unitId)) {
                   const unit = s.units[uIdx];
-                  if (!player.units.some(u => u.id === unitId)) {
+                  if (!player.units.some((u) => u.id === unitId)) {
                     player.units.push({ ...unit });
                   }
                   s.units.splice(uIdx, 1);
@@ -136,7 +163,10 @@ export const useGameStore = create<GameState>()(
       const player = state.players.find((p) => p.id === state.currentPlayerId);
       if (!player) return;
 
-      const nextUnit = UnitSystem.findNextAvailableUnit(player, state.selectedUnitId);
+      const nextUnit = UnitSystem.findNextAvailableUnit(
+        player,
+        state.selectedUnitId,
+      );
       if (!nextUnit) return;
 
       set((state) => {
@@ -148,7 +178,9 @@ export const useGameStore = create<GameState>()(
 
     skipUnit: (unitId) =>
       set((state) => {
-        const player = state.players.find((p) => p.id === state.currentPlayerId);
+        const player = state.players.find(
+          (p) => p.id === state.currentPlayerId,
+        );
         if (!player) return;
         const unit = player.units.find((u) => u.id === unitId);
         if (unit) {
@@ -165,7 +197,9 @@ export const useGameStore = create<GameState>()(
         state.selectedUnitId = null;
         if (settlementId) {
           // Only open the full SettlementScreen for owned settlements
-          const isOwned = state.players.find(p => p.id === state.currentPlayerId)?.settlements.some(s => s.id === settlementId);
+          const isOwned = state.players
+            .find((p) => p.id === state.currentPlayerId)
+            ?.settlements.some((s) => s.id === settlementId);
           if (isOwned || useUIStore.getState().isDebugMode) {
             useUIStore.getState().setSettlementScreenOpen(true);
           }
@@ -174,7 +208,9 @@ export const useGameStore = create<GameState>()(
 
     moveUnit: (unitId, toX, toY) =>
       set((state) => {
-        const player = state.players.find((p) => p.id === state.currentPlayerId);
+        const player = state.players.find(
+          (p) => p.id === state.currentPlayerId,
+        );
         if (!player) return;
 
         const unitIndex = player.units.findIndex((u) => u.id === unitId);
@@ -185,12 +221,17 @@ export const useGameStore = create<GameState>()(
           const targetTile = state.map[toY][toX];
           unit.x = toX;
           unit.y = toY;
-          unit.movesRemaining -= MovementSystem.getMovementCost(unit, targetTile);
+          unit.movesRemaining -= MovementSystem.getMovementCost(
+            unit,
+            targetTile,
+          );
 
           // Check if entering own settlement
-          const settlement = player.settlements.find(s => s.x === toX && s.y === toY);
+          const settlement = player.settlements.find(
+            (s) => s.x === toX && s.y === toY,
+          );
           if (settlement) {
-            if (!settlement.units.some(u => u.id === unit.id)) {
+            if (!settlement.units.some((u) => u.id === unit.id)) {
               settlement.units.push({ ...unit });
             }
             player.units.splice(unitIndex, 1);
@@ -220,7 +261,9 @@ export const useGameStore = create<GameState>()(
           return;
         }
 
-        const currentPlayerIndex = state.players.findIndex((p) => p.id === state.currentPlayerId);
+        const currentPlayerIndex = state.players.findIndex(
+          (p) => p.id === state.currentPlayerId,
+        );
         const nextPlayerIndex = (currentPlayerIndex + 1) % state.players.length;
         const nextPlayer = state.players[nextPlayerIndex];
 
@@ -250,7 +293,10 @@ export const useGameStore = create<GameState>()(
 
       const state = get();
       if (state.phase === TurnPhase.PRODUCTION) {
-        const updatedPlayers = TurnEngine.runProduction(state.players, state.map);
+        const updatedPlayers = TurnEngine.runProduction(
+          state.players,
+          state.map,
+        );
         set((s) => {
           s.players = updatedPlayers;
         });
@@ -266,7 +312,9 @@ export const useGameStore = create<GameState>()(
       } else if (state.phase === TurnPhase.END_TURN) {
         get().endTurn();
       } else if (state.phase === TurnPhase.MOVEMENT) {
-        const currentPlayer = state.players.find((p) => p.id === state.currentPlayerId);
+        const currentPlayer = state.players.find(
+          (p) => p.id === state.currentPlayerId,
+        );
         if (currentPlayer && !currentPlayer.isHuman) {
           get().endTurn();
         }
@@ -275,7 +323,9 @@ export const useGameStore = create<GameState>()(
 
     foundSettlement: (unitId) =>
       set((state) => {
-        const player = state.players.find((p) => p.id === state.currentPlayerId);
+        const player = state.players.find(
+          (p) => p.id === state.currentPlayerId,
+        );
         if (!player) return;
 
         const unitIndex = player.units.findIndex((u) => u.id === unitId);
@@ -284,13 +334,25 @@ export const useGameStore = create<GameState>()(
 
         const allSettlements = state.players.flatMap((p) => p.settlements);
 
-        if (!SettlementSystem.canFoundSettlement(player, unit, state.map, allSettlements)) return;
+        if (
+          !SettlementSystem.canFoundSettlement(
+            player,
+            unit,
+            state.map,
+            allSettlements,
+          )
+        )
+          return;
 
         const newSettlement = SettlementSystem.createSettlement(
           player,
           unit,
           `${player.name}'s Settlement`,
-          [BuildingType.TOWN_HALL, BuildingType.CARPENTERS_SHOP, BuildingType.BLACKSMITHS_HOUSE]
+          [
+            BuildingType.TOWN_HALL,
+            BuildingType.CARPENTERS_SHOP,
+            BuildingType.BLACKSMITHS_HOUSE,
+          ],
         );
 
         player.units.splice(unitIndex, 1);
@@ -303,14 +365,21 @@ export const useGameStore = create<GameState>()(
 
     buyBuilding: (settlementId, building) =>
       set((state) => {
-        const player = state.players.find((p) => p.id === state.currentPlayerId);
+        const player = state.players.find(
+          (p) => p.id === state.currentPlayerId,
+        );
         if (!player) return;
 
-        const settlement = player.settlements.find((s) => s.id === settlementId);
+        const settlement = player.settlements.find(
+          (s) => s.id === settlementId,
+        );
         if (settlement) {
           // Instead of instant buy, add to productionQueue if not already there or built
-          if (!settlement.buildings.includes(building) && !settlement.productionQueue.includes(building)) {
-             settlement.productionQueue.push(building);
+          if (
+            !settlement.buildings.includes(building) &&
+            !settlement.productionQueue.includes(building)
+          ) {
+            settlement.productionQueue.push(building);
           }
         }
       }),
@@ -326,19 +395,23 @@ export const useGameStore = create<GameState>()(
               // Check in settlement units or player units
               let unit = settlement.units.find((u) => u.id === unitId);
               if (!unit) {
-                const player = state.players.find(pl => pl.id === state.currentPlayerId);
-                const pUnitIdx = player?.units.findIndex(u => u.id === unitId) ?? -1;
+                const player = state.players.find(
+                  (pl) => pl.id === state.currentPlayerId,
+                );
+                const pUnitIdx =
+                  player?.units.findIndex((u) => u.id === unitId) ?? -1;
                 if (pUnitIdx !== -1) {
                   unit = player!.units[pUnitIdx];
                   // Move to settlement units if assigned
                   settlement.units.push({ ...unit });
                   player!.units.splice(pUnitIdx, 1);
-                  if (state.selectedUnitId === unitId) state.selectedUnitId = null;
+                  if (state.selectedUnitId === unitId)
+                    state.selectedUnitId = null;
                 }
               }
 
               if (unit) {
-                settlement.workforce.set(unitId, (job as any));
+                settlement.workforce.set(unitId, job as any);
               }
             }
             return;
@@ -348,17 +421,20 @@ export const useGameStore = create<GameState>()(
 
     sellGood: (unitId, good, amount) =>
       set((state) => {
-        const player = state.players.find((p) => p.id === state.currentPlayerId);
+        const player = state.players.find(
+          (p) => p.id === state.currentPlayerId,
+        );
         const unit = player?.units.find((u) => u.id === unitId);
         if (!player || !unit) return;
 
-        const { goldGained, newPrice, actualSellAmount } = EconomySystem.sellGood(
-          player,
-          unit,
-          good,
-          amount,
-          state.europePrices[good]
-        );
+        const { goldGained, newPrice, actualSellAmount } =
+          EconomySystem.sellGood(
+            player,
+            unit,
+            good,
+            amount,
+            state.europePrices[good],
+          );
 
         if (actualSellAmount <= 0) return;
 
@@ -369,7 +445,9 @@ export const useGameStore = create<GameState>()(
 
     buyGood: (unitId, good, amount) =>
       set((state) => {
-        const player = state.players.find((p) => p.id === state.currentPlayerId);
+        const player = state.players.find(
+          (p) => p.id === state.currentPlayerId,
+        );
         const unit = player?.units.find((u) => u.id === unitId);
         if (!player || !unit) return;
 
@@ -377,7 +455,7 @@ export const useGameStore = create<GameState>()(
           player.gold,
           good,
           amount,
-          state.europePrices[good]
+          state.europePrices[good],
         );
 
         if (!canAfford) return;
@@ -395,44 +473,55 @@ export const useGameStore = create<GameState>()(
 
     tradeWithSettlement: (settlementId, unitId, goodOffered) =>
       set((state) => {
-        const player = state.players.find((p) => p.id === state.currentPlayerId);
+        const player = state.players.find(
+          (p) => p.id === state.currentPlayerId,
+        );
         const unit = player?.units.find((u) => u.id === unitId);
         if (!unit) return;
 
-        let foreignPlayer = state.players.find(p => p.settlements.some(s => s.id === settlementId));
+        const foreignPlayer = state.players.find((p) =>
+          p.settlements.some((s) => s.id === settlementId),
+        );
         if (!foreignPlayer) return;
 
-        const sIdx = foreignPlayer.settlements.findIndex(s => s.id === settlementId);
-
-        const { updatedSettlement, updatedUnit } = ForeignInteractionSystem.trade(
-          foreignPlayer.settlements[sIdx],
-          unit,
-          goodOffered
+        const sIdx = foreignPlayer.settlements.findIndex(
+          (s) => s.id === settlementId,
         );
 
+        const { updatedSettlement, updatedUnit } =
+          ForeignInteractionSystem.trade(
+            foreignPlayer.settlements[sIdx],
+            unit,
+            goodOffered,
+          );
+
         foreignPlayer.settlements[sIdx] = updatedSettlement;
-        const uIdx = player!.units.findIndex(u => u.id === unitId);
+        const uIdx = player!.units.findIndex((u) => u.id === unitId);
         player!.units[uIdx] = updatedUnit;
       }),
 
     learnFromSettlement: (settlementId, unitId) =>
       set((state) => {
-        const player = state.players.find((p) => p.id === state.currentPlayerId);
+        const player = state.players.find(
+          (p) => p.id === state.currentPlayerId,
+        );
         const unit = player?.units.find((u) => u.id === unitId);
         if (!unit) return;
 
-        let foreignPlayer = state.players.find(p => p.settlements.some(s => s.id === settlementId));
+        const foreignPlayer = state.players.find((p) =>
+          p.settlements.some((s) => s.id === settlementId),
+        );
         if (!foreignPlayer) return;
 
-        const sIdx = foreignPlayer.settlements.findIndex(s => s.id === settlementId);
-
-        const { updatedSettlement, updatedUnit } = ForeignInteractionSystem.learn(
-          foreignPlayer.settlements[sIdx],
-          unit
+        const sIdx = foreignPlayer.settlements.findIndex(
+          (s) => s.id === settlementId,
         );
 
+        const { updatedSettlement, updatedUnit } =
+          ForeignInteractionSystem.learn(foreignPlayer.settlements[sIdx], unit);
+
         foreignPlayer.settlements[sIdx] = updatedSettlement;
-        const uIdx = player!.units.findIndex(u => u.id === unitId);
+        const uIdx = player!.units.findIndex((u) => u.id === unitId);
         player!.units[uIdx] = updatedUnit;
       }),
 
@@ -440,7 +529,7 @@ export const useGameStore = create<GameState>()(
       const state = get();
       let settlement: Settlement | undefined;
       for (const p of state.players) {
-        settlement = p.settlements.find(s => s.id === settlementId);
+        settlement = p.settlements.find((s) => s.id === settlementId);
         if (settlement) break;
       }
 
@@ -456,7 +545,9 @@ export const useGameStore = create<GameState>()(
 
     resolveCombat: (attackerId, targetX, targetY) =>
       set((state) => {
-        const player = state.players.find((p) => p.id === state.currentPlayerId);
+        const player = state.players.find(
+          (p) => p.id === state.currentPlayerId,
+        );
         if (!player) return;
 
         const attacker = player.units.find((u) => u.id === attackerId);
@@ -467,7 +558,9 @@ export const useGameStore = create<GameState>()(
 
         for (const p of state.players) {
           if (p.id !== state.currentPlayerId) {
-            const unit = p.units.find((u) => u.x === targetX && u.y === targetY);
+            const unit = p.units.find(
+              (u) => u.x === targetX && u.y === targetY,
+            );
             if (unit) {
               defender = unit;
               break;
@@ -476,7 +569,9 @@ export const useGameStore = create<GameState>()(
         }
 
         for (const p of state.players) {
-          const settlement = p.settlements.find((c) => c.x === targetX && c.y === targetY);
+          const settlement = p.settlements.find(
+            (c) => c.x === targetX && c.y === targetY,
+          );
           if (settlement) {
             defenderSettlement = settlement;
             if (!defender && p.id !== state.currentPlayerId) {
@@ -489,43 +584,64 @@ export const useGameStore = create<GameState>()(
         if (!defender) return;
 
         const defenderTile = state.map[targetY][targetX];
-        const result = CombatSystem.resolveCombat(attacker, defender, defenderTile, defenderSettlement);
+        const result = CombatSystem.resolveCombat(
+          attacker,
+          defender,
+          defenderTile,
+          defenderSettlement,
+        );
 
         if (result.winner === 'attacker') {
-           const defenderPlayer = state.players.find(p => p.units.some(u => u.id === (defender as any).id));
-           if (defenderPlayer) {
-              const uIdx = defenderPlayer.units.findIndex(u => u.id === (defender as any).id);
-              if (uIdx !== -1) {
-                defenderPlayer.units.splice(uIdx, 1);
-              }
-           }
+          const defenderPlayer = state.players.find((p) =>
+            p.units.some((u) => u.id === (defender as any).id),
+          );
+          if (defenderPlayer) {
+            const uIdx = defenderPlayer.units.findIndex(
+              (u) => u.id === (defender as any).id,
+            );
+            if (uIdx !== -1) {
+              defenderPlayer.units.splice(uIdx, 1);
+            }
+          }
 
-           const capturedSettlementPlayer = state.players.find(p => p.settlements.some(s => s.id === defender!.id));
-           if (capturedSettlementPlayer && capturedSettlementPlayer.id !== state.currentPlayerId) {
-             const sIdx = capturedSettlementPlayer.settlements.findIndex(s => s.id === defender!.id);
-             const s = capturedSettlementPlayer.settlements[sIdx];
-             if (s.population > 1) {
-                s.population -= 1;
-             } else {
-               // capture logic below
-             }
-           }
+          const capturedSettlementPlayer = state.players.find((p) =>
+            p.settlements.some((s) => s.id === defender!.id),
+          );
+          if (
+            capturedSettlementPlayer &&
+            capturedSettlementPlayer.id !== state.currentPlayerId
+          ) {
+            const sIdx = capturedSettlementPlayer.settlements.findIndex(
+              (s) => s.id === defender!.id,
+            );
+            const s = capturedSettlementPlayer.settlements[sIdx];
+            if (s.population > 1) {
+              s.population -= 1;
+            } else {
+              // capture logic below
+            }
+          }
 
-           if (capturedSettlementPlayer && capturedSettlementPlayer.id !== state.currentPlayerId) {
-              const sIdx = capturedSettlementPlayer.settlements.findIndex(s => s.id === defender!.id);
-              const s = capturedSettlementPlayer.settlements[sIdx];
+          if (
+            capturedSettlementPlayer &&
+            capturedSettlementPlayer.id !== state.currentPlayerId
+          ) {
+            const sIdx = capturedSettlementPlayer.settlements.findIndex(
+              (s) => s.id === defender!.id,
+            );
+            const s = capturedSettlementPlayer.settlements[sIdx];
 
-              attacker.x = targetX;
-              attacker.y = targetY;
-              attacker.movesRemaining = 0;
+            attacker.x = targetX;
+            attacker.y = targetY;
+            attacker.movesRemaining = 0;
 
-              s.ownerId = player.id;
-              s.units.forEach(u => u.ownerId = player.id);
-              player.settlements.push(s);
-              capturedSettlementPlayer.settlements.splice(sIdx, 1);
-           }
+            s.ownerId = player.id;
+            s.units.forEach((u) => (u.ownerId = player.id));
+            player.settlements.push(s);
+            capturedSettlementPlayer.settlements.splice(sIdx, 1);
+          }
         } else {
-          const aIdx = player.units.findIndex(u => u.id === attackerId);
+          const aIdx = player.units.findIndex((u) => u.id === attackerId);
           if (aIdx !== -1) {
             player.units.splice(aIdx, 1);
           }
@@ -537,10 +653,14 @@ export const useGameStore = create<GameState>()(
 
     recruitUnit: (unitType) =>
       set((state) => {
-        const player = state.players.find((p) => p.id === state.currentPlayerId);
+        const player = state.players.find(
+          (p) => p.id === state.currentPlayerId,
+        );
         if (!player) return;
 
-        const selectedUnit = player.units.find((u) => u.id === state.selectedUnitId);
+        const selectedUnit = player.units.find(
+          (u) => u.id === state.selectedUnitId,
+        );
         if (!selectedUnit || selectedUnit.type !== UnitType.SHIP) return;
 
         const costs: Record<string, number> = {
@@ -562,7 +682,10 @@ export const useGameStore = create<GameState>()(
         }
 
         if (musketsToConsume > 0) {
-          selectedUnit.cargo.set(GoodType.MUSKETS, (selectedUnit.cargo.get(GoodType.MUSKETS) || 0) - musketsToConsume);
+          selectedUnit.cargo.set(
+            GoodType.MUSKETS,
+            (selectedUnit.cargo.get(GoodType.MUSKETS) || 0) - musketsToConsume,
+          );
         }
 
         player.gold -= goldCost;
@@ -608,5 +731,6 @@ export const useGameStore = create<GameState>()(
 );
 
 if (typeof window !== 'undefined') {
-  (window as unknown as { useGameStore: typeof useGameStore }).useGameStore = useGameStore;
+  (window as unknown as { useGameStore: typeof useGameStore }).useGameStore =
+    useGameStore;
 }

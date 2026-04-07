@@ -3,7 +3,10 @@ import type { Tile } from '../entities/Tile';
 import { TerrainType, UnitType } from '../entities/types';
 
 export class MovementSystem {
-  static getReachableTiles(unit: Unit, map: Tile[][]): { x: number; y: number; cost: number }[] {
+  static getReachableTiles(
+    unit: Unit,
+    map: Tile[][],
+  ): { x: number; y: number; cost: number }[] {
     const reachable: { x: number; y: number; cost: number }[] = [];
     const visited = new Map<string, number>();
     const queue: { x: number; y: number; cost: number }[] = [];
@@ -63,7 +66,10 @@ export class MovementSystem {
       return Infinity;
     }
 
-    if (tile.terrainType === TerrainType.OCEAN || tile.terrainType === TerrainType.COAST) {
+    if (
+      tile.terrainType === TerrainType.OCEAN ||
+      tile.terrainType === TerrainType.COAST
+    ) {
       return Infinity;
     }
 
@@ -71,7 +77,10 @@ export class MovementSystem {
       return Infinity;
     }
 
-    if (tile.terrainType === TerrainType.FOREST || tile.terrainType === TerrainType.HILLS) {
+    if (
+      tile.terrainType === TerrainType.FOREST ||
+      tile.terrainType === TerrainType.HILLS
+    ) {
       return 2;
     }
 

@@ -1,7 +1,7 @@
 type Callback = (...args: any[]) => void;
 
 class EventBus {
-  private listeners: Map<string, Callback[]> = new Map();
+  private listeners = new Map<string, Callback[]>();
 
   on(event: string, callback: Callback) {
     if (!this.listeners.has(event)) {
@@ -16,7 +16,7 @@ class EventBus {
     if (eventListeners) {
       this.listeners.set(
         event,
-        eventListeners.filter((cb) => cb !== callback)
+        eventListeners.filter((cb) => cb !== callback),
       );
     }
   }

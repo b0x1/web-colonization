@@ -1,4 +1,12 @@
-import type { BuildingType, GoodType, UnitType, JobType, Culture, Organization, Attitude } from './types';
+import type {
+  BuildingType,
+  GoodType,
+  UnitType,
+  JobType,
+  Culture,
+  Organization,
+  Attitude,
+} from './types';
 import type { Unit } from './Unit';
 
 export interface Settlement {

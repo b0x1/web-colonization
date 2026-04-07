@@ -11,9 +11,19 @@ interface Props {
   onDelete: (slotName: string) => void;
 }
 
-export const ManualSavesSection: React.FC<Props> = ({ slots, saves, isMainMenuOpen, onSave, onLoad, onDownload, onDelete }) => (
+export const ManualSavesSection: React.FC<Props> = ({
+  slots,
+  saves,
+  isMainMenuOpen,
+  onSave,
+  onLoad,
+  onDownload,
+  onDelete,
+}) => (
   <>
-    <h3 className="text-lg font-bold mb-3 text-blue-400 border-b border-slate-700 pb-1">Manual Saves</h3>
+    <h3 className="text-lg font-bold mb-3 text-blue-400 border-b border-slate-700 pb-1">
+      Manual Saves
+    </h3>
     <div className="space-y-3">
       {slots.map((slot) => {
         const save = saves.find((s) => s.slotName === slot);
@@ -26,7 +36,9 @@ export const ManualSavesSection: React.FC<Props> = ({ slots, saves, isMainMenuOp
               <div className="font-black text-slate-300">Slot {slot}</div>
               {save ? (
                 <>
-                  <div className="font-bold">Turn {save.turn} - {save.playerName}</div>
+                  <div className="font-bold">
+                    Turn {save.turn} - {save.playerName}
+                  </div>
                   <div className="text-xs text-slate-400 mt-1">
                     {new Date(save.timestamp).toLocaleString()}
                   </div>

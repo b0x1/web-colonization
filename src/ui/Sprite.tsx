@@ -9,7 +9,12 @@ interface SpriteProps {
 
 const manifestCache: Record<string, any> = {};
 
-export const Sprite: React.FC<SpriteProps> = ({ type, category, size = 64, className = '' }) => {
+export const Sprite: React.FC<SpriteProps> = ({
+  type,
+  category,
+  size = 64,
+  className = '',
+}) => {
   const [manifest, setManifest] = useState<any>(manifestCache[category]);
 
   useEffect(() => {
@@ -30,7 +35,7 @@ export const Sprite: React.FC<SpriteProps> = ({ type, category, size = 64, class
 
   if (!coords) {
     if (manifest) {
-       console.warn(`Sprite type "${type}" not found in category "${category}"`);
+      console.warn(`Sprite type "${type}" not found in category "${category}"`);
     }
     return null;
   }

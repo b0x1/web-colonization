@@ -8,13 +8,22 @@ interface Props {
   onDelete: (slotName: string) => void;
 }
 
-export const AutosaveSection: React.FC<Props> = ({ save, onLoad, onDownload, onDelete }) => (
+export const AutosaveSection: React.FC<Props> = ({
+  save,
+  onLoad,
+  onDownload,
+  onDelete,
+}) => (
   <div className="mb-8">
-    <h3 className="text-lg font-bold mb-3 text-blue-400 border-b border-slate-700 pb-1">Autosave</h3>
+    <h3 className="text-lg font-bold mb-3 text-blue-400 border-b border-slate-700 pb-1">
+      Autosave
+    </h3>
     {save ? (
       <div className="flex justify-between items-center p-4 bg-slate-900/50 rounded-lg border border-slate-700 hover:border-slate-500 transition-colors">
         <div>
-          <div className="font-bold">Turn {save.turn} - {save.playerName}</div>
+          <div className="font-bold">
+            Turn {save.turn} - {save.playerName}
+          </div>
           <div className="text-xs text-slate-400 mt-1">
             {new Date(save.timestamp).toLocaleString()}
           </div>
@@ -41,7 +50,9 @@ export const AutosaveSection: React.FC<Props> = ({ save, onLoad, onDownload, onD
         </div>
       </div>
     ) : (
-      <div className="p-4 text-slate-500 italic bg-slate-900/30 rounded-lg border border-slate-800">No autosave found</div>
+      <div className="p-4 text-slate-500 italic bg-slate-900/30 rounded-lg border border-slate-800">
+        No autosave found
+      </div>
     )}
   </div>
 );
