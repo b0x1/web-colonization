@@ -23,16 +23,19 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
-        uses: actions/checkout@v6.0.2
+        uses: actions/checkout@v6
 
       - name: Setup Node.js
-        uses: actions/setup-node@v6.3.0
+        uses: actions/setup-node@v6
         with:
           node-version: "24"
           cache: "npm"
 
       - name: Install dependencies
-        run: npm ci
+        run: npm ci --legacy-peer-deps
+
+      - name: Lint
+        run: npm run lint
 
       - name: Test
         run: npm run test
@@ -43,7 +46,7 @@ jobs:
           NODE_ENV: production
 
       - name: Upload artifact
-        uses: actions/upload-pages-artifact@v4.0.0
+        uses: actions/upload-pages-artifact@v4
         with:
           path: dist
 
@@ -57,4 +60,4 @@ jobs:
     steps:
       - name: Deploy to GitHub Pages
         id: deployment
-        uses: actions/deploy-pages@v5.0.0
+        uses: actions/deploy-pages@v5
