@@ -264,9 +264,10 @@ export const useGameStore = create<GameState>()(
       } else if (state.phase === TurnPhase.TRADE) {
         get().endTurn();
       } else if (state.phase === TurnPhase.AI) {
-        const updatedPlayers = AISystem.runAITurn(state.players, state.map);
+        const { players: updatedPlayers, namingStats: updatedNamingStats } = AISystem.runAITurn(state.players, state.map, state.namingStats);
         set((s) => {
           s.players = updatedPlayers;
+          s.namingStats = updatedNamingStats;
         });
         get().endTurn();
       } else if (state.phase === TurnPhase.END_TURN) {
