@@ -2,6 +2,7 @@ import Phaser from 'phaser';
 import type { Tile } from '../entities/Tile';
 import type { Settlement } from '../entities/Settlement';
 import { TerrainType } from '../entities/types';
+import type { Position } from '../entities/Position';
 
 export class TerrainRenderer {
   private scene: Phaser.Scene;
@@ -38,17 +39,17 @@ export class TerrainRenderer {
     });
   }
 
-  public tileToWorld(tileX: number, tileY: number): { x: number; y: number } {
+  public tileToWorld(tile: Position): { x: number; y: number } {
     return {
-      x: tileX * this.tileSize,
-      y: tileY * this.tileSize,
+      x: tile.x * this.tileSize,
+      y: tile.y * this.tileSize,
     };
   }
 
-  public worldToTile(worldX: number, worldY: number): { x: number; y: number } {
+  public worldToTile(worldPos: { x: number; y: number }): Position {
     return {
-      x: Math.floor(worldX / this.tileSize),
-      y: Math.floor(worldY / this.tileSize),
+      x: Math.floor(worldPos.x / this.tileSize),
+      y: Math.floor(worldPos.y / this.tileSize),
     };
   }
 
@@ -108,7 +109,7 @@ export class TerrainRenderer {
         }
 
         if (tile.terrainType === TerrainType.COAST) {
-          const { x: worldX, y: worldY } = this.tileToWorld(x, y);
+          const { x: worldX, y: worldY } = this.tileToWorld({ x, y });
           this.drawCoastBorders(tiles, x, y, worldX, worldY);
         }
       });
@@ -124,7 +125,7 @@ export class TerrainRenderer {
     this.playerSettlementGraphics = this.scene.add.group();
 
     playerSettlements.forEach((settlement) => {
-      const { x: worldX, y: worldY } = this.tileToWorld(settlement.position.x, settlement.position.y);
+      const { x: worldX, y: worldY } = this.tileToWorld(settlement.position);
       const frame = `settlement_${settlement.organization.toLowerCase()}`;
       const sprite = this.scene.add.image(worldX, worldY, 'other', frame)
         .setOrigin(0, 0)
@@ -161,7 +162,7 @@ export class TerrainRenderer {
     }
   }
 
-  public updateReachableHighlights(reachableTiles: { x: number; y: number }[]) {
+  public updateReachableHighlights(reachableTiles: Position[]) {
     if (this.reachableHighlights) {
       this.reachableHighlights.destroy();
       this.reachableHighlights = null;
@@ -171,7 +172,7 @@ export class TerrainRenderer {
     this.reachableHighlights.setDepth(5);
 
     reachableTiles.forEach((tile) => {
-      const { x: worldX, y: worldY } = this.tileToWorld(tile.x, tile.y);
+      const { x: worldX, y: worldY } = this.tileToWorld(tile);
       this.reachableHighlights?.fillRect(worldX, worldY, this.tileSize, this.tileSize);
     });
   }
@@ -183,14 +184,14 @@ export class TerrainRenderer {
     }
   }
 
-  public updateSelectionHighlight(tileX: number | null, tileY: number | null) {
+  public updateSelectionHighlight(tile: Position | null) {
     if (this.selectionHighlight) {
       this.selectionHighlight.destroy();
       this.selectionHighlight = null;
     }
 
-    if (tileX !== null && tileY !== null) {
-      const { x: worldX, y: worldY } = this.tileToWorld(tileX, tileY);
+    if (tile) {
+      const { x: worldX, y: worldY } = this.tileToWorld(tile);
       this.selectionHighlight = this.scene.add.graphics();
       this.selectionHighlight.lineStyle(2, 0xffffff, 1);
       this.selectionHighlight.strokeRect(worldX, worldY, this.tileSize, this.tileSize);
@@ -199,15 +200,15 @@ export class TerrainRenderer {
   }
 
   public showTooltip(
-    tileX: number,
-    tileY: number,
-    worldX: number,
-    worldY: number,
+    tile: Position,
+    worldPos: { x: number; y: number },
     settlementName?: string
   ) {
     this.hideTooltip();
 
-    const text = settlementName ? `${settlementName} (${tileX}, ${tileY})` : `(${tileX}, ${tileY})`;
+    const text = settlementName ? `${settlementName} (${tile.x}, ${tile.y})` : `(${tile.x}, ${tile.y})`;
+
+    const { x: worldX, y: worldY } = worldPos;
 
     this.hoverTooltip = this.scene.add
       .text(worldX + 10, worldY + 10, text, {
