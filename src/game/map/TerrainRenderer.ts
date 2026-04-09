@@ -109,8 +109,9 @@ export class TerrainRenderer {
         }
 
         if (tile.terrainType === TerrainType.COAST) {
-          const { x: worldX, y: worldY } = this.tileToWorld({ x, y });
-          this.drawCoastBorders(tiles, x, y, worldX, worldY);
+          const pos = { x, y };
+          const worldPos = this.tileToWorld(pos);
+          this.drawCoastBorders(tiles, pos, worldPos);
         }
       });
     });
@@ -134,8 +135,11 @@ export class TerrainRenderer {
     });
   }
 
-  private drawCoastBorders(tiles: Tile[][], x: number, y: number, worldX: number, worldY: number) {
+  private drawCoastBorders(tiles: Tile[][], pos: Position, worldPos: { x: number; y: number }) {
     if (!this.coastBorders) return;
+
+    const { x, y } = pos;
+    const { x: worldX, y: worldY } = worldPos;
 
     const checkOcean = (tx: number, ty: number) => {
       if (ty < 0 || ty >= tiles.length || tx < 0 || tx >= tiles[ty].length) {
