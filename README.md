@@ -7,8 +7,11 @@ implemented by a meat blob prompting [Claude](https://claude.ai) to prompt
 
 ## Architecture and Stack
 
-For detailed information on the tech stack, project structure, and architectural
-guidelines, please refer to [AGENTS.md](./AGENTS.md).
+For detailed information on
+the tech stack,
+project structure,
+and architectural guidelines,
+please read [ARCHITECTURE.md](./ARCHITECTURE.md).
 
 ## Getting Started
 
