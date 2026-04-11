@@ -1,18 +1,16 @@
 import React from 'react';
 import type { Unit } from '../../../game/entities/Unit';
-import type { Player } from '../../../game/entities/Player';
 import type { Settlement } from '../../../game/entities/Settlement';
 import { useGameStore } from '../../../game/state/gameStore';
 
 interface Props {
   unitsAtTile: Unit[];
   settlementAtTile?: Settlement | null;
-  players: Player[];
   onSelectUnit: (unitId: string) => void;
   onSelectSettlement: (settlementId: string) => void;
 }
 
-export const UnitSelector: React.FC<Props> = ({ unitsAtTile, settlementAtTile, players, onSelectUnit, onSelectSettlement }) => {
+export const UnitSelector: React.FC<Props> = ({ unitsAtTile, settlementAtTile, onSelectUnit, onSelectSettlement }) => {
   const currentPlayerId = useGameStore.getState().currentPlayerId;
   const isOwnedSettlement = settlementAtTile?.ownerId === currentPlayerId;
 
@@ -35,7 +33,6 @@ export const UnitSelector: React.FC<Props> = ({ unitsAtTile, settlementAtTile, p
           </button>
         )}
       {unitsAtTile.map((u) => {
-        const owner = players.find(p => p.id === u.ownerId);
         return (
           <button
             key={u.id}
