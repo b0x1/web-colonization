@@ -15,7 +15,7 @@ export class UnitRenderer {
     this.unitBadges = scene.add.group();
   }
 
-  render(players: Player[], selectedUnitId: string | null) {
+  render(players: Player[], selectedUnitId: string | null): void {
     this.unitSprites.clear(true, true);
     this.selectionRings.clear(true, true);
     this.unitBadges.clear(true, true);
@@ -29,7 +29,7 @@ export class UnitRenderer {
         if (inSettlement && selectedUnitId !== unit.id) return;
 
         const key = toKey(unit.position);
-        if (!unitsByTile[key]) unitsByTile[key] = [];
+        unitsByTile[key] ??= [];
         unitsByTile[key].push(unit);
       });
     });
@@ -75,7 +75,7 @@ export class UnitRenderer {
     });
   }
 
-  destroy() {
+  destroy(): void {
     this.unitSprites.destroy(true);
     this.selectionRings.destroy(true);
     this.unitBadges.destroy(true);

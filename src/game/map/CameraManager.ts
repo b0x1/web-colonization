@@ -20,7 +20,7 @@ export class CameraManager {
     };
   }
 
-  setup(mapWidth: number, mapHeight: number) {
+  setup(mapWidth: number, mapHeight: number): void {
     this.scene.cameras.main.setBounds(
       0,
       0,
@@ -29,7 +29,7 @@ export class CameraManager {
     );
   }
 
-  update() {
+  update(): void {
     const cam = this.scene.cameras.main;
 
     if (this.cursors.left.isDown) cam.scrollX -= this.scrollSpeed;
@@ -48,12 +48,12 @@ export class CameraManager {
     }
   }
 
-  centerOn(pos: Position) {
+  centerOn(pos: Position): void {
     const { x: wx, y: wy } = this.terrainRenderer.tileToWorld(pos);
     this.scene.cameras.main.centerOn(wx, wy);
   }
 
-  emitViewportUpdate() {
+  emitViewportUpdate(): void {
     const cam = this.scene.cameras.main;
     eventBus.emit('viewportUpdated', {
       x: cam.scrollX / this.tileSize,

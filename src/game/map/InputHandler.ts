@@ -8,14 +8,14 @@ import { isSame, type Position } from '../entities/Position';
 export class InputHandler {
   constructor(private scene: Phaser.Scene, private terrainRenderer: TerrainRenderer) {}
 
-  setup(mapWidth: number, mapHeight: number, getReachableTiles: () => Position[], handleMove: (id: string, position: Position) => void) {
+  setup(mapWidth: number, mapHeight: number, getReachableTiles: () => Position[], handleMove: (id: string, position: Position) => void): void { {
     this.scene.input.mouse?.disableContextMenu();
 
     this.scene.input.on('pointerdown', (pointer: Phaser.Input.Pointer) => {
       const worldPoint = pointer.positionToCamera(this.scene.cameras.main) as Phaser.Math.Vector2;
       const pos = this.terrainRenderer.worldToTile(worldPoint);
 
-      if (pos.x < 0 || pos.x >= mapWidth || pos.y < 0 || pos.y >= mapHeight) return;
+      if (pos.x < 0 ?? pos.x >= mapWidth ?? pos.y < 0 ?? pos.y >= mapHeight) return;
 
       if (pointer.leftButtonDown()) {
         this.handleLeftClick(pos);
@@ -42,13 +42,13 @@ export class InputHandler {
 
     this.scene.input.keyboard?.on('keydown-ESC', () => {
       useGameStore.getState().selectUnit(null);
-      this.scene.events.emit('unitSelected', null as any);
+      this.scene.events.emit('unitSelected', null as unknown);
       useGameStore.getState().selectTile(null);
       this.terrainRenderer.updateSelectionHighlight(null);
     });
   }
 
-  private handleLeftClick(pos: Position) {
+  private handleLeftClick(pos: Position): void { {
     const state = useGameStore.getState();
     const player = state.players.find(p => p.id === state.currentPlayerId);
 
@@ -61,14 +61,14 @@ export class InputHandler {
        unitsAtTile.push(...availableUnitsInSettlement);
     }
 
-    const tile = state.map[pos.y]?.[pos.x] || { position: pos, terrainType: 'UNKNOWN', movementCost: 1, hasResource: null };
-    useGameStore.getState().selectTile(tile as any);
+    const tile = state.map[pos.y]?.[pos.x] ?? { position: pos, terrainType: 'UNKNOWN', movementCost: 1, hasResource: null };
+    useGameStore.getState().selectTile(tile as unknown);
 
     if (settlementAtTile) {
       const isOwned = settlementAtTile.ownerId === state.currentPlayerId;
       if (unitsAtTile.length > 0 && isOwned) {
          useGameStore.getState().selectUnit(null);
-         this.scene.events.emit('unitSelected', null as any);
+         this.scene.events.emit('unitSelected', null as unknown);
       } else {
          useGameStore.getState().selectSettlement(settlementAtTile.id);
          this.scene.events.emit('settlementSelected', settlementAtTile.id);
@@ -79,17 +79,17 @@ export class InputHandler {
       this.scene.events.emit('unitSelected', unit.id);
     } else if (unitsAtTile.length > 1) {
       useGameStore.getState().selectUnit(null);
-      this.scene.events.emit('unitSelected', null as any);
+      this.scene.events.emit('unitSelected', null as unknown);
     } else {
       useGameStore.getState().selectUnit(null);
       useGameStore.getState().selectSettlement(null);
-      this.scene.events.emit('unitSelected', null as any);
-      this.scene.events.emit('settlementSelected', null as any);
+      this.scene.events.emit('unitSelected', null as unknown);
+      this.scene.events.emit('settlementSelected', null as unknown);
     }
     this.terrainRenderer.updateSelectionHighlight(pos);
   }
 
-  private handleRightClick(pos: Position, reachableTiles: Position[], handleMove: (id: string, position: Position) => void) {
+  private handleRightClick(pos: Position, reachableTiles: Position[], handleMove: (id: string, position: Position) => void): void { {
     const state = useGameStore.getState();
     if (!state.selectedUnitId) return;
 
@@ -120,7 +120,7 @@ export class InputHandler {
         handleMove(state.selectedUnitId, pos);
       } else {
         useGameStore.getState().selectUnit(null);
-        this.scene.events.emit('unitSelected', null as any);
+        this.scene.events.emit('unitSelected', null as unknown);
         this.terrainRenderer.updateSelectionHighlight(null);
       }
     }
