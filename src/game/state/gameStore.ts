@@ -591,7 +591,7 @@ export const useGameStore = create<GameState>()(
         state.namingStats = updatedStats;
 
         player.units.push({
-          id: `unit-${String(Date.now())}-${String(Math.floor(Math.random() * 1000))}`,
+          id: `unit-${Date.now()}-${Math.floor(Math.random() * 1000)}`,
           ownerId: player.id,
           name: newUnitName,
           type: unitType,
