@@ -1,4 +1,4 @@
-import { TerrainType } from '../entities/types';
+import type { TerrainType } from '../entities/types';
 import type { Position } from '../entities/Position';
 
 export class TileMap {

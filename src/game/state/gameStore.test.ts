@@ -128,10 +128,18 @@ describe('gameStore', () => {
 
       useGameStore.getState().endTurn();
 
-      const updatedP2 = useGameStore.getState().players.find(p => p.id === 'p2')!;
+      const updatedP2 = useGameStore.getState().players.find((player) => player.id === 'p2');
+      expect(updatedP2).toBeDefined();
+      if (!updatedP2) {
+        return;
+      }
       expect(updatedP2.units[0].movesRemaining).toBe(2);
 
-      const updatedP1 = useGameStore.getState().players.find(p => p.id === 'p1')!;
+      const updatedP1 = useGameStore.getState().players.find((player) => player.id === 'p1');
+      expect(updatedP1).toBeDefined();
+      if (!updatedP1) {
+        return;
+      }
       expect(updatedP1.units[0].movesRemaining).toBe(0);
     });
   });

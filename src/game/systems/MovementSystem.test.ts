@@ -3,12 +3,13 @@ import { MovementSystem } from './MovementSystem';
 import { createUnit } from './../entities/Unit';
 import { createTile } from './../entities/Tile';
 import { TerrainType, UnitType } from './../entities/types';
+import type { Tile } from '../entities/Tile';
 
 describe('MovementSystem', () => {
   const createMap = (width: number, height: number, terrainType: TerrainType = TerrainType.PLAINS) => {
-    const map: any[][] = [];
+    const map: Tile[][] = [];
     for (let y = 0; y < height; y++) {
-      const row: any[] = [];
+      const row: Tile[] = [];
       for (let x = 0; x < width; x++) {
         row.push(createTile(`${x}-${y}`, x, y, terrainType, 1));
       }
@@ -48,8 +49,8 @@ describe('MovementSystem', () => {
 
     // Only (6,5) which is OCEAN should be reachable
     expect(reachable.length).toBe(1);
-    expect(reachable[0].x).toBe(6);
-    expect(reachable[0].y).toBe(5);
+    expect(reachable[0]?.x).toBe(6);
+    expect(reachable[0]?.y).toBe(5);
   });
 
   it('should restrict non-SHIP from OCEAN', () => {
@@ -61,8 +62,8 @@ describe('MovementSystem', () => {
 
     // Only (6,5) which is PLAINS should be reachable
     expect(reachable.length).toBe(1);
-    expect(reachable[0].x).toBe(6);
-    expect(reachable[0].y).toBe(5);
+    expect(reachable[0]?.x).toBe(6);
+    expect(reachable[0]?.y).toBe(5);
   });
 
   it('should restrict land units from COAST', () => {
@@ -74,7 +75,7 @@ describe('MovementSystem', () => {
 
     // Only (6,5) which is PLAINS should be reachable, COAST is now blocked
     expect(reachable.length).toBe(1);
-    expect(reachable[0].x).toBe(6);
-    expect(reachable[0].y).toBe(5);
+    expect(reachable[0]?.x).toBe(6);
+    expect(reachable[0]?.y).toBe(5);
   });
 });

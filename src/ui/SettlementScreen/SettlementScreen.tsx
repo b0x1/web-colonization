@@ -1,5 +1,5 @@
 import React, { useEffect } from 'react';
-import { useGameStore } from '../../game/state/gameStore';
+import { getSettlementProduction, useGameStore } from '../../game/state/gameStore';
 import { useUIStore } from '../../game/state/uiStore';
 import { BuildingSlots } from './BuildingSlots';
 import { MapGrid } from './MapGrid';
@@ -7,7 +7,6 @@ import { AvailableUnits } from './AvailableUnits';
 import { InventoryPanel } from './InventoryPanel';
 import { Flag } from '../Flag';
 import { isSame } from '../../game/entities/Position';
-import { ProductionSystem } from '../../game/systems/ProductionSystem';
 
 export const SettlementScreen: React.FC = () => {
   const { selectedSettlementId, players, currentPlayerId, map } = useGameStore();
@@ -33,6 +32,7 @@ export const SettlementScreen: React.FC = () => {
   if (!settlement || !player || !settlementOwner) return null;
 
   const isReadOnly = settlement.ownerId !== currentPlayerId;
+  const { hammersProduced } = getSettlementProduction(settlement, map);
 
   // Collect units physically at the settlement
   const unitsAtSettlement = [
@@ -68,7 +68,7 @@ export const SettlementScreen: React.FC = () => {
                 <span className="text-[9px] font-black uppercase tracking-widest bg-blue-900/50 px-1.5 py-0.5 rounded border border-blue-700/50">Hammers</span>
                 {settlement.hammers}
                 <span className="text-xs font-bold text-blue-400">
-                  (+{ProductionSystem.calculateSettlementProduction(settlement, map).hammersProduced})
+                  (+{hammersProduced})
                 </span>
               </div>
               {isReadOnly && <span className="text-red-500 text-[10px] font-black uppercase tracking-widest bg-red-950/30 px-2 py-0.5 rounded border border-red-900/30">[READ ONLY - {settlementOwner.name}]</span>}
@@ -96,7 +96,7 @@ export const SettlementScreen: React.FC = () => {
             <BuildingSlots settlementId={settlement.id} ownedBuildings={settlement.buildings} />
           </div>
           <div className="h-48 bg-slate-900/30 rounded-xl border border-slate-800 p-4">
-            <InventoryPanel settlement={settlement} map={useGameStore.getState().map} />
+            <InventoryPanel settlement={settlement} map={map} />
           </div>
         </div>
 

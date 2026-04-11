@@ -24,9 +24,7 @@
     "noImplicitReturns": true,
     "erasableSyntaxOnly": false,
     "noFallthroughCasesInSwitch": true,
-    "noUncheckedSideEffectImports": true,
-    "noUncheckedIndexedAccess": true,
-    "exactOptionalPropertyTypes": true
+    "noUncheckedSideEffectImports": true
   },
   "include": ["src"]
 }

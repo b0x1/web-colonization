@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/no-explicit-any, @typescript-eslint/no-unsafe-argument */
-import Phaser from 'phaser';
+import type Phaser from 'phaser';
 import type { TerrainRenderer } from './TerrainRenderer';
 import { useGameStore } from '../state/gameStore';
 import { useUIStore } from '../state/uiStore';

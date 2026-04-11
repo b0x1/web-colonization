@@ -3,9 +3,8 @@ import Phaser from 'phaser';
 import { TileMap } from '../game/map/TileMap';
 import { TerrainRenderer } from '../game/map/TerrainRenderer';
 import { SpriteLoader } from '../game/utils/SpriteLoader';
-import { useGameStore } from '../game/state/gameStore';
+import { getReachableTilesForUnit, useGameStore } from '../game/state/gameStore';
 import type { Unit } from '../game/entities/Unit';
-import { MovementSystem } from '../game/systems/MovementSystem';
 import { eventBus } from '../game/state/EventBus';
 import { MAP_CONSTANTS, UNIT_CONSTANTS } from '../game/constants';
 import { UnitRenderer } from '../game/map/UnitRenderer';
@@ -82,7 +81,7 @@ export class WorldScene extends Phaser.Scene {
 
       const selectedUnit = state.players.flatMap((p) => p.units).find((u) => u.id === state.selectedUnitId);
       if (selectedUnit) {
-        this.reachableTiles = MovementSystem.getReachableTiles(selectedUnit, state.map);
+        this.reachableTiles = getReachableTilesForUnit(selectedUnit, state.map);
         this.terrainRenderer.updateReachableHighlights(this.reachableTiles);
       } else {
         this.reachableTiles = [];
@@ -173,7 +172,7 @@ export class WorldScene extends Phaser.Scene {
     this.unitRenderer.destroy();
   }
 
-  update(): void {
+  override update(): void {
     this.cameraManager.update();
   }
 }
