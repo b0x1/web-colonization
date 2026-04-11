@@ -1,5 +1,6 @@
 import { createNoise2D } from 'simplex-noise';
-import { TerrainType, Attitude, GoodType, Nation } from '../entities/types';
+import type { Nation } from '../entities/types';
+import { TerrainType, Attitude, GoodType } from '../entities/types';
 import type { Settlement } from '../entities/Settlement';
 import { MAP_CONSTANTS, NATION_BONUSES } from '../constants';
 

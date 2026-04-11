@@ -8,7 +8,9 @@
     "build:sprites": "node scripts/build-sprites.js",
     "prebuild": "npm run build:sprites",
     "build": "tsc -b && vite build",
-    "lint": "eslint .",
+    "typecheck": "tsc -b --pretty false",
+    "lint": "eslint . --max-warnings 0",
+    "check": "npm run typecheck && npm run lint && npm run test",
     "test": "vitest run",
     "preview": "vite preview"
   },

@@ -88,7 +88,12 @@ describe('Europe Trade', () => {
 
     const { players } = useGameStore.getState();
     const player = players[0];
-    const ship = player.units.find(u => u.type === UnitType.SHIP)!;
+    const ship = player.units.find((unit) => unit.type === UnitType.SHIP);
+
+    expect(ship).toBeDefined();
+    if (!ship) {
+      return;
+    }
 
     // Initial gold 1000, SOLDIER costs 800g = 200g left
     expect(player.gold).toBe(200);

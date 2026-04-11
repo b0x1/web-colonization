@@ -1,6 +1,6 @@
 # SKILLS — webcol
 
-Technical patterns for this codebase. Use these. Not invent own.
+Use these pattern. Do not invent new pattern unless old one fail.
 
 ---
 
@@ -8,151 +8,130 @@ Technical patterns for this codebase. Use these. Not invent own.
 
 File: `src/game/state/EventBus.ts`
 
-Scene emit event. React subscribe in `useEffect`. React dispatch store action. Scene react to store subscription.
-No direct cross-layer calls.
+Scene shout event.
+React hear in `useEffect`.
+React call store action.
+Scene hear store by subscription.
+No direct scene <-> React grab.
 
-EventBus generic. `on<T>` infer callback type from call site.
+New event:
+- add to `EventMap`
+- use typed event
+- no loose string event name all over cave
 
-```typescript
-// subscribe
-const unsub = eventBus.on<{ x: number; y: number }>('cameraJump', ({ x, y }) => { ... });
-// cleanup
-return () => unsub();
-
-// emit
-eventBus.emit('cameraJump', { x: 10, y: 20 });
-```
-
-New event → add to `EventMap` type in EventBus.ts. No string literal elsewhere.
+Smell:
+- React import scene -> stop
+- Scene call React code -> stop
+- New event string outside `EventMap` -> stop
 
 ---
 
-## SYSTEM CLASS
+## SYSTEM
 
-Pure TypeScript. No Phaser. No React. No store read inside system.
-Caller read state, pass in. System return plain data.
+System pure TypeScript.
+No Phaser.
+No React.
+No Zustand read inside.
+Input in. plain data out.
 
+Good:
 ```typescript
-// Good
 const result = CombatSystem.resolveCombat(attacker, defender, tile);
 useGameStore.getState().applyResult(result);
+```
 
-// Bad
+Bad:
+```typescript
 class CombatSystem {
   resolve() {
-    const state = useGameStore.getState(); // NO
+    const state = useGameStore.getState();
   }
 }
 ```
 
-System must be testable with Vitest alone. No Phaser start. No React render.
+Smell:
+- system import store/EventBus -> stop
+- system touch DOM/window/document -> stop
+- system need React/Phaser test -> stop
 
 ---
 
-## ENTITY PATTERN
+## ENTITY
 
-Use interface + factory function. Not class with constructor.
-Plain object. Immer-safe. JSON-serialisable.
+Entity is plain data.
+Use interface + factory.
+No class instance.
+Must be Immer-safe and JSON-safe.
 
-```typescript
-// Good
-interface Settlement {
-  readonly id: string;
-  readonly position: { x: number; y: number };
-  population: number;
-}
-function createSettlement(id: string, position: { x: number; y: number }): Settlement {
-  return { id, position, population: 1 };
-}
-
-// Bad
-class Settlement {
-  constructor(public id: string) {} // Immer breaks class instances
-}
-```
+Smell:
+- constructor -> stop
+- method on entity object -> stop
+- entity import system/store/ui/scene -> stop
 
 ---
 
-## ZUSTAND STORE
+## STORE
 
-Store hold serialisable data only. No Phaser object. No React ref. No class instance.
-Store action do input validation then update state.
-Complex logic → delegate to system class.
+Store hold serialisable data only.
+No Phaser object.
+No React ref.
+No class instance.
+Store validate input.
+Heavy rule go system.
 
-```typescript
-// Good
-addUnit: (unitData) => set(produce(state => {
-  const unit = createUnit(unitData);
-  state.units[unit.id] = unit;
-})),
-
-// Bad — logic in store
-addUnit: (unitData) => set(produce(state => {
-  if (state.units[unitData.id]) throw ...; // validation ok
-  const stats = calculateBaseStats(unitData.type); // logic → move to system
-})),
-```
+Smell:
+- store calculate game rule blob -> move to system
+- store keep framework object -> stop
 
 ---
 
-## REACT COMPONENT
+## UI
 
-Container: connect Zustand, pass props down. No render logic.
-Presentational: receive props, render. No store access.
-Never both. Never call system class direct.
-Style with Tailwind only. No inline style. No `.css` class if Tailwind can do.
+Container read Zustand and pass prop down.
+Present file render only.
+Do not do both in one file when feature grow.
+UI no Phaser.
+UI no direct system call.
+Tailwind first.
 
-```typescript
-// Container
-function SettlementPanelContainer() {
-  const settlement = useGameStore(s => s.selectedSettlement);
-  return <SettlementPanel settlement={settlement} />;
-}
-
-// Presentational
-function SettlementPanel({ settlement }: { settlement: Settlement }) {
-  return <div className="p-4 bg-stone-800">...</div>;
-}
-```
+Smell:
+- React file import Phaser -> stop
+- React file import system -> stop
+- component hide game rule in click handler -> stop
 
 ---
 
-## CONSTANTS
+## CONSTANT
 
-All magic numbers and config strings → `src/game/constants.ts`.
+Magic number or string go `src/game/constants.ts`.
 
-```typescript
-// Bad
-if (population > 50) { ... }
-
-// Good
-if (population > MAX_SETTLEMENT_POPULATION) { ... }
-```
+Smell:
+- `if (population > 50)` -> bad
+- hidden config string inline -> bad
 
 ---
 
-## TESTS
+## TEST
 
-File `src/game/systems/CombatSystem.ts` → test at `src/game/systems/CombatSystem.test.ts`.
-Test system in isolation. Pass plain data in. Assert plain data out.
-No Phaser. No React. No store.
+System test live next to system file.
+Test system alone.
+Pass plain data in.
+Check plain data out.
+No Phaser. No React. No store boot.
 
-```typescript
-describe('CombatSystem', () => {
-  it('defender win on equal strength', () => {
-    const result = CombatSystem.resolveCombat(attacker, defender, tile);
-    expect(result.winner).toBe('defender');
-  });
-});
-```
+Smell:
+- test need browser render for system -> stop
+- new logic file with no test -> stop
 
 ---
 
-## NEW FEATURE FOLDER
+## FOLDER
 
-New feature → new folder. Not dump files in root of existing dir.
+New feature get own folder.
+Do not dump many files in old root pile.
 
-```
+Example:
+```text
 src/ui/TradePanel/
   TradePanel.tsx
   TradePanelContainer.tsx

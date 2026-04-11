@@ -3,19 +3,12 @@ import type { Tile } from '../entities/Tile';
 import type { Settlement } from '../entities/Settlement';
 import { GoodType, UnitType, JobType, BuildingType } from '../entities/types';
 import { eventBus } from '../state/EventBus';
-import { SaveSystem } from './SaveSystem';
-import type { GameState } from '../state/gameStore';
 import { BUILDING_COSTS, COLONY_CONSTANTS, UNIT_BUILD_COSTS } from '../constants';
 import { createUnit } from '../entities/Unit';
 import { ProductionSystem } from './ProductionSystem';
 import { NamingSystem, type NamingStats } from './NamingSystem';
 
 export class TurnEngine {  // eslint-disable-line @typescript-eslint/no-extraneous-class
-  static autoSave(state: GameState): void {
-    SaveSystem.save(state, 'autosave');
-    eventBus.emit('notification', 'Auto-saved');
-  }
-
   static runProduction(players: Player[], map: Tile[][], namingStats: NamingStats): { players: Player[]; namingStats: NamingStats } {
     let currentNamingStats = { ...namingStats };
     const updatedPlayers = players.map((player) => {

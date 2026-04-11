@@ -21,8 +21,10 @@ import { UnitSystem } from '../systems/UnitSystem';
 import { EconomySystem } from '../systems/EconomySystem';
 import { MovementSystem } from '../systems/MovementSystem';
 import { NamingSystem, type NamingStats } from '../systems/NamingSystem';
+import { ProductionSystem } from '../systems/ProductionSystem';
 import { useUIStore } from './uiStore';
 import { isSame } from '../entities/Position';
+import { SaveManager } from './SaveManager';
 
 enableMapSet();
 
@@ -234,7 +236,8 @@ export const useGameStore = create<GameState>()(
         if (nextTurn > state.turn && nextPlayerIndex === 0) {
           setTimeout(() => {
             const currentState = get();
-            TurnEngine.autoSave(currentState as unknown as GameState);
+            SaveManager.save(currentState, 'autosave');
+            eventBus.emit('notification', 'Auto-saved');
           }, 0);
         }
 
@@ -635,3 +638,14 @@ export const useGameStore = create<GameState>()(
 if (typeof window !== 'undefined') {
   (window as unknown as { useGameStore: typeof useGameStore }).useGameStore = useGameStore;
 }
+
+export const getReachableTilesForUnit = (
+  unit: Unit,
+  map: Tile[][]
+): (Position & { cost: number })[] => MovementSystem.getReachableTiles(unit, map);
+
+export const getSettlementProduction = (
+  settlement: Settlement,
+  map: Tile[][]
+): { netProduction: Map<GoodType, number>; hammersProduced: number } =>
+  ProductionSystem.calculateSettlementProduction(settlement, map);

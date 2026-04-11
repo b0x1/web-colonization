@@ -1,8 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useGameStore } from '../game/state/gameStore';
 import { useUIStore } from '../game/state/uiStore';
-import { SaveSystem } from '../game/systems/SaveSystem';
-import type { SaveMeta } from '../game/systems/SaveSystem';
+import { SaveManager, type SaveMeta } from '../game/state/SaveManager';
 import { eventBus } from '../game/state/EventBus';
 import { AutosaveSection } from './SaveLoadModal/components/AutosaveSection';
 import { ManualSavesSection } from './SaveLoadModal/components/ManualSavesSection';
@@ -14,12 +13,12 @@ export const SaveLoadModal: React.FC = () => {
   const resetGame = useGameStore((state) => state.resetGame);
 
   const [saves, setSaves] = useState<SaveMeta[]>(() =>
-    isSaveModalOpen ? SaveSystem.listSaves() : [],
+    isSaveModalOpen ? SaveManager.listSaves() : [],
   );
 
   useEffect(() => {
     if (isSaveModalOpen) {
-      const allSaves = SaveSystem.listSaves();
+      const allSaves = SaveManager.listSaves();
       setSaves(allSaves);
     }
   }, [isSaveModalOpen]);
@@ -27,12 +26,12 @@ export const SaveLoadModal: React.FC = () => {
   if (!isSaveModalOpen) return null;
 
   const handleSave = (slotName: string) => {
-    SaveSystem.save(gameState, slotName);
-    setSaves(SaveSystem.listSaves());
+    SaveManager.save(gameState, slotName);
+    setSaves(SaveManager.listSaves());
   };
 
   const handleLoad = (slotName: string) => {
-    const loadedState = SaveSystem.load(slotName);
+    const loadedState = SaveManager.load(slotName);
     if (loadedState) {
       loadGameState(loadedState);
       eventBus.emit('gameLoaded');
@@ -40,13 +39,13 @@ export const SaveLoadModal: React.FC = () => {
   };
 
   const handleDownload = (slotName: string) => {
-    SaveSystem.downloadSave(slotName);
+    SaveManager.downloadSave(slotName);
   };
 
   const handleDelete = (slotName: string) => {
     if (confirm(`Are you sure you want to delete this save (${slotName})?`)) {
-      SaveSystem.deleteSave(slotName);
-      setSaves(SaveSystem.listSaves());
+      SaveManager.deleteSave(slotName);
+      setSaves(SaveManager.listSaves());
     }
   };
 
