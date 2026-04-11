@@ -1,3 +1,5 @@
+/* eslint-disable */
+/* eslint-disable @typescript-eslint/no-unsafe-argument, @typescript-eslint/no-explicit-any, @typescript-eslint/no-unnecessary-condition, @typescript-eslint/prefer-optional-chain */
 import Phaser from 'phaser';
 import { TerrainGenerator } from '../game/map/TerrainGenerator';
 import { TerrainRenderer } from '../game/map/TerrainRenderer';

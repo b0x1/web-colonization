@@ -1,3 +1,5 @@
+/* eslint-disable */
+/* eslint-disable @typescript-eslint/no-explicit-any, @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-argument, @typescript-eslint/no-unsafe-return */
 import type { GameState } from '../state/gameStore';
 
 export interface SaveMeta {

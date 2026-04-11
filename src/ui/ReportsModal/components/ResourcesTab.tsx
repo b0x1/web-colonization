@@ -1,3 +1,5 @@
+
+
 import React from 'react';
 import type { Player } from '../../../game/entities/Player';
 import { GoodType } from '../../../game/entities/types';
@@ -28,7 +30,7 @@ export const ResourcesTab: React.FC<Props> = ({ displayedPlayers, onSettlementCl
           <tr
             key={settlement.id}
             className="border-b border-slate-700 hover:bg-slate-700/30 transition-colors cursor-pointer"
-            onClick={() => onSettlementClick(settlement.id, settlement.position)}
+            onClick={() => { onSettlementClick(settlement.id, settlement.position); }}
           >
             <td className="p-3 sticky left-0 bg-slate-800">
               <Flag nation={player.nation} size={24} />
@@ -38,7 +40,7 @@ export const ResourcesTab: React.FC<Props> = ({ displayedPlayers, onSettlementCl
             </td>
             {goods.map((good) => (
               <td key={good} className="p-3 font-mono">
-                {settlement.inventory.get(good) || 0}
+                {settlement.inventory.get(good) ?? 0}
               </td>
             ))}
           </tr>

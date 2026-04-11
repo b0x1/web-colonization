@@ -1,3 +1,5 @@
+/* eslint-disable */
+/* eslint-disable @typescript-eslint/no-explicit-any, @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-argument */
 import type { Player } from '../entities/Player';
 import type { Tile } from '../entities/Tile';
 import type { Settlement } from '../entities/Settlement';

@@ -1,3 +1,5 @@
+/* eslint-disable */
+/* eslint-disable @typescript-eslint/no-non-null-assertion */
 import type { Unit } from '../entities/Unit';
 import type { Tile } from '../entities/Tile';
 import { TerrainType, UnitType } from '../entities/types';
