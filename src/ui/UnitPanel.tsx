@@ -113,7 +113,7 @@ export const UnitPanel: React.FC = () => {
         <div className="h-1.5 flex-1 bg-slate-700 rounded-full overflow-hidden">
           <div
             className="h-full bg-blue-500 transition-all duration-500"
-            style={{ width: `${(unit.movesRemaining / unit.maxMoves * 100)}%` }}
+            style={{ width: `${(unit.movesRemaining / unit.maxMoves) * 100}%` }}
           ></div>
         </div>
         <span className="text-[10px] font-mono font-bold text-slate-400">{unit.movesRemaining}/{unit.maxMoves} MOVES</span>
