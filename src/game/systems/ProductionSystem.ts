@@ -90,7 +90,7 @@ export class ProductionSystem {  // eslint-disable-line @typescript-eslint/no-ex
     }
 
     // 3. Food consumption
-    const foodConsumption = settlement.population * 2;
+    const foodConsumption = settlement.workforce.size * 2;
     netProduction.set(GoodType.FOOD, (netProduction.get(GoodType.FOOD) || 0) - foodConsumption);
 
     return { netProduction, hammersProduced };

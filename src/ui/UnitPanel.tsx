@@ -84,7 +84,6 @@ export const UnitPanel: React.FC = () => {
       <UnitSelector
         unitsAtTile={unitsAtTile}
         settlementAtTile={settlementAtTile}
-        players={players}
         onSelectUnit={selectUnit}
         onSelectSettlement={useGameStore.getState().selectSettlement}
       />

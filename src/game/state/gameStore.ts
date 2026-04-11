@@ -1,4 +1,4 @@
-/* eslint-disable @typescript-eslint/no-explicit-any, @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-argument, @typescript-eslint/no-non-null-assertion, @typescript-eslint/no-unnecessary-condition */
+/* eslint-disable @typescript-eslint/no-explicit-any, @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-argument, @typescript-eslint/no-non-null-assertion, @typescript-eslint/no-unnecessary-condition */
 import { enableMapSet } from 'immer';
 import { create } from 'zustand';
 import { immer } from 'zustand/middleware/immer';
@@ -7,7 +7,7 @@ import type { Tile } from '../entities/Tile';
 import type { Unit } from '../entities/Unit';
 import type { Settlement } from '../entities/Settlement';
 import type { Position } from '../entities/Position';
-import { BuildingType, GoodType, JobType, Nation, TurnPhase, UnitType } from '../entities/types';
+import { BuildingType, GoodType, Nation, TurnPhase, UnitType } from '../entities/types';
 import { TurnEngine } from '../systems/TurnEngine';
 import { AISystem } from '../systems/AISystem';
 import { RECRUITMENT_COSTS } from '../constants';
@@ -48,7 +48,7 @@ export interface GameState {
   endTurn: () => void;
   foundSettlement: (unitId: string) => void;
   buyBuilding: (settlementId: string, building: BuildingType) => void;
-  assignJob: (settlementId: string, unitId: string, job: JobType | string | null) => void; // eslint-disable-line
+  assignJob: (settlementId: string, unitId: string, job: string | null) => void;
   sellGood: (unitId: string, good: GoodType, amount: number) => void;
   buyGood: (unitId: string, good: GoodType, amount: number) => void;
   recruitUnit: (unitType: UnitType) => void;
@@ -234,7 +234,7 @@ export const useGameStore = create<GameState>()(
         if (nextTurn > state.turn && nextPlayerIndex === 0) {
           setTimeout(() => {
             const currentState = get();
-            TurnEngine.autoSave(currentState as any);
+            TurnEngine.autoSave(currentState as unknown as GameState);
           }, 0);
         }
 
@@ -300,7 +300,8 @@ export const useGameStore = create<GameState>()(
           player,
           unit,
           settlementName,
-          [BuildingType.TOWN_HALL, BuildingType.CARPENTERS_SHOP, BuildingType.BLACKSMITHS_HOUSE]
+          [BuildingType.TOWN_HALL, BuildingType.CARPENTERS_SHOP, BuildingType.BLACKSMITHS_HOUSE],
+          state.map
         );
 
         player.units.splice(unitIndex, 1);
@@ -332,11 +333,21 @@ export const useGameStore = create<GameState>()(
           if (settlement) {
             if (job === null) {
               settlement.workforce.delete(unitId);
+              // Move unit back to player units if it was in the settlement
+              const uIdx = settlement.units.findIndex(u => u.id === unitId);
+              if (uIdx !== -1) {
+                const unit = settlement.units[uIdx];
+                const player = state.players.find(pl => pl.id === settlement.ownerId);
+                if (player && !player.units.some(u => u.id === unitId)) {
+                  player.units.push({ ...unit });
+                }
+                settlement.units.splice(uIdx, 1);
+              }
             } else {
               // Check in settlement units or player units
               let unit = settlement.units.find((u) => u.id === unitId);
               if (!unit) {
-                const player = state.players.find(pl => pl.id === state.currentPlayerId);
+                const player = state.players.find(pl => pl.id === settlement.ownerId);
                 const pUnitIdx = player?.units.findIndex(u => u.id === unitId) ?? -1;
                 if (pUnitIdx !== -1) {
                   unit = player!.units[pUnitIdx];
@@ -351,6 +362,7 @@ export const useGameStore = create<GameState>()(
                 settlement.workforce.set(unitId, (job as any));
               }
             }
+            settlement.population = settlement.workforce.size;
             return;
           }
         }
