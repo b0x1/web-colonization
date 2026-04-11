@@ -7,11 +7,13 @@ import { createSettlement } from './../entities/Settlement';
 import { createUnit } from './../entities/Unit';
 import { TerrainType, GoodType, UnitType, JobType, Nation } from './../entities/types';
 
+import type { Tile } from '../entities/Tile';
+
 describe('TurnEngine', () => {
-  const createMap = (width: number, height: number): any[][] => {
-    const map: any[][] = [];
+  const createMap = (width: number, height: number): Tile[][] => {
+    const map: Tile[][] = [];
     for (let y = 0; y < height; y++) {
-      const row: any[] = [];
+      const row: Tile[] = [];
       for (let x = 0; x < width; x++) {
         row.push(createTile(`${x}-${y}`, x, y, TerrainType.GRASSLAND, 1));
       }
