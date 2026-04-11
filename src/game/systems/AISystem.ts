@@ -4,14 +4,29 @@ import type { Tile } from '../entities/Tile';
 import type { Settlement } from '../entities/Settlement';
 import type { Unit } from '../entities/Unit';
 import { TerrainType, ResourceType, UnitType, Attitude } from '../entities/types';
-import { eventBus } from '../state/EventBus';
 import { NATION_BONUSES } from '../constants';
 import { distance, isSame, type Position } from '../entities/Position';
 import { NamingSystem, type NamingStats } from './NamingSystem';
 
+export interface AIUnitMovedEffect {
+  readonly type: 'unitMoved';
+  readonly id: string;
+  readonly fromX: number;
+  readonly fromY: number;
+  readonly toX: number;
+  readonly toY: number;
+}
+
+export interface AISystemResult {
+  readonly players: Player[];
+  readonly namingStats: NamingStats;
+  readonly effects: readonly AIUnitMovedEffect[];
+}
+
 export class AISystem {
-  static runAITurn(players: Player[], map: Tile[][], namingStats: NamingStats): { players: Player[]; namingStats: NamingStats } {
+  static runAITurn(players: Player[], map: Tile[][], namingStats: NamingStats): AISystemResult {
     let currentNamingStats = { ...namingStats };
+    const effects: AIUnitMovedEffect[] = [];
 
     const updatedPlayers = players.map((p) => ({
       ...p,
@@ -93,7 +108,7 @@ export class AISystem {
                 unit.position.x = nx;
                 unit.position.y = ny;
                 unit.movesRemaining -= targetTile.movementCost;
-                eventBus.emit('unitMoved', { id: unit.id, fromX, fromY, toX: nx, toY: ny });
+                effects.push({ type: 'unitMoved', id: unit.id, fromX, fromY, toX: nx, toY: ny });
               }
             }
           }
@@ -102,7 +117,7 @@ export class AISystem {
       }
     }
 
-    return { players: updatedPlayers, namingStats: currentNamingStats };
+    return { players: updatedPlayers, namingStats: currentNamingStats, effects };
   }
 
   private static findNearestTarget(

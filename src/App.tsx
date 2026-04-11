@@ -2,6 +2,8 @@ import { useEffect, useRef } from 'react';
 import Phaser from 'phaser';
 import { useGameStore } from './game/state/gameStore';
 import { useUIStore } from './game/state/uiStore';
+import { eventBus } from './game/state/EventBus';
+import type { Tile } from './game/entities/Tile';
 import { WorldScene } from './scenes/WorldScene';
 import { MainMenuScene } from './scenes/MainMenuScene';
 import { HUD } from './ui/HUD';
@@ -25,13 +27,7 @@ import { LazyRenderController } from './game/rendering/LazyRenderController';
 function App(): React.ReactElement {
   const gameRef = useRef<Phaser.Game | null>(null);
   const lazyRenderControllerRef = useRef<LazyRenderController | null>(null);
-  const {
-    selectUnit,
-    selectSettlement,
-    endTurn,
-    players,
-    currentPlayerId
-  } = useGameStore();
+  const { selectUnit, selectSettlement, endTurn, players, currentPlayerId } = useGameStore();
   const {
     showEndTurnConfirm,
     setShowEndTurnConfirm
@@ -64,16 +60,6 @@ function App(): React.ReactElement {
       lazyRenderController.requestRender();
     });
 
-    game.events.once('ready', () => {
-      const worldScene = game.scene.getScene('WorldScene') as WorldScene;
-      worldScene.events.on('unitSelected', (unitId: string | null) => {
-        selectUnit(unitId);
-      });
-      worldScene.events.on('settlementSelected', (settlementId: string | null) => {
-        selectSettlement(settlementId);
-      });
-    });
-
     return () => {
       unsubscribeRender();
       lazyRenderControllerRef.current?.destroy();
@@ -83,7 +69,41 @@ function App(): React.ReactElement {
         gameRef.current = null;
       }
     };
-  }, [selectUnit, selectSettlement]);
+  }, []);
+
+  useEffect(() => {
+    const unsubscribeUnitSelected = eventBus.on('unitSelected', (unitId) => {
+      selectUnit(unitId);
+    });
+    const unsubscribeSettlementSelected = eventBus.on('settlementSelected', (settlementId) => {
+      selectSettlement(settlementId);
+    });
+    const unsubscribeTileSelected = eventBus.on('tileSelected', (position) => {
+      const tile: Tile | null = position
+        ? useGameStore.getState().map[position.y]?.[position.x] ?? null
+        : null;
+      useGameStore.getState().selectTile(tile);
+    });
+    const unsubscribeCombatRequested = eventBus.on('combatRequested', (target) => {
+      const selectedUnitId = useGameStore.getState().selectedUnitId;
+      if (!selectedUnitId) {
+        return;
+      }
+
+      useGameStore.getState().resolveCombat(selectedUnitId, target);
+    });
+    const unsubscribeTradeRequested = eventBus.on('nativeTradeRequested', (settlementId) => {
+      useUIStore.getState().setNativeTradeModalOpen(true, settlementId);
+    });
+
+    return () => {
+      unsubscribeUnitSelected();
+      unsubscribeSettlementSelected();
+      unsubscribeTileSelected();
+      unsubscribeCombatRequested();
+      unsubscribeTradeRequested();
+    };
+  }, [selectSettlement, selectUnit]);
 
   return (
     <div className="relative w-screen h-screen overflow-hidden">

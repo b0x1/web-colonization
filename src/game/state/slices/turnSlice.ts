@@ -3,7 +3,6 @@ import type { GameState } from '../types';
 import { TurnPhase } from '../../entities/types';
 import { SaveManager } from '../SaveManager';
 import { eventBus } from '../EventBus';
-/* eslint-disable @typescript-eslint/no-explicit-any */
 import { TurnEngine } from '../../systems/TurnEngine';
 import { AISystem } from '../../systems/AISystem';
 
@@ -12,6 +11,27 @@ export interface TurnSlice {
   phase: TurnPhase;
   endTurn: () => void;
 }
+
+const emitTurnEffects = (effects: readonly { readonly type: 'notification'; readonly message: string }[]): void => {
+  effects.forEach((effect) => {
+    eventBus.emit('notification', effect.message);
+  });
+};
+
+const emitAIEffects = (
+  effects: readonly {
+    readonly type: 'unitMoved';
+    readonly id: string;
+    readonly fromX: number;
+    readonly fromY: number;
+    readonly toX: number;
+    readonly toY: number;
+  }[],
+): void => {
+  effects.forEach((effect) => {
+    eventBus.emit('unitMoved', effect);
+  });
+};
 
 export const createTurnSlice: StateCreator<
   GameState,
@@ -73,25 +93,35 @@ export const createTurnSlice: StateCreator<
     });
 
     const state = get();
-    if (state.phase === (TurnPhase.PRODUCTION as any)) {
-      const { players: updatedPlayers, namingStats: updatedNamingStats } = TurnEngine.runProduction(state.players, state.map, state.namingStats);
+    if (state.phase === TurnPhase.PRODUCTION) {
+      const { players: updatedPlayers, namingStats: updatedNamingStats, effects } = TurnEngine.runProduction(
+        state.players,
+        state.map,
+        state.namingStats,
+      );
       set((s) => {
         s.players = updatedPlayers;
         s.namingStats = updatedNamingStats;
       });
+      emitTurnEffects(effects);
       get().endTurn();
-      } else if (state.phase === (TurnPhase.TRADE as any)) {
+    } else if (state.phase === TurnPhase.TRADE) {
       get().endTurn();
-      } else if (state.phase === (TurnPhase.AI as any)) {
-      const { players: updatedPlayers, namingStats: updatedNamingStats } = AISystem.runAITurn(state.players, state.map, state.namingStats);
+    } else if (state.phase === TurnPhase.AI) {
+      const { players: updatedPlayers, namingStats: updatedNamingStats, effects } = AISystem.runAITurn(
+        state.players,
+        state.map,
+        state.namingStats,
+      );
       set((s) => {
         s.players = updatedPlayers;
         s.namingStats = updatedNamingStats;
       });
+      emitAIEffects(effects);
       get().endTurn();
-      } else if (state.phase === (TurnPhase.END_TURN as any)) {
+    } else if (state.phase === TurnPhase.END_TURN) {
       get().endTurn();
-      } else if (state.phase === (TurnPhase.MOVEMENT as any)) {
+    } else {  // MOVEMENT
       const currentPlayer = state.players.find((p) => p.id === state.currentPlayerId);
       if (currentPlayer && !currentPlayer.isHuman) {
         get().endTurn();

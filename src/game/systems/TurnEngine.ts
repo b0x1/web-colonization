@@ -2,15 +2,26 @@ import type { Player } from '../entities/Player';
 import type { Tile } from '../entities/Tile';
 import type { Settlement } from '../entities/Settlement';
 import { GoodType, UnitType, JobType, BuildingType } from '../entities/types';
-import { eventBus } from '../state/EventBus';
 import { BUILDING_COSTS, COLONY_CONSTANTS, UNIT_BUILD_COSTS } from '../constants';
 import { createUnit } from '../entities/Unit';
 import { ProductionSystem } from './ProductionSystem';
 import { NamingSystem, type NamingStats } from './NamingSystem';
 
+export interface TurnNotificationEffect {
+  readonly type: 'notification';
+  readonly message: string;
+}
+
+export interface TurnEngineResult {
+  readonly players: Player[];
+  readonly namingStats: NamingStats;
+  readonly effects: readonly TurnNotificationEffect[];
+}
+
 export class TurnEngine {  // eslint-disable-line @typescript-eslint/no-extraneous-class
-  static runProduction(players: Player[], map: Tile[][], namingStats: NamingStats): { players: Player[]; namingStats: NamingStats } {
+  static runProduction(players: Player[], map: Tile[][], namingStats: NamingStats): TurnEngineResult {
     let currentNamingStats = { ...namingStats };
+    const effects: TurnNotificationEffect[] = [];
     const updatedPlayers = players.map((player) => {
       const newPlayerUnits = player.units.map((u) => ({ ...u, cargo: new Map<GoodType, number>(u.cargo) }));
 
@@ -34,7 +45,7 @@ export class TurnEngine {  // eslint-disable-line @typescript-eslint/no-extraneo
           if (unit.turnsInJob >= COLONY_CONSTANTS.EXPERT_PROMOTION_TURNS && !unit.specialty) {
             if (Object.values(JobType).includes(assignment as JobType)) {
               unit.specialty = assignment as JobType;
-              eventBus.emit('notification', `${unit.type} has become an expert ${unit.specialty}!`);
+              effects.push({ type: 'notification', message: `${unit.type} has become an expert ${unit.specialty}!` });
             }
           }
         });
@@ -66,7 +77,7 @@ export class TurnEngine {  // eslint-disable-line @typescript-eslint/no-extraneo
             3
           );
           newPlayerUnits.push(newUnit);
-          eventBus.emit('notification', `An intellectual has joined the cause in ${newSettlement.name}!`);
+          effects.push({ type: 'notification', message: `An intellectual has joined the cause in ${newSettlement.name}!` });
         }
 
         // 3. Construction
@@ -94,7 +105,7 @@ export class TurnEngine {  // eslint-disable-line @typescript-eslint/no-extraneo
 
                 if (isBuilding) {
                   newSettlement.buildings.push(currentItem as BuildingType);
-                  eventBus.emit('notification', `${newSettlement.name} completed ${(currentItem as BuildingType)}!`);
+                  effects.push({ type: 'notification', message: `${newSettlement.name} completed ${(currentItem as BuildingType)}!` });
                 } else if (isUnit) {
                   const namingResult = NamingSystem.getNextName(player.nation, (currentItem as UnitType) === UnitType.SHIP ? 'ship' : 'unit', currentNamingStats);
                   currentNamingStats = namingResult.updatedStats;
@@ -110,7 +121,7 @@ export class TurnEngine {  // eslint-disable-line @typescript-eslint/no-extraneo
                   );
                   newSettlement.units.push(newUnit);
                   newPlayerUnits.push(newUnit);
-                  eventBus.emit('notification', `${newSettlement.name} completed ${(currentItem as UnitType)}!`);
+                  effects.push({ type: 'notification', message: `${newSettlement.name} completed ${(currentItem as UnitType)}!` });
                 }
               }
             }
@@ -135,7 +146,7 @@ export class TurnEngine {  // eslint-disable-line @typescript-eslint/no-extraneo
                 3
               );
               newPlayerUnits.push(newColonist);
-              eventBus.emit('notification', `A new colonist has been born in ${newSettlement.name}!`);
+              effects.push({ type: 'notification', message: `A new colonist has been born in ${newSettlement.name}!` });
           } else {
               newSettlement.inventory.set(GoodType.FOOD, Math.max(0, netFood));
           }
@@ -159,6 +170,6 @@ export class TurnEngine {  // eslint-disable-line @typescript-eslint/no-extraneo
       };
     });
 
-    return { players: updatedPlayers, namingStats: currentNamingStats };
+    return { players: updatedPlayers, namingStats: currentNamingStats, effects };
   }
 }
