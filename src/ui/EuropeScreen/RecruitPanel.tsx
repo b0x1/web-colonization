@@ -1,4 +1,3 @@
-/* eslint-disable */
 import React from 'react';
 import { useGameStore } from '../../game/state/gameStore';
 import { UnitType, GoodType } from '../../game/entities/types';
@@ -21,9 +20,9 @@ export const RecruitPanel: React.FC = () => {
       <h3 className="text-2xl font-black uppercase tracking-tight mb-6 text-blue-300">Recruit Units</h3>
       <div className="grid grid-cols-3 gap-6">
         {unitsToRecruit.map((u) => {
-          const canAffordGold = (player?.gold || 0) >= u.cost;
+          const canAffordGold = (player?.gold ?? 0) >= u.cost;
           const hasMuskets =
-            u.type !== UnitType.SOLDIER || (selectedUnit.cargo.get(GoodType.MUSKETS) || 0) >= 50;
+            u.type !== UnitType.SOLDIER || (selectedUnit.cargo.get(GoodType.MUSKETS) ?? 0) >= 50;
           const canRecruit = canAffordGold && hasMuskets;
 
           return (

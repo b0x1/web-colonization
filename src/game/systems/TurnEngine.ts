@@ -18,7 +18,12 @@ export interface TurnEngineResult {
   readonly effects: readonly TurnNotificationEffect[];
 }
 
-export class TurnEngine {  // eslint-disable-line @typescript-eslint/no-extraneous-class
+/* eslint-disable-next-line @typescript-eslint/no-extraneous-class */
+export class TurnEngine {
+  private constructor() {
+    // Static utility class
+  }
+
   static runProduction(players: Player[], map: Tile[][], namingStats: NamingStats): TurnEngineResult {
     let currentNamingStats = { ...namingStats };
     const effects: TurnNotificationEffect[] = [];

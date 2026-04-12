@@ -1,11 +1,15 @@
-/* eslint-disable @typescript-eslint/prefer-nullish-coalescing */
 import type { Settlement } from '../entities/Settlement';
 import type { Tile } from '../entities/Tile';
 import { BuildingType, GoodType, JobType } from '../entities/types';
 import { JOB_PRODUCTION_RULES, TERRAIN_PRODUCTION_RULES } from '../rules/ProductionRules';
 import { COLONY_CONSTANTS } from '../constants';
 
-export class ProductionSystem {  // eslint-disable-line @typescript-eslint/no-extraneous-class
+/* eslint-disable-next-line @typescript-eslint/no-extraneous-class */
+export class ProductionSystem {
+  private constructor() {
+    // Static utility class
+  }
+
   static calculateSettlementProduction(
     settlement: Settlement,
     map: Tile[][],
@@ -44,25 +48,25 @@ export class ProductionSystem {  // eslint-disable-line @typescript-eslint/no-ex
             let possible = amount;
 
             if (isActualProduction) {
-              const currentInventory = settlement.inventory.get(inputGood) || 0;
+              const currentInventory = settlement.inventory.get(inputGood) ?? 0;
               possible = Math.min(amount, currentInventory);
             }
 
-            netProduction.set(inputGood, (netProduction.get(inputGood) || 0) - possible);
+            netProduction.set(inputGood, (netProduction.get(inputGood) ?? 0) - possible);
 
             if (rule.producesHammers) {
               hammersProduced += possible;
             } else if (rule.outputGood) {
               netProduction.set(
                 rule.outputGood,
-                (netProduction.get(rule.outputGood) || 0) + possible
+                (netProduction.get(rule.outputGood) ?? 0) + possible
               );
             }
           } else if (rule.outputGood) {
             const outputGood = rule.outputGood;
             netProduction.set(
               outputGood,
-              (netProduction.get(outputGood) || 0) + amount
+              (netProduction.get(outputGood) ?? 0) + amount
             );
           }
         }
@@ -72,10 +76,10 @@ export class ProductionSystem {  // eslint-disable-line @typescript-eslint/no-ex
         if (parts.length === 2) {
           const tx = parseInt(parts[0]);
           const ty = parseInt(parts[1]);
-          const tile = map[ty]?.[tx];
-          const good = TERRAIN_PRODUCTION_RULES[tile.terrainType];
+          const tile = map[ty]?.[tx] as Tile | undefined;
+          const good = tile ? TERRAIN_PRODUCTION_RULES[tile.terrainType] : null;
           if (good) {
-            netProduction.set(good, (netProduction.get(good) || 0) + amount);
+            netProduction.set(good, (netProduction.get(good) ?? 0) + amount);
           }
         }
       }
@@ -83,15 +87,15 @@ export class ProductionSystem {  // eslint-disable-line @typescript-eslint/no-ex
 
     // 2. Building bonuses
     if (settlement.buildings.includes(BuildingType.LUMBER_MILL)) {
-      netProduction.set(GoodType.LUMBER, (netProduction.get(GoodType.LUMBER) || 0) + 2);
+      netProduction.set(GoodType.LUMBER, (netProduction.get(GoodType.LUMBER) ?? 0) + 2);
     }
     if (settlement.buildings.includes(BuildingType.IRON_WORKS)) {
-      netProduction.set(GoodType.ORE, (netProduction.get(GoodType.ORE) || 0) + 2);
+      netProduction.set(GoodType.ORE, (netProduction.get(GoodType.ORE) ?? 0) + 2);
     }
 
     // 3. Food consumption
     const foodConsumption = settlement.workforce.size * 2;
-    netProduction.set(GoodType.FOOD, (netProduction.get(GoodType.FOOD) || 0) - foodConsumption);
+    netProduction.set(GoodType.FOOD, (netProduction.get(GoodType.FOOD) ?? 0) - foodConsumption);
 
     return { netProduction, hammersProduced };
   }

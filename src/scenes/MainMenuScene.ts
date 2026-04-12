@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-unsafe-argument, @typescript-eslint/no-explicit-any, @typescript-eslint/no-unnecessary-condition, @typescript-eslint/prefer-optional-chain */
 import Phaser from 'phaser';
 import { TerrainGenerator } from '../game/map/TerrainGenerator';
 import { TerrainRenderer } from '../game/map/TerrainRenderer';
@@ -30,7 +29,7 @@ export class MainMenuScene extends Phaser.Scene {
     const width = Math.ceil(this.cameras.main.width / MAP_CONSTANTS.TILE_SIZE) + 1;
     const height = Math.ceil(this.cameras.main.height / MAP_CONSTANTS.TILE_SIZE) + 1;
 
-    this.terrainRenderer = new TerrainRenderer(this as any, MAP_CONSTANTS.TILE_SIZE);
+    this.terrainRenderer = new TerrainRenderer(this as unknown as Phaser.Scene, MAP_CONSTANTS.TILE_SIZE);
 
     const generator = new TerrainGenerator(width, height, `menu-bg-${Date.now()}`);
     const terrainData = generator.generate();
@@ -62,9 +61,7 @@ export class MainMenuScene extends Phaser.Scene {
     // Title removed - handled by React UI MainMenu.tsx
 
     this.scale.on('resize', (gameSize: Phaser.Structs.Size) => {
-      if (this.cameras && this.cameras.main) {
-        this.cameras.main.setViewport(0, 0, gameSize.width, gameSize.height);
-      }
+      this.cameras.main.setViewport(0, 0, gameSize.width, gameSize.height);
       overlay.clear();
       overlay.fillStyle(0x000000, 0.6);
       overlay.fillRect(0, 0, gameSize.width, gameSize.height);

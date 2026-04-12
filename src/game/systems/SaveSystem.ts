@@ -9,9 +9,14 @@ export interface SaveData {
   map: GameState['map'];
 }
 
-export class SaveSystem { // eslint-disable-line @typescript-eslint/no-extraneous-class
+/* eslint-disable-next-line @typescript-eslint/no-extraneous-class */
+export class SaveSystem {
+  private constructor() {
+    // Static utility class
+  }
+
   static serialize(
-    state: Pick<GameState, 'players' | 'currentPlayerId' | 'turn' | 'phase' | 'europePrices' | 'map'>
+   state: Pick<GameState, 'players' | 'currentPlayerId' | 'turn' | 'phase' | 'europePrices' | 'map'>
   ): string {
     const data: SaveData = {
       players: state.players,

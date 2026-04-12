@@ -1,14 +1,17 @@
-/* eslint-disable */
 import type { Player } from '../entities/Player';
 import type { Unit } from '../entities/Unit';
 import type { Settlement } from '../entities/Settlement';
 import type { Tile } from '../entities/Tile';
-import { BuildingType, UnitType, TerrainType } from '../entities/types';
+import type { BuildingType} from '../entities/types';
+import { UnitType, TerrainType } from '../entities/types';
 import { NATION_BONUSES } from '../constants';
 import { distance, getNeighbors, toKey } from '../entities/Position';
 
+/* eslint-disable-next-line @typescript-eslint/no-extraneous-class */
 export class SettlementSystem {
-  private constructor() {}
+  private constructor() {
+    // Static utility class
+  }
 
   static createSettlement(
     player: Player,
@@ -18,8 +21,12 @@ export class SettlementSystem {
     map: Tile[][]
   ): Settlement {
     const nationData = NATION_BONUSES[player.nation];
-    const neighbors = getNeighbors(unit.position, map[0].length, map.length);
-    const randomNeighbor = neighbors[Math.floor(Math.random() * neighbors.length)];
+    const neighbors = getNeighbors(unit.position, map[0]?.length ?? 0, map.length);
+    const randomNeighbor = neighbors[Math.floor(Math.random() * (neighbors.length))] as { x: number; y: number } | undefined;
+
+    if (!randomNeighbor) {
+      throw new Error('No valid neighbors for settlement creation');
+    }
 
     return {
       id: `settlement-${String(Date.now())}-${String(Math.floor(Math.random() * 1000))}`,
@@ -51,7 +58,7 @@ export class SettlementSystem {
     if (nationData.culture === 'NATIVE' && unit.type !== UnitType.VILLAGER) return false;
 
     // Check terrain
-    const tile = map[unit.position.y]?.[unit.position.x];
+    const tile = map[unit.position.y]?.[unit.position.x] as Tile | undefined;
     if (!tile) return false;
     if (
       tile.terrainType === TerrainType.OCEAN ||

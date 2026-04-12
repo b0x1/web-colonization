@@ -1,10 +1,14 @@
-/* eslint-disable @typescript-eslint/no-non-null-assertion */
 import type { Unit } from '../entities/Unit';
 import type { Tile } from '../entities/Tile';
 import { TerrainType, UnitType } from '../entities/types';
 import { isSame, toKey, type Position, getNeighbors } from '../entities/Position';
 
-export class MovementSystem {  // eslint-disable-line @typescript-eslint/no-extraneous-class
+/* eslint-disable-next-line @typescript-eslint/no-extraneous-class */
+export class MovementSystem {
+  private constructor() {
+    // Static utility class
+  }
+
   static getReachableTiles(unit: Unit, map: Tile[][]): (Position & { cost: number })[] {
     const reachable: (Position & { cost: number })[] = [];
     const visited = new Map<string, number>();
@@ -14,10 +18,11 @@ export class MovementSystem {  // eslint-disable-line @typescript-eslint/no-extr
     visited.set(toKey(unit.position), 0);
 
     const height = map.length;
-    const width = map[0]?.length || 0;
+    const width = map[0]?.length ?? 0;
 
     while (queue.length > 0) {
-      const current = queue.shift()!;
+      const current = queue.shift();
+      if (!current) continue;
 
       // Add to reachable if it's not the starting tile
       if (!isSame(current, unit.position)) {
@@ -26,7 +31,10 @@ export class MovementSystem {  // eslint-disable-line @typescript-eslint/no-extr
 
       const neighbors = getNeighbors(current, width, height);
       for (const neighbor of neighbors) {
-        const targetTile = map[neighbor.y][neighbor.x];
+        const row = map[neighbor.y] as Tile[] | undefined;
+        const targetTile = row?.[neighbor.x];
+        if (!targetTile) continue;
+
         const moveCost = this.getMovementCost(unit, targetTile);
 
         if (moveCost !== Infinity) {
@@ -34,7 +42,8 @@ export class MovementSystem {  // eslint-disable-line @typescript-eslint/no-extr
 
           if (totalCost <= unit.movesRemaining) {
             const key = toKey(neighbor);
-            if (!visited.has(key) || visited.get(key)! > totalCost) {
+            const prevCost = visited.get(key);
+            if (prevCost === undefined || prevCost > totalCost) {
               visited.set(key, totalCost);
               queue.push({ ...neighbor, cost: totalCost });
             }

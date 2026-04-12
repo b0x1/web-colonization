@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-explicit-any, @typescript-eslint/no-unsafe-assignment */
 import React from 'react';
 import { useGameStore } from '../game/state/gameStore';
 import { useUIStore } from '../game/state/uiStore';
@@ -25,7 +24,7 @@ export const ForeignSettlementModal: React.FC = () => {
   return (
     <div className="absolute left-5 bottom-80 w-64 bg-black/90 text-white p-5 rounded-xl pointer-events-auto shadow-2xl border border-blue-500/30 backdrop-blur-md font-sans z-50">
       <div className="flex items-center gap-3 mb-4">
-        <Flag nation={nation as any} size={40} />
+        <Flag nation={nation } size={40} />
         <div>
           <h3 className="text-xl font-black uppercase tracking-tight text-blue-400 leading-tight">{settlement.name}</h3>
           <p className="text-[10px] font-black uppercase tracking-widest text-slate-500">{nationName}</p>

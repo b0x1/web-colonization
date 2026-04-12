@@ -1,5 +1,3 @@
-/* eslint-disable */
-
 import React from 'react';
 import { useGameStore } from '../game/state/gameStore';
 import { TerrainType } from '../game/entities/types';
@@ -10,7 +8,7 @@ export const FieldPanel: React.FC = () => {
 
   if (!selectedTile) return null;
 
-  const tile = map[selectedTile.position.y]?.[selectedTile.position.x];
+  const tile = map[selectedTile.position.y]?.[selectedTile.position.x] as { terrainType: TerrainType; hasResource: string | null; movementCost: number } | undefined;
   if (!tile) return null;
 
   const getDefenseBonus = (type: TerrainType) => {

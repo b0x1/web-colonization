@@ -1,4 +1,3 @@
-/* eslint-disable */
 import type { Player } from '../entities/Player';
 import type { Tile } from '../entities/Tile';
 import type { Settlement } from '../entities/Settlement';
@@ -23,7 +22,12 @@ export interface AISystemResult {
   readonly effects: readonly AIUnitMovedEffect[];
 }
 
-export class AISystem {
+
+export class AISystem {  // eslint-disable-line @typescript-eslint/no-extraneous-class
+  private constructor() {
+    // Static utility class
+  }
+
   static runAITurn(players: Player[], map: Tile[][], namingStats: NamingStats): AISystemResult {
     let currentNamingStats = { ...namingStats };
     const effects: AIUnitMovedEffect[] = [];
@@ -48,6 +52,7 @@ export class AISystem {
       let unitIndex = 0;
       while (unitIndex < player.units.length) {
         const unit = player.units[unitIndex];
+
         if (unit.movesRemaining <= 0) {
           unitIndex++;
           continue;
@@ -56,9 +61,10 @@ export class AISystem {
         let unitRemoved = false;
 
         if (unit.type === UnitType.COLONIST || unit.type === UnitType.VILLAGER) {
-          const currentTile = map[unit.position.y][unit.position.x];
+          const row = map[unit.position.y] as Tile[] | undefined;
+          const currentTile = row?.[unit.position.x];
           const nationData = NATION_BONUSES[player.nation];
-          if (currentTile.terrainType === TerrainType.PLAINS || currentTile.terrainType === TerrainType.GRASSLAND || currentTile.terrainType === TerrainType.PRAIRIE) {
+          if (currentTile && (currentTile.terrainType === TerrainType.PLAINS || currentTile.terrainType === TerrainType.GRASSLAND || currentTile.terrainType === TerrainType.PRAIRIE)) {
             const hasAdjacentSettlement = updatedPlayers.flatMap(p => p.settlements).some(
               (c) => distance(c.position, unit.position) <= 1,
             );
@@ -100,8 +106,9 @@ export class AISystem {
             const nx = unit.position.x + dx;
             const ny = unit.position.y + dy;
 
-            if (ny >= 0 && ny < map.length && nx >= 0 && nx < map[ny].length) {
-              const targetTile = map[ny][nx];
+            const targetRow = map[ny] as Tile[] | undefined;
+            const targetTile = targetRow?.[nx];
+            if (targetTile) {
               if (unit.movesRemaining >= targetTile.movementCost) {
                 const fromX = unit.position.x;
                 const fromY = unit.position.y;
@@ -129,8 +136,10 @@ export class AISystem {
     let minDistance = Infinity;
 
     for (let y = 0; y < map.length; y++) {
-      for (let x = 0; x < map[y].length; x++) {
-        const tile = map[y][x];
+      const row = map[y] as Tile[] | undefined;
+      if (!row) continue;
+      for (let x = 0; x < row.length; x++) {
+        const tile = row[x];
         const isTargetType =
           tile.terrainType === TerrainType.PLAINS || tile.hasResource === ResourceType.FOREST;
         if (!isTargetType) continue;

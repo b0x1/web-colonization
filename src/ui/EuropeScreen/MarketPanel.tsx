@@ -1,4 +1,3 @@
-/* eslint-disable */
 import React, { useState } from 'react';
 import { useGameStore } from '../../game/state/gameStore';
 import { GoodType } from '../../game/entities/types';
@@ -28,7 +27,7 @@ export const MarketPanel: React.FC = () => {
         <tbody>
           {Object.values(GoodType).map((good) => {
             const price = europePrices[good];
-            const cargo = selectedUnit.cargo.get(good) || 0;
+            const cargo = selectedUnit.cargo.get(good) ?? 0;
             return (
               <tr key={good} className="border-b border-slate-800 hover:bg-slate-700/20 transition-colors">
                 <td className="p-3 font-bold capitalize">{good.toLowerCase().replace('_', ' ')}</td>
@@ -53,12 +52,12 @@ export const MarketPanel: React.FC = () => {
                         placeholder="Qty"
                         value={buyAmounts[good] || ''}
                         onChange={(e) =>
-                          { setBuyAmounts({ ...buyAmounts, [good]: parseInt(e.target.value) || 0 }); }
+                          { setBuyAmounts({ ...buyAmounts, [good]: parseInt(e.target.value) }); }
                         }
                       />
                       <button
                         onClick={() => {
-                          const amount = buyAmounts[good] || 0;
+                          const amount = buyAmounts[good] ?? 0;
                           if (amount > 0) buyGood(selectedUnit.id, good, amount);
                         }}
                         className="px-3 py-1 bg-blue-600 hover:bg-blue-500 text-white text-xs font-bold rounded shadow-sm transition-colors cursor-pointer"

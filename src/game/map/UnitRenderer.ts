@@ -1,5 +1,4 @@
-/* eslint-disable */
-import Phaser from 'phaser';
+import type Phaser from 'phaser';
 import type { Unit } from '../entities/Unit';
 import type { Player } from '../entities/Player';
 import type { TerrainRenderer } from './TerrainRenderer';
@@ -30,7 +29,7 @@ export class UnitRenderer {
         if (inSettlement && selectedUnitId !== unit.id) return;
 
         const key = toKey(unit.position);
-        if (!unitsByTile[key]) unitsByTile[key] = [];
+        if (!(unitsByTile[key] as Unit[] | undefined)) unitsByTile[key] = [];
         unitsByTile[key].push(unit);
       });
     });

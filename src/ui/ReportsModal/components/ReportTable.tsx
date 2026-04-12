@@ -1,4 +1,3 @@
-/* eslint-disable */
 import React from 'react';
 
 export interface ReportTableHeader {
@@ -25,7 +24,7 @@ export const ReportTable: React.FC<ReportTableProps> = ({ headers, children }) =
               return (
                 <th
                   key={index}
-                  className={`p-3 font-bold ${className}`}
+                  className={`p-3 font-bold ${className ?? ""}`}
                 >
                   {content}
                 </th>
