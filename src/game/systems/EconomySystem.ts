@@ -1,6 +1,6 @@
 import type { Player } from '../entities/Player';
 import type { Unit } from '../entities/Unit';
-import { GoodType } from '../entities/types';
+import type { GoodType } from '../entities/types';
 
 /* eslint-disable-next-line @typescript-eslint/no-extraneous-class */
 export class EconomySystem {

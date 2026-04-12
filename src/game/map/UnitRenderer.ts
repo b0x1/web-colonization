@@ -1,4 +1,4 @@
-import Phaser from 'phaser';
+import type Phaser from 'phaser';
 import type { Unit } from '../entities/Unit';
 import type { Player } from '../entities/Player';
 import type { TerrainRenderer } from './TerrainRenderer';

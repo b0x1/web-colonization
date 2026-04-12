@@ -1,4 +1,4 @@
-/* eslint-disable @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-argument */
+ 
 import type Phaser from 'phaser';
 import type { Tile } from '../entities/Tile';
 import type { Settlement } from '../entities/Settlement';

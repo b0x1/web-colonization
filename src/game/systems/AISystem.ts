@@ -22,7 +22,8 @@ export interface AISystemResult {
   readonly effects: readonly AIUnitMovedEffect[];
 }
 
-export class AISystem {
+
+export class AISystem {  // eslint-disable-line @typescript-eslint/no-extraneous-class
   private constructor() {
     // Static utility class
   }
