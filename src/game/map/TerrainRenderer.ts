@@ -1,4 +1,3 @@
- 
 import type Phaser from 'phaser';
 import type { Tile } from '../entities/Tile';
 import type { Settlement } from '../entities/Settlement';
