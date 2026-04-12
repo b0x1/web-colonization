@@ -83,17 +83,18 @@ export type NamingStats = Record<string, {
   ship: number;
 }>;
 
-export class NamingSystem {  // eslint-disable-line @typescript-eslint/no-extraneous-class
+/* eslint-disable-next-line @typescript-eslint/no-extraneous-class */
+export class NamingSystem {
+  private constructor() {
+    // Static utility class
+  }
+
   static getNextName(nation: Nation, type: 'settlement' | 'unit' | 'ship', stats: NamingStats): { name: string; updatedStats: NamingStats } {
     const nationKey = nation as string;
     const lists = NAME_LISTS[nationKey] ?? NAME_LISTS[Nation.ENGLAND]; // Fallback to England if missing
     const list = lists[type] ?? lists.unit;
 
-    if (!stats[nationKey]) {  // eslint-disable-line @typescript-eslint/no-unnecessary-condition
-      stats[nationKey] = { settlement: 0, unit: 0, ship: 0 };
-    }
-
-    const currentIndex = stats[nationKey][type];
+    const currentIndex = (stats[nationKey] as { settlement: number; unit: number; ship: number } | undefined)?.[type] ?? 0;
     const nameIndex = currentIndex % list.length;
     const cycle = Math.floor(currentIndex / list.length);
 
@@ -102,10 +103,13 @@ export class NamingSystem {  // eslint-disable-line @typescript-eslint/no-extran
       name = `${name} ${this.toRoman(cycle + 1)}`;
     }
 
+    const currentStats = stats[nationKey] as { settlement: number; unit: number; ship: number } | undefined;
     const updatedStats = {
       ...stats,
       [nationKey]: {
-        ...stats[nationKey],
+        settlement: currentStats?.settlement ?? 0,
+        unit: currentStats?.unit ?? 0,
+        ship: currentStats?.ship ?? 0,
         [type]: currentIndex + 1,
       },
     };

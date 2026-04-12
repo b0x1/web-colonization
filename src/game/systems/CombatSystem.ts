@@ -1,4 +1,4 @@
-import { GoodType, UnitType, TerrainType, Attitude } from '../entities/types';
+import { GoodType, UnitType, TerrainType, Attitude, BuildingType } from '../entities/types';
 import { COMBAT_CONSTANTS } from '../constants';
 import type { Unit } from '../entities/Unit';
 import type { Settlement } from '../entities/Settlement';
@@ -11,18 +11,22 @@ export interface CombatResult {
   message: string;
 }
 
-export class CombatSystem {  // eslint-disable-line @typescript-eslint/no-extraneous-class
+/* eslint-disable-next-line @typescript-eslint/no-extraneous-class */
+export class CombatSystem {
+  private constructor() {
+    // Static utility class
+  }
+
   static resolveCombat(
     attacker: Unit,
     defender: Unit | Settlement,
     defenderTile: Tile,
     defenderSettlement?: Settlement
   ): CombatResult {
-    const attackerBaseStrength = COMBAT_CONSTANTS.UNIT_STRENGTHS[attacker.type as keyof typeof COMBAT_CONSTANTS.UNIT_STRENGTHS];
+    const attackerBaseStrength = COMBAT_CONSTANTS.UNIT_STRENGTHS[attacker.type];
     let attackerModifier = 1.0;
 
-    // eslint-disable-next-line
-    if (attacker.type === UnitType.SOLDIER && (attacker.cargo.get(GoodType.MUSKETS) || 0) >= 10) {
+    if (attacker.type === UnitType.SOLDIER && (attacker.cargo.get(GoodType.MUSKETS) ?? 0) >= 10) {
       attackerModifier *= 1.3;
     }
 
@@ -35,7 +39,7 @@ export class CombatSystem {  // eslint-disable-line @typescript-eslint/no-extran
     const isSettlement = 'buildings' in defender;
 
     if (isUnit) {
-      defenderBaseStrength = COMBAT_CONSTANTS.UNIT_STRENGTHS[defender.type as keyof typeof COMBAT_CONSTANTS.UNIT_STRENGTHS];
+      defenderBaseStrength = COMBAT_CONSTANTS.UNIT_STRENGTHS[defender.type];
     } else if (isSettlement) {
       if (defender.ownerId.startsWith('npc-')) {
         defenderBaseStrength = COMBAT_CONSTANTS.BASE_NATIVE_STRENGTH;
@@ -54,7 +58,7 @@ export class CombatSystem {  // eslint-disable-line @typescript-eslint/no-extran
       defenderModifier *= 2.0;
     }
 
-    if (defenderSettlement?.buildings.includes('STOCKADE')) {
+    if (defenderSettlement?.buildings.includes(BuildingType.STOCKADE)) {
       defenderModifier *= 1.5;
     }
 

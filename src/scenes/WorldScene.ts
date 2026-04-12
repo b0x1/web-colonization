@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-unsafe-argument, @typescript-eslint/no-explicit-any, @typescript-eslint/no-unnecessary-condition, @typescript-eslint/prefer-optional-chain */
 import Phaser from 'phaser';
 import { TileMap } from '../game/map/TileMap';
 import { TerrainRenderer } from '../game/map/TerrainRenderer';
@@ -43,7 +42,7 @@ export class WorldScene extends Phaser.Scene {
       SpriteLoader.register(this, key);
     });
 
-    this.terrainRenderer = new TerrainRenderer(this as any, this.TILE_SIZE);
+    this.terrainRenderer = new TerrainRenderer(this as unknown as Phaser.Scene, this.TILE_SIZE);
     this.unitRenderer = new UnitRenderer(this, this.terrainRenderer, this.TILE_SIZE);
     this.cameraManager = new CameraManager(this, this.terrainRenderer, this.TILE_SIZE);
     this.inputHandler = new InputHandler(this, this.terrainRenderer);
@@ -65,7 +64,7 @@ export class WorldScene extends Phaser.Scene {
     );
 
     this.storeUnsubscribe = useGameStore.subscribe((state, prevState) => {
-      if (!this.scene?.scene) return;
+
       if (!this.scene.isActive('WorldScene')) return;
 
       const playerSettlements = state.players.flatMap(p => p.settlements);
@@ -99,10 +98,8 @@ export class WorldScene extends Phaser.Scene {
     });
 
     this.scale.on('resize', (gameSize: Phaser.Structs.Size) => {
-      if (this.cameras && this.cameras.main) {
-        this.cameras.main.setViewport(0, 0, gameSize.width, gameSize.height);
-        this.cameraManager.emitViewportUpdate();
-      }
+      this.cameras.main.setViewport(0, 0, gameSize.width, gameSize.height);
+      this.cameraManager.emitViewportUpdate();
     });
 
     this.unitRenderer.render(state.players, state.selectedUnitId);
@@ -133,7 +130,7 @@ export class WorldScene extends Phaser.Scene {
     const { x: startX, y: startY } = this.terrainRenderer.tileToWorld(from);
     const { x: endX, y: endY } = this.terrainRenderer.tileToWorld(to);
 
-    this.unitRenderer.unitSprites.getChildren().forEach((child: any) => {
+    this.unitRenderer.unitSprites.getChildren().forEach((child: unknown) => {
       if (
         child instanceof Phaser.GameObjects.Image &&
         child.texture.key === 'units' &&

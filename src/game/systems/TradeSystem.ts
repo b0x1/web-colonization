@@ -1,6 +1,10 @@
-/* eslint-disable */
+/* eslint-disable-next-line @typescript-eslint/no-extraneous-class */
 export class TradeSystem {
-  process() {
-    console.log('Processing trade');
+  private constructor() {
+    // Static utility class
+  }
+
+  static process(): void {
+    // TODO: Implement trade processing
   }
 }

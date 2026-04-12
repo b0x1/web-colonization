@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-explicit-any, @typescript-eslint/no-unsafe-argument */
 import Phaser from 'phaser';
 import type { TerrainRenderer } from './TerrainRenderer';
 import { useGameStore } from '../state/gameStore';
@@ -43,7 +42,7 @@ export class InputHandler {
 
     this.scene.input.keyboard?.on('keydown-ESC', () => {
       useGameStore.getState().selectUnit(null);
-      this.scene.events.emit('unitSelected', null as any);
+      this.scene.events.emit('unitSelected', null);
       useGameStore.getState().selectTile(null);
       this.terrainRenderer.updateSelectionHighlight(null);
     });
@@ -62,15 +61,15 @@ export class InputHandler {
        unitsAtTile.push(...availableUnitsInSettlement);
     }
 
-    const tile = state.map[pos.y]?.[pos.x] ||  // eslint-disable-line @typescript-eslint/no-unnecessary-condition
+    const tile = state.map[pos.y]?.[pos.x] ??
       { position: pos, terrainType: 'UNKNOWN', movementCost: 1, hasResource: null };
-    useGameStore.getState().selectTile(tile as any);
+    useGameStore.getState().selectTile(tile);
 
     if (settlementAtTile) {
       const isOwned = settlementAtTile.ownerId === state.currentPlayerId;
       if (unitsAtTile.length > 0 && isOwned) {
          useGameStore.getState().selectUnit(null);
-         this.scene.events.emit('unitSelected', null as any);
+         this.scene.events.emit('unitSelected', null);
       } else {
          useGameStore.getState().selectSettlement(settlementAtTile.id);
          this.scene.events.emit('settlementSelected', settlementAtTile.id);
@@ -81,12 +80,12 @@ export class InputHandler {
       this.scene.events.emit('unitSelected', unit.id);
     } else if (unitsAtTile.length > 1) {
       useGameStore.getState().selectUnit(null);
-      this.scene.events.emit('unitSelected', null as any);
+      this.scene.events.emit('unitSelected', null);
     } else {
       useGameStore.getState().selectUnit(null);
       useGameStore.getState().selectSettlement(null);
-      this.scene.events.emit('unitSelected', null as any);
-      this.scene.events.emit('settlementSelected', null as any);
+      this.scene.events.emit('unitSelected', null);
+      this.scene.events.emit('settlementSelected', null);
     }
     this.terrainRenderer.updateSelectionHighlight(pos);
   }
@@ -122,7 +121,7 @@ export class InputHandler {
         handleMove(state.selectedUnitId, pos);
       } else {
         useGameStore.getState().selectUnit(null);
-        this.scene.events.emit('unitSelected', null as any);
+        this.scene.events.emit('unitSelected', null);
         this.terrainRenderer.updateSelectionHighlight(null);
       }
     }

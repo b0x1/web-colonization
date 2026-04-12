@@ -1,4 +1,3 @@
-/* eslint-disable */
 import type { Player } from '../entities/Player';
 import type { Tile } from '../entities/Tile';
 import type { Settlement } from '../entities/Settlement';
@@ -9,7 +8,12 @@ import type { Unit } from '../entities/Unit';
 import { NamingSystem, type NamingStats } from './NamingSystem';
 import type { Position } from '../entities/Position';
 
+/* eslint-disable-next-line @typescript-eslint/no-extraneous-class */
 export class GameSystem {
+  private constructor() {
+    // Static utility class
+  }
+
   static initGame(params: { playerName: string; nation: Nation; mapSize: 'Small' | 'Medium' | 'Large'; aiCount: number }): {
     map: Tile[][];
     players: Player[];
@@ -182,7 +186,8 @@ export class GameSystem {
 
       for (let y = quadrantY; y < quadrantY + 10; y++) {
         for (let x = quadrantX; x < quadrantX + 10; x++) {
-          if (map[y]?.[x] && map[y][x].terrainType !== TerrainType.OCEAN && map[y][x].terrainType !== TerrainType.COAST) {
+        const tile = map[y]?.[x] as Tile | undefined;
+        if (tile && tile.terrainType !== TerrainType.OCEAN && tile.terrainType !== TerrainType.COAST) {
             aiStartX = x;
             aiStartY = y;
             aiFound = true;
@@ -202,8 +207,12 @@ export class GameSystem {
     const settlementsByNation = new Map<Nation, Settlement[]>();
     generatedNativeSettlements.forEach(s => {
       const n = s.ownerId as Nation;
-      if (!settlementsByNation.has(n)) settlementsByNation.set(n, []);
-      settlementsByNation.get(n)!.push(s);
+      let nationSettlements = settlementsByNation.get(n);
+      if (!nationSettlements) {
+        nationSettlements = [];
+        settlementsByNation.set(n, nationSettlements);
+      }
+      nationSettlements.push(s);
     });
 
     settlementsByNation.forEach((settlements, nativeNation) => {

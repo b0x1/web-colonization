@@ -1,4 +1,3 @@
-
 /* eslint-disable @typescript-eslint/no-explicit-any, @typescript-eslint/no-unsafe-argument */
 import React, { useState } from 'react';
 import { useGameStore } from '../../game/state/gameStore';

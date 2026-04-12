@@ -17,7 +17,11 @@ export interface SaveData {
   map: any[][];
 }
 
-export class SaveSystem {  // eslint-disable-line @typescript-eslint/no-extraneous-class
+ /* eslint-disable-next-line @typescript-eslint/no-extraneous-class */
+ export class SaveSystem {
+   private constructor() {
+     // Static utility class
+   }
   private static readonly MANIFEST_KEY = 'webcol_saves';
   private static readonly SAVE_PREFIX = 'webcol_save_';
 

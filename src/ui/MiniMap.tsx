@@ -1,4 +1,3 @@
-/* eslint-disable */
 import React, { useEffect, useState, useCallback, useMemo } from 'react';
 import { useGameStore } from '../game/state/gameStore';
 import { useUIStore } from '../game/state/uiStore';
@@ -39,7 +38,7 @@ export const MiniMap: React.FC = () => {
   const [viewport, setViewport] = useState({ x: 0, y: 0, width: 0, height: 0 });
 
   const currentPlayer = useMemo(() => players.find((p) => p.id === currentPlayerId), [players, currentPlayerId]);
-  const availableUnits = useMemo(() => currentPlayer?.units.filter((u) => u.movesRemaining > 0 && !u.isSkipping) || [], [currentPlayer]);
+  const availableUnits = useMemo(() => currentPlayer?.units.filter((u) => u.movesRemaining > 0 && !u.isSkipping) ?? [], [currentPlayer]);
   const hasAvailableUnits = availableUnits.length > 0;
 
   const handleEndTurn = useCallback(() => {
@@ -52,7 +51,7 @@ export const MiniMap: React.FC = () => {
 
   useEffect(() => {
     const unsubscribe = eventBus.on('viewportUpdated', (v) => {
-      setViewport(v);
+      setViewport(v as { x: number; y: number; width: number; height: number });
     });
     return () => { unsubscribe(); };
   }, []);
@@ -92,7 +91,7 @@ export const MiniMap: React.FC = () => {
         onMapClick={handlePointerAction}
       />
       <button
-        onClick={() => { hasAvailableUnits ? selectNextUnit() : handleEndTurn(); }}
+        onClick={() => { if (hasAvailableUnits) { selectNextUnit(); } else { handleEndTurn(); } }}
         className={`w-full py-3 px-4 font-black uppercase tracking-widest text-sm rounded shadow-2xl transition-all transform active:scale-[0.98] border-2 pointer-events-auto ${
           hasAvailableUnits
             ? 'bg-blue-600 hover:bg-blue-500 text-white border-blue-400'

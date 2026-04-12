@@ -1,4 +1,3 @@
-/* eslint-disable */
 import { describe, it, expect } from 'vitest';
 import { NamingSystem, type NamingStats } from './NamingSystem';
 import { Nation } from '../entities/types';
@@ -19,7 +18,7 @@ describe('NamingSystem', () => {
         // Some native lists might have Jamestown if I copied them, but my researched ones shouldn't
         // Actually, let's just check that it's NOT the first name of England if it's not England
         if (name === 'Jamestown') {
-            console.warn(`Nation ${nation} returned Jamestown`);
+            // console.warn(`Nation ${nation} returned Jamestown`);
         }
       }
 

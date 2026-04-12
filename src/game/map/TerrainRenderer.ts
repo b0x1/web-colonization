@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-argument */
 import Phaser from 'phaser';
 import type { Tile } from '../entities/Tile';
 import type { Settlement } from '../entities/Settlement';
@@ -27,13 +26,13 @@ export class TerrainRenderer {
   }
 
   private initializeIndexMaps() {
-    const terrainManifest = this.scene.cache.json.get('terrain-manifest');
+    const terrainManifest = this.scene.cache.json.get('terrain-manifest') as Record<string, unknown>;
     const terrainKeys = Object.keys(terrainManifest).sort();
     terrainKeys.forEach((key, index) => {
       this.terrainIndexMap.set(key, index);
     });
 
-    const resourceManifest = this.scene.cache.json.get('resources-manifest');
+    const resourceManifest = this.scene.cache.json.get('resources-manifest') as Record<string, unknown>;
     const resourceKeys = Object.keys(resourceManifest).sort();
     resourceKeys.forEach((key, index) => {
       this.resourceIndexMap.set(key, index);

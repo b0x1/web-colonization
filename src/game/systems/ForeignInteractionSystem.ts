@@ -1,10 +1,13 @@
-/* eslint-disable */
 
 import type { Settlement } from '../entities/Settlement';
 import type { Unit } from '../entities/Unit';
 import { GoodType, Attitude, UnitType } from '../entities/types';
 
-export class ForeignInteractionSystem {
+ /* eslint-disable-next-line @typescript-eslint/no-extraneous-class */
+ export class ForeignInteractionSystem {
+   private constructor() {
+     // Static utility class
+   }
   static trade(
     settlement: Settlement,
     unit: Unit,

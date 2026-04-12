@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-non-null-assertion */
 import React from 'react';
 import { useGameStore } from '../../game/state/gameStore';
 import { Sprite } from '../Sprite';
@@ -14,12 +13,13 @@ export const MapGrid: React.FC<Props> = ({ settlementId }) => {
 
   if (!settlement) return null;
 
-  const tiles = [];
+  const tiles: ({ position: Position; terrainType: string; hasResource: string | null } | null)[] = [];
   for (let dy = -1; dy <= 1; dy++) {
     for (let dx = -1; dx <= 1; dx++) {
       const tx = settlement.position.x + dx;
       const ty = settlement.position.y + dy;
-      tiles.push(map[ty]?.[tx]);
+      const tile = map[ty]?.[tx] as { position: Position; terrainType: string; hasResource: string | null } | undefined;
+      tiles.push(tile ?? null);
     }
   }
 
@@ -37,7 +37,9 @@ export const MapGrid: React.FC<Props> = ({ settlementId }) => {
 
   return (
     <div className="grid grid-cols-3 gap-1 bg-slate-900 p-1 rounded border border-slate-700 w-full aspect-square max-w-[450px]">
-      {tiles.map((tile, _i) => {
+      {tiles.map((tile, i) => {
+        if (!tile) return <div key={i} className="aspect-square bg-black/20" />;
+
         const workers = Array.from(settlement.workforce.entries())
           .filter(([_, assignment]) => assignment === toKey(tile.position))
           .map(([id]) => settlement.units.find(u => u.id === id))
@@ -77,17 +79,19 @@ export const MapGrid: React.FC<Props> = ({ settlementId }) => {
             </div>
             {workers.length > 0 && (
               <div className="flex flex-wrap gap-0.5 justify-center p-1 z-20">
-                {workers.map(unit => (
+                {workers.map(unit => {
+                  if (!unit) return null;
+                  return (
                    <div
-                    key={unit!.id}
+                    key={unit.id}
                     draggable
-                    onDragStart={(e) => { handleDragStart(e, unit!.id); }}
+                    onDragStart={(e) => { handleDragStart(e, unit.id); }}
                     className="w-10 h-10 bg-blue-600/40 rounded-full border border-white/20 shadow-sm relative overflow-hidden cursor-grab active:cursor-grabbing"
-                    title={unit!.type}
+                    title={unit.type}
                   >
-                     <Sprite type={unit!.type} category="units" size={40} />
+                     <Sprite type={unit.type} category="units" size={40} />
                   </div>
-                ))}
+                );})}
               </div>
             )}
             {isSettlementTile && <div className="absolute inset-0 border-2 border-yellow-500/30 pointer-events-none" />}
