@@ -42,7 +42,7 @@ export class UnitSystem {
   }
 
   static canMoveTo(unit: Unit, toX: number, toY: number, map: Tile[][]): boolean {
-    const row = map[toY] as Tile[] | undefined;
+    const row = map[toY];
     const targetTile = row?.[toX];
     if (!targetTile) return false;
     const cost = MovementSystem.getMovementCost(unit, targetTile);

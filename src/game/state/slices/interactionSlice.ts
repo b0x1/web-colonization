@@ -49,7 +49,7 @@ export const createInteractionSlice: StateCreator<
 
       foreignPlayer.settlements[sIdx] = updatedSettlement as unknown as import('../../entities/Settlement').Settlement;
       const uIdx = player.units.findIndex(u => u.id === unitId);
-      const playerUnit = player!.units[uIdx];
+      const playerUnit = player.units[uIdx];
       if (playerUnit) {
         player.units[uIdx] = updatedUnit as unknown as import('../../entities/Unit').Unit;
       }
@@ -76,7 +76,7 @@ export const createInteractionSlice: StateCreator<
 
       foreignPlayer.settlements[sIdx] = updatedSettlement as unknown as import('../../entities/Settlement').Settlement;
       const uIdx = player.units.findIndex(u => u.id === unitId);
-      const playerUnit = player!.units[uIdx];
+      const playerUnit = player.units[uIdx];
       if (playerUnit) {
         player.units[uIdx] = updatedUnit as unknown as import('../../entities/Unit').Unit;
       }

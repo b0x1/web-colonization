@@ -31,7 +31,7 @@ export class MovementSystem {
 
       const neighbors = getNeighbors(current, width, height);
       for (const neighbor of neighbors) {
-        const row = map[neighbor.y] as Tile[] | undefined;
+        const row = map[neighbor.y];
         const targetTile = row?.[neighbor.x];
         if (!targetTile) continue;
 
