@@ -1,12 +1,54 @@
 import React, { useEffect, useMemo } from 'react';
-import { getSettlementProduction, useGameStore } from '../../game/state/gameStore';
+import { useStoreWithEqualityFn } from 'zustand/traditional';
+import { shallow } from 'zustand/shallow';
+import {
+  useGameStore,
+  selectCurrentPlayer,
+  selectSettlementById,
+  selectSettlementOwner,
+  selectUnitsAtSettlement,
+  getSettlementProduction,
+} from '../../game/state/gameStore';
 import { useUIStore } from '../../game/state/uiStore';
-import { isSame } from '../../game/entities/Position';
+import type { Unit } from '../../game/entities/Unit';
 import { SettlementScreenView } from './SettlementScreenView';
 
+const EMPTY_UNITS: Unit[] = [];
+
 export const SettlementScreenContainer: React.FC = () => {
-  const { selectedSettlementId, players, currentPlayerId, map, selectSettlement } = useGameStore();
-  const { isSettlementScreenOpen, setSettlementScreenOpen } = useUIStore();
+  const { isSettlementScreenOpen, setSettlementScreenOpen, isDebugMode } = useUIStore();
+  const selectedSettlementId = useStoreWithEqualityFn(useGameStore, (state) => state.selectedSettlementId);
+  const selectSettlement = useStoreWithEqualityFn(useGameStore, (state) => state.selectSettlement);
+  const player = useStoreWithEqualityFn(useGameStore, selectCurrentPlayer);
+  const settlement = useStoreWithEqualityFn(useGameStore, (state) =>
+    selectSettlementById(state, state.selectedSettlementId),
+  );
+  const settlementOwner = useStoreWithEqualityFn(useGameStore, (state) =>
+    selectSettlementOwner(state, state.selectedSettlementId),
+  );
+  const map = useStoreWithEqualityFn(useGameStore, (state) => state.map);
+  const unitsAtSettlement = useStoreWithEqualityFn(
+    useGameStore,
+    (state) =>
+      state.selectedSettlementId
+        ? selectUnitsAtSettlement(state, state.selectedSettlementId)
+        : EMPTY_UNITS,
+    shallow,
+  );
+  const production = useMemo(
+    () =>
+      settlement && map.length > 0 ? getSettlementProduction(settlement, map) : undefined,
+    [settlement, map],
+  );
+
+  useEffect(() => {
+    if (selectedSettlementId && !isSettlementScreenOpen) {
+      const isOwned = settlement?.ownerId === player?.id;
+      if (isOwned || isDebugMode) {
+        setSettlementScreenOpen(true);
+      }
+    }
+  }, [selectedSettlementId, isSettlementScreenOpen, settlement?.ownerId, player?.id, isDebugMode, setSettlementScreenOpen]);
 
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
@@ -24,46 +66,20 @@ export const SettlementScreenContainer: React.FC = () => {
     selectSettlement(null);
   };
 
-  const data = useMemo(() => {
-    if (!isSettlementScreenOpen || !selectedSettlementId) return null;
+  if (!isSettlementScreenOpen || !selectedSettlementId || !player || !settlement || !settlementOwner || !production) return null;
 
-    const player = players.find((p) => p.id === currentPlayerId);
-    const settlementOwner = players.find((p) => p.settlements.some((s) => s.id === selectedSettlementId));
-    const settlement = settlementOwner?.settlements.find((c) => c.id === selectedSettlementId);
-
-    if (!settlement || !player || !settlementOwner) return null;
-
-    const isReadOnly = settlement.ownerId !== currentPlayerId;
-    const { hammersProduced, netProduction } = getSettlementProduction(settlement, map);
-
-    // Collect units physically at the settlement
-    const unitsAtSettlement = [
-      ...settlement.units,
-      ...settlementOwner.units.filter(u => isSame(u.position, settlement.position))
-    ].reduce<typeof settlement.units>((acc, unit) => {
-      // Avoid duplicates by ID
-      if (!acc.find(u => u.id === unit.id)) {
-        acc.push(unit);
-      }
-      return acc;
-    }, []);
-
-    return {
-      settlement,
-      player,
-      settlementOwner,
-      isReadOnly,
-      hammersProduced,
-      unitsAtSettlement,
-      netProduction
-    };
-  }, [isSettlementScreenOpen, selectedSettlementId, players, currentPlayerId, map]);
-
-  if (!data) return null;
+  const isReadOnly = settlement.ownerId !== player.id;
+  const { hammersProduced, netProduction } = production;
 
   return (
     <SettlementScreenView
-      {...data}
+      player={player}
+      settlement={settlement}
+      settlementOwner={settlementOwner}
+      isReadOnly={isReadOnly}
+      hammersProduced={hammersProduced}
+      unitsAtSettlement={unitsAtSettlement}
+      netProduction={netProduction}
       onClose={handleClose}
     />
   );

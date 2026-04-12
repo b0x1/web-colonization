@@ -3,7 +3,7 @@ import type { GameState } from '../types';
 import { UnitSystem } from '../../systems/UnitSystem';
 import { eventBus } from '../EventBus';
 import { isSame } from '../../entities/Position';
-import { useUIStore } from '../uiStore';
+import { selectCurrentPlayer } from '../selectors';
 
 export interface SelectionSlice {
   selectedUnitId: string | null;
@@ -28,7 +28,7 @@ export const createSelectionSlice: StateCreator<
 
   selectUnit: (unitId) => {
     set((state) => {
-      const player = state.players.find((p) => p.id === state.currentPlayerId);
+      const player = selectCurrentPlayer(state);
       if (player) {
         // 1. Tuck away previously selected unit if it's on a settlement tile
         if (state.selectedUnitId) {
@@ -80,7 +80,7 @@ export const createSelectionSlice: StateCreator<
 
   selectNextUnit: () => {
     const state = get();
-    const player = state.players.find((p) => p.id === state.currentPlayerId);
+    const player = selectCurrentPlayer(state);
     if (!player) return;
 
     const nextUnit = UnitSystem.findNextAvailableUnit(player, state.selectedUnitId);
@@ -95,7 +95,7 @@ export const createSelectionSlice: StateCreator<
 
   skipUnit: (unitId) => {
     set((state) => {
-      const player = state.players.find((p) => p.id === state.currentPlayerId);
+      const player = selectCurrentPlayer(state);
       if (!player) return;
       const unit = player.units.find((u) => u.id === unitId);
       if (unit) {
@@ -111,13 +111,6 @@ export const createSelectionSlice: StateCreator<
     set((state) => {
       state.selectedSettlementId = settlementId;
       state.selectedUnitId = null;
-      if (settlementId) {
-        // Only open the full SettlementScreen for owned settlements
-        const isOwned = state.players.find(p => p.id === state.currentPlayerId)?.settlements.some(s => s.id === settlementId);
-        if (isOwned || useUIStore.getState().isDebugMode) {
-          useUIStore.getState().setSettlementScreenOpen(true);
-        }
-      }
     });
   },
 });

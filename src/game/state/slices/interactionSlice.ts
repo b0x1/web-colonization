@@ -1,13 +1,14 @@
-/* eslint-disable @typescript-eslint/no-explicit-any, @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-argument, @typescript-eslint/no-non-null-assertion */
+/* eslint-disable @typescript-eslint/no-explicit-any, @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-argument */
 import type { StateCreator } from 'zustand';
 import type { GameState } from '../types';
 import type { CombatResult } from '../../systems/CombatSystem';
 import type { Position } from '../../entities/Position';
-import { isSame } from '../../entities/Position';
+import { TraversalUtils } from '../../utils/TraversalUtils';
 import type { GoodType } from '../../entities/types';
 import { ForeignInteractionSystem } from '../../systems/ForeignInteractionSystem';
 import { CombatSystem } from '../../systems/CombatSystem';
 import { random } from '../utils';
+import { selectCurrentPlayer, selectSettlementById, selectSettlementOwner, selectUnitOwner } from '../selectors';
 
 export interface InteractionSlice {
   combatResult: CombatResult | null;
@@ -28,11 +29,11 @@ export const createInteractionSlice: StateCreator<
 
   tradeWithSettlement: (settlementId, unitId, goodOffered) => {
     set((state) => {
-      const player = state.players.find((p) => p.id === state.currentPlayerId);
+      const player = selectCurrentPlayer(state);
       const unit = player?.units.find((u) => u.id === unitId);
-      if (!unit) return;
+      if (!unit || !player) return;
 
-      const foreignPlayer = state.players.find(p => p.settlements.some(s => s.id === settlementId));
+      const foreignPlayer = selectSettlementOwner(state, settlementId);
       if (!foreignPlayer) return;
 
       const sIdx = foreignPlayer.settlements.findIndex(s => s.id === settlementId);
@@ -47,21 +48,21 @@ export const createInteractionSlice: StateCreator<
       );
 
       foreignPlayer.settlements[sIdx] = updatedSettlement as unknown as import('../../entities/Settlement').Settlement;
-      const uIdx = player!.units.findIndex(u => u.id === unitId);
+      const uIdx = player.units.findIndex(u => u.id === unitId);
       const playerUnit = player!.units[uIdx];
       if (playerUnit) {
-        player!.units[uIdx] = updatedUnit as unknown as import('../../entities/Unit').Unit;
+        player.units[uIdx] = updatedUnit as unknown as import('../../entities/Unit').Unit;
       }
     });
   },
 
   learnFromSettlement: (settlementId, unitId) => {
     set((state) => {
-      const player = state.players.find((p) => p.id === state.currentPlayerId);
+      const player = selectCurrentPlayer(state);
       const unit = player?.units.find((u) => u.id === unitId);
-      if (!unit) return;
+      if (!unit || !player) return;
 
-      const foreignPlayer = state.players.find(p => p.settlements.some(s => s.id === settlementId));
+      const foreignPlayer = selectSettlementOwner(state, settlementId);
       if (!foreignPlayer) return;
 
       const sIdx = foreignPlayer.settlements.findIndex(s => s.id === settlementId);
@@ -74,21 +75,17 @@ export const createInteractionSlice: StateCreator<
       );
 
       foreignPlayer.settlements[sIdx] = updatedSettlement as unknown as import('../../entities/Settlement').Settlement;
-      const uIdx = player!.units.findIndex(u => u.id === unitId);
+      const uIdx = player.units.findIndex(u => u.id === unitId);
       const playerUnit = player!.units[uIdx];
       if (playerUnit) {
-        player!.units[uIdx] = updatedUnit as unknown as import('../../entities/Unit').Unit;
+        player.units[uIdx] = updatedUnit as unknown as import('../../entities/Unit').Unit;
       }
     });
   },
 
   attackSettlement: (settlementId, unitId) => {
     const state = get();
-    let settlement;
-    for (const p of state.players) {
-      settlement = p.settlements.find(s => s.id === settlementId);
-      if (settlement) break;
-    }
+    const settlement = selectSettlementById(state, settlementId);
 
     if (settlement) {
       state.resolveCombat(unitId, settlement.position);
@@ -103,34 +100,19 @@ export const createInteractionSlice: StateCreator<
 
   resolveCombat: (attackerId, target) => {
     set((state) => {
-      const player = state.players.find((p) => p.id === state.currentPlayerId);
+      const player = selectCurrentPlayer(state);
       if (!player) return;
 
       const attacker = player.units.find((u) => u.id === attackerId);
       if (!attacker) return;
 
-      let defender: any;
-      let defenderSettlement: any;
+      const otherPlayers = state.players.filter(p => p.id !== state.currentPlayerId);
+      const defenderUnit = TraversalUtils.findUnitsAt(otherPlayers, target)[0];
+      const defenderSettlement = TraversalUtils.findSettlementAt(state.players, target);
 
-      for (const p of state.players) {
-        if (p.id !== state.currentPlayerId) {
-          const unit = p.units.find((u) => isSame(u.position, target));
-          if (unit) {
-            defender = unit;
-            break;
-          }
-        }
-      }
-
-      for (const p of state.players) {
-        const settlement = p.settlements.find((c) => isSame(c.position, target));
-        if (settlement) {
-          defenderSettlement = settlement;
-          if (!defender && p.id !== state.currentPlayerId) {
-            defender = settlement;
-          }
-          break;
-        }
+      let defender: any = defenderUnit;
+      if (!defender && defenderSettlement && defenderSettlement.ownerId !== state.currentPlayerId) {
+        defender = defenderSettlement;
       }
 
       if (!defender) return;
@@ -140,17 +122,17 @@ export const createInteractionSlice: StateCreator<
       const result = CombatSystem.resolveCombat(attacker as any, defender, defenderTile, defenderSettlement, random);
 
       if (result.winner === 'attacker') {
-           const defenderPlayer = state.players.find(p => p.units.some(u => u.id === (defender).id));
-         if (defenderPlayer) {
-              const uIdx = defenderPlayer.units.findIndex(u => u.id === (defender).id);
-            if (uIdx !== -1) {
-              defenderPlayer.units.splice(uIdx, 1);
-            }
-         }
+        const defenderPlayer = selectUnitOwner(state, defender.id);
+        if (defenderPlayer) {
+          const uIdx = defenderPlayer.units.findIndex(u => u.id === (defender).id);
+          if (uIdx !== -1) {
+            defenderPlayer.units.splice(uIdx, 1);
+          }
+        }
 
-         const capturedSettlementPlayer = state.players.find(p => p.settlements.some(s => s.id === defender.id));
-         if (capturedSettlementPlayer && capturedSettlementPlayer.id !== state.currentPlayerId) {
-           const sIdx = capturedSettlementPlayer.settlements.findIndex(s => s.id === defender.id);
+        const capturedSettlementPlayer = selectSettlementOwner(state, defender.id);
+        if (capturedSettlementPlayer && capturedSettlementPlayer.id !== state.currentPlayerId) {
+          const sIdx = capturedSettlementPlayer.settlements.findIndex(s => s.id === defender.id);
            const s = capturedSettlementPlayer.settlements[sIdx];
            if (s) {
              if (s.population > 1) {

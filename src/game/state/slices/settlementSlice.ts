@@ -4,7 +4,9 @@ import type { GameState } from '../types';
 import { BuildingType } from '../../entities/types';
 import { SettlementSystem } from '../../systems/SettlementSystem';
 import { NamingSystem } from '../../systems/NamingSystem';
+import { TraversalUtils } from '../../utils/TraversalUtils';
 import { random, generateId } from '../utils';
+import { selectCurrentPlayer, selectSettlementById, selectSettlementOwner } from '../selectors';
 
 export interface SettlementSlice {
   foundSettlement: (unitId: string) => void;
@@ -20,14 +22,14 @@ export const createSettlementSlice: StateCreator<
 > = (set) => ({
   foundSettlement: (unitId) => {
     set((state) => {
-      const player = state.players.find((p) => p.id === state.currentPlayerId);
+      const player = selectCurrentPlayer(state);
       if (!player) return;
 
       const unitIndex = player.units.findIndex((u) => u.id === unitId);
       const unit = player.units[unitIndex];
       if (!unit) return;
 
-      const allSettlements = state.players.flatMap((p) => p.settlements);
+      const allSettlements = TraversalUtils.getAllSettlements(state.players);
 
       if (!SettlementSystem.canFoundSettlement(player, unit, state.map, allSettlements)) return;
 
@@ -55,7 +57,7 @@ export const createSettlementSlice: StateCreator<
 
   buyBuilding: (settlementId, building) => {
     set((state) => {
-      const player = state.players.find((p) => p.id === state.currentPlayerId);
+      const player = selectCurrentPlayer(state);
       if (!player) return;
 
       const settlement = player.settlements.find((s) => s.id === settlementId);
@@ -101,13 +103,11 @@ export const createSettlementSlice: StateCreator<
               }
             }
 
-            if (unit) {
-              settlement.workforce.set(unitId, job as any);
-            }
+          if (unit) {
+            settlement.workforce.set(unitId, job as any);
           }
-          settlement.population = settlement.workforce.size;
-          return;
         }
+        settlement.population = settlement.workforce.size;
       }
     });
   },

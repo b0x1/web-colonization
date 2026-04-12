@@ -1,17 +1,27 @@
 
-import React, { useEffect } from 'react';
-import { useGameStore } from '../game/state/gameStore';
+import React, { useEffect, useMemo } from 'react';
+import { useStoreWithEqualityFn } from 'zustand/traditional';
+import { shallow } from 'zustand/shallow';
+import {
+  useGameStore,
+  selectCurrentPlayer,
+  selectSelectedUnit,
+  selectSettlementAtPosition,
+  selectUnitById,
+  selectUnitsAtPosition,
+} from '../game/state/gameStore';
 import { useUIStore } from '../game/state/uiStore';
 import { UnitType } from '../game/entities/types';
 import { UnitSelector } from './UnitPanel/components/UnitSelector';
-import { isSame, distance } from '../game/entities/Position';
+import { distance } from '../game/entities/Position';
+import type { Unit } from '../game/entities/Unit';
+
+const EMPTY_TILE_UNITS: readonly Unit[] = [];
 
 export const UnitPanel: React.FC = () => {
   const {
-    currentPlayerId,
     selectedUnitId,
     selectedTile,
-    players,
     skipUnit,
     selectUnit,
   } = useGameStore();
@@ -36,6 +46,29 @@ export const UnitPanel: React.FC = () => {
     isHowToPlayModalOpen ||
     isGameSetupModalOpen;
 
+  const unit = useGameStore(selectSelectedUnit);
+  const player = useGameStore(selectCurrentPlayer);
+  const settlementAtTile = useGameStore((state) =>
+    selectSettlementAtPosition(state, state.selectedTile?.position ?? null),
+  );
+  const unitsAtTile = useStoreWithEqualityFn(
+    useGameStore,
+    (state) => {
+      const tile = state.selectedTile;
+      return tile ? selectUnitsAtPosition(state, tile.position) : EMPTY_TILE_UNITS;
+    },
+    shallow,
+  );
+  const unitOwner = useGameStore((state) => {
+    const selected = selectUnitById(state, state.selectedUnitId);
+    return state.players.find((p) => p.id === selected?.ownerId);
+  });
+  const allSettlements = useStoreWithEqualityFn(
+    useGameStore,
+    (state) => state.players.flatMap((p) => p.settlements),
+    shallow,
+  );
+
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
       if (isMainMenuOpen || isAnyModalOpen) return;
@@ -43,45 +76,37 @@ export const UnitPanel: React.FC = () => {
       if ((e.code === 'Space') && selectedUnitId) {
         e.preventDefault();
         skipUnit(selectedUnitId);
-      } else if (e.key.toLowerCase() === 'b' && selectedUnitId) {
-        const unit = players.flatMap((p) => p.units).find((u) => u.id === selectedUnitId);
-        if (unit && (unit.type === UnitType.COLONIST || unit.type === UnitType.VILLAGER)) {
+      } else if (e.key.toLowerCase() === 'b' && unit) {
+        if (unit.type === UnitType.COLONIST || unit.type === UnitType.VILLAGER) {
           e.preventDefault();
-          foundSettlement(selectedUnitId);
+          foundSettlement(unit.id);
         }
       }
     };
     window.addEventListener('keydown', handleKeyDown);
     return () => { window.removeEventListener('keydown', handleKeyDown); };
-  }, [selectedUnitId, skipUnit, isMainMenuOpen, isAnyModalOpen, players, foundSettlement]);
+  }, [selectedUnitId, unit, skipUnit, isMainMenuOpen, isAnyModalOpen, foundSettlement]);
+
+  const unitsForTileSelector = useMemo((): readonly Unit[] => {
+    if (!selectedTile || !settlementAtTile || settlementAtTile.ownerId !== player?.id) {
+      return unitsAtTile;
+    }
+    const availableUnitsInSettlement = settlementAtTile.units.filter((u) => !settlementAtTile.workforce.has(u.id));
+    const merged: Unit[] = [...unitsAtTile];
+    for (const au of availableUnitsInSettlement) {
+      if (!merged.some((u) => u.id === au.id)) {
+        merged.push(au);
+      }
+    }
+    return merged;
+  }, [selectedTile, settlementAtTile, player?.id, unitsAtTile]);
 
   if (isMainMenuOpen) return null;
 
-  const allUnits = players.flatMap((p) => p.units);
-  const unit = allUnits.find((u) => u.id === selectedUnitId);
-
-  const player = players.find(p => p.id === currentPlayerId);
-  const settlementAtTile = selectedTile
-    ? players.flatMap(p => p.settlements).find(s => isSame(s.position, selectedTile.position))
-    : null;
-
-  const unitsAtTile = selectedTile
-    ? allUnits.filter(u => isSame(u.position, selectedTile.position))
-    : [];
-
-  if (selectedTile && settlementAtTile && settlementAtTile.ownerId === player?.id) {
-     const availableUnitsInSettlement = settlementAtTile.units.filter(u => !settlementAtTile.workforce.has(u.id));
-     availableUnitsInSettlement.forEach(au => {
-        if (!unitsAtTile.some(u => u.id === au.id)) {
-           unitsAtTile.push(au);
-        }
-     });
-  }
-
-  if (!unit && selectedTile && (unitsAtTile.length > 1 || (settlementAtTile && (unitsAtTile.length > 0 || (settlementAtTile.ownerId === player?.id))))) {
+  if (!unit && selectedTile && (unitsForTileSelector.length > 1 || (settlementAtTile && (unitsForTileSelector.length > 0 || settlementAtTile.ownerId === player?.id)))) {
     return (
       <UnitSelector
-        unitsAtTile={unitsAtTile}
+        unitsAtTile={[...unitsForTileSelector]}
         settlementAtTile={settlementAtTile}
         onSelectUnit={selectUnit}
         onSelectSettlement={useGameStore.getState().selectSettlement}
@@ -91,10 +116,7 @@ export const UnitPanel: React.FC = () => {
 
   if (!unit) return null;
 
-  const isReadOnly = unit.ownerId !== currentPlayerId;
-  const unitOwner = players.find(p => p.id === unit.ownerId);
-
-  const allSettlements = players.flatMap(p => p.settlements);
+  const isReadOnly = unit.ownerId !== player?.id;
 
   const isAdjacentToSettlement = allSettlements.some(s =>
     distance(s.position, unit.position) <= 1

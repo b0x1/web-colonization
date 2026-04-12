@@ -2,12 +2,13 @@ import type { StateCreator } from 'zustand';
 import type { GameState } from '../types';
 import { UnitType, GoodType, Nation } from '../../entities/types';
 import type { Position } from '../../entities/Position';
-import { isSame } from '../../entities/Position';
+import { TraversalUtils } from '../../utils/TraversalUtils';
 import { UnitSystem } from '../../systems/UnitSystem';
 import { MovementSystem } from '../../systems/MovementSystem';
 import { EconomySystem } from '../../systems/EconomySystem';
 import { NamingSystem } from '../../systems/NamingSystem';
 import { RECRUITMENT_COSTS } from '../../constants';
+import { selectCurrentPlayer } from '../selectors';
 
 export interface UnitSlice {
   europePrices: Record<GoodType, number>;
@@ -42,7 +43,7 @@ export const createUnitSlice: StateCreator<
 
   moveUnit: (unitId, to) => {
     set((state) => {
-      const player = state.players.find((p) => p.id === state.currentPlayerId);
+      const player = selectCurrentPlayer(state);
       if (!player) return;
 
       const unitIndex = player.units.findIndex((u) => u.id === unitId);
@@ -56,7 +57,7 @@ export const createUnitSlice: StateCreator<
         unit.movesRemaining -= MovementSystem.getMovementCost(unit as unknown as import('../../entities/Unit').Unit, targetTile);
 
         // Check if entering own settlement
-        const settlement = player.settlements.find(s => isSame(s.position, to));
+        const settlement = TraversalUtils.findSettlementAt([player], to);
         if (settlement) {
           if (!settlement.units.some(u => u.id === unit.id)) {
             settlement.units.push({ ...unit });
@@ -70,7 +71,7 @@ export const createUnitSlice: StateCreator<
 
   sellGood: (unitId, good, amount) => {
     set((state) => {
-      const player = state.players.find((p) => p.id === state.currentPlayerId);
+      const player = selectCurrentPlayer(state);
       const unit = player?.units.find((u) => u.id === unitId);
       if (!player || !unit) return;
 
@@ -93,7 +94,7 @@ export const createUnitSlice: StateCreator<
 
   buyGood: (unitId, good, amount) => {
     set((state) => {
-      const player = state.players.find((p) => p.id === state.currentPlayerId);
+      const player = selectCurrentPlayer(state);
       const unit = player?.units.find((u) => u.id === unitId);
       if (!player || !unit) return;
 
@@ -113,7 +114,7 @@ export const createUnitSlice: StateCreator<
 
   recruitUnit: (unitType) => {
     set((state) => {
-      const player = state.players.find((p) => p.id === state.currentPlayerId);
+      const player = selectCurrentPlayer(state);
       if (!player) return;
 
       const selectedUnit = player.units.find((u) => u.id === state.selectedUnitId);
