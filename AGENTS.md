@@ -1,86 +1,70 @@
 # AGENTS — webcol
 
-Read full before plan. See ARCHITECTURE.md for stack, layers, file structure.
-See SKILLS.md for code patterns.
+Read this first. Then read `ARCHITECTURE.md`. Then read `SKILLS.md`.
 
 ---
 
-## WATCH — fix when done
+## BIG RULE
 
-`eslint-plugin-react-hooks@7.0.1` not support `eslint@10`. Use STABLE only.
-When fixed: remove `--legacy-peer-deps` from `README.md`, `.github/workflows/deploy.yml`, this section.
+Four layer. No climb up.
 
----
+- UI: read store. render only. no Phaser. no game rule.
+- Scene: draw. input. no rule. talk by EventBus only.
+- System: rule only. no Phaser. no React. no DOM. no store read inside.
+- Entity: data only. plain object. no import from above.
 
-## LAYERS — most important rule
-
-Four layers. No wrong-direction crossing. See ARCHITECTURE.md for diagram.
-
-- UI: read store, render. No Phaser. No logic.
-- Scene: render, input. No rules. Talk via EventBus only.
-- System: rules only. No Phaser. No React. No DOM.
-- Entity: data only. No imports from above.
-
-Scene do logic → extract to system.
-Component do logic → move to store or system.
-System need Phaser/React to test → layer violation. Fix.
+If touched file break layer, fix now.
+If scene do rule, move to system.
+If component do rule, move to store or system.
+If system need browser or Phaser to test, code wrong.
 
 ---
 
-## BEFORE WRITE CODE
+## BEFORE HIT ROCK
 
-1. Read files first. Understand before add.
-2. Plan say what clean up, not just what add.
-3. Check layer violations in every touched file. Find old violation → fix now.
-4. Magic number or string → `src/game/constants.ts`. Not inline.
-5. Write or update tests for every system method touched.
-6. One logical change per commit. Feature and refactor = separate commits.
-
----
-
-## REFACTOR — always look before add
-
-Before new feature, scan touched files:
-
-- Same logic in two places → extract shared utility now. No "we fix later".
-- Class over ~150 lines → check multiple responsibilities, split
-- Magic values inline → move to `constants.ts`
-- No tests on non-trivial logic → add tests for existing behaviour before modify
-- Dead code found → delete. No comment-out. No keep "just in case".
-
-State refactor plan explicit. Say what clean and why.
+1. Read file first.
+2. Say clean-up plan, not only new thing plan.
+3. Look for old bad code in touched file. Fix now.
+4. Magic number or string go `src/game/constants.ts`.
+5. Touch system logic, add or update test.
+6. One logical change per commit. Refactor separate from feature.
 
 ---
 
-## TYPESCRIPT
+## KEEP CODE SMALL
 
-- No `any`. Use `unknown` + type guard if shape unknown. Else define interface.
-- No `!` non-null assertion. Handle null/undefined explicit.
-- Enum not string literal for domain values.
-- `readonly` on data not mutate after create.
-- Explicit return type on all public methods and exports.
-- New file with logic → needs `.test.ts`. Scenes and pure components exempt. Utilities inside them not exempt.
-- Test files live next to source file. No `__tests__` folders.
-  - `src/game/systems/CombatSystem.ts` → `src/game/systems/CombatSystem.test.ts`
-  - Integration tests with no single source file → colocate in the most relevant layer folder.
+- Same logic two place: extract now.
+- Big class around 150+ line: split job.
+- Dead code: delete.
+- Commented code: delete.
+- No test on tricky logic: add test before change.
+
+If unsure, choose simple, typed, boring path.
 
 ---
 
-## COPYRIGHT
+## TYPE RULE
 
-webcol original project. Inspired by colonisation genre. Must not copy commercial game.
+- No `any`.
+- No `!`.
+- Use `unknown` + guard when shape fuzzy.
+- Use enum for domain value.
+- Use `readonly` when data should not change after make.
+- Public method and export need return type.
+- New logic file needs next-to-file test.
+- No `__tests__` folder.
 
-No copy: mechanic names/values/formulas, artwork/sprites/audio, UI layouts, in-game text.
-Fine: genre conventions, generic historical terms (colonist, lumber, soldier), re-derived mechanics.
-
-Task ask copy copyrighted thing → flag in plan, propose original alternative.
+Good:
+`src/game/systems/CombatSystem.ts` -> `src/game/systems/CombatSystem.test.ts`
 
 ---
 
-## AVOID
+## NO
 
-- No new dependency without justification. Use already installed.
-- No `TODO` or `FIXME`. Implement now or make separate task.
-- No `console.log`. Use EventBus diagnostic event or remove before commit.
-- No stub and call done. Cannot implement → say in plan, throw `NotImplementedError`.
-- No copy copyrighted assets or mechanics.
+- No new package unless needed and explained.
+- No `TODO`, `FIXME`, `HACK`.
+- No `console.log`.
+- No fake stub and call done.
+- No copied commercial game text, art, audio, layout, numbers, formula.
+
+If user ask copy copyrighted thing, stop and offer original version.

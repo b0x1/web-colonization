@@ -13,7 +13,7 @@ vi.mock('phaser', () => ({
 
 describe('TerrainRenderer', () => {
   // Use a partial mock for scene to avoid Phaser initialization in Node.js
-  const mockScene = {} as any;
+  const mockScene = {} as ConstructorParameters<typeof TerrainRenderer>[0];
   const tileSize = 64;
   const renderer = new TerrainRenderer(mockScene, tileSize);
 

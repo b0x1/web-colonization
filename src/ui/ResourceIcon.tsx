@@ -1,5 +1,5 @@
 import React from 'react';
-import { GoodType } from '../game/entities/types';
+import type { GoodType } from '../game/entities/types';
 import { Sprite } from './Sprite';
 
 interface ResourceIconProps {

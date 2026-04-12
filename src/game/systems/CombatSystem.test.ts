@@ -6,13 +6,13 @@ import { createTile } from './../entities/Tile';
 import { UnitType, TerrainType, BuildingType, Attitude, GoodType } from './../entities/types';
 
 describe('CombatSystem', () => {
-  let attacker: any;
-  let defenderUnit: any;
-  let npcSettlement: any;
-  let playerSettlement: any;
-  let flatTile: any;
-  let hillTile: any;
-  let mountainTile: any;
+  let attacker: ReturnType<typeof createUnit>;
+  let defenderUnit: ReturnType<typeof createUnit>;
+  let npcSettlement: ReturnType<typeof createSettlement>;
+  let playerSettlement: ReturnType<typeof createSettlement>;
+  let flatTile: ReturnType<typeof createTile>;
+  let hillTile: ReturnType<typeof createTile>;
+  let mountainTile: ReturnType<typeof createTile>;
 
   beforeEach(() => {
     attacker = createUnit('u1', 'p1', 'Test Unit', UnitType.SOLDIER, 0, 0, 3);

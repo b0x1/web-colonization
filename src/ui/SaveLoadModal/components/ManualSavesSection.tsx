@@ -1,5 +1,5 @@
 import React from 'react';
-import type { SaveMeta } from '../../../game/systems/SaveSystem';
+import type { SaveMeta } from '../../../game/state/SaveManager';
 
 interface Props {
   slots: string[];

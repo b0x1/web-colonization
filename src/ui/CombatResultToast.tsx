@@ -12,6 +12,8 @@ export const CombatResultToast: React.FC = () => {
       }, 3000);
       return () => { clearTimeout(timer); };
     }
+
+    return undefined;
   }, [combatResult, clearCombatResult]);
 
   if (!combatResult) return null;

@@ -3,20 +3,33 @@ import type { Tile } from '../entities/Tile';
 import type { Settlement } from '../entities/Settlement';
 import type { Unit } from '../entities/Unit';
 import { TerrainType, ResourceType, UnitType, Attitude } from '../entities/types';
-import { eventBus } from '../state/EventBus';
 import { NATION_BONUSES } from '../constants';
 import { distance, isSame, type Position } from '../entities/Position';
 import { NamingSystem, type NamingStats } from './NamingSystem';
 
-/* eslint-disable-next-line @typescript-eslint/no-extraneous-class */
+export interface AIUnitMovedEffect {
+  readonly type: 'unitMoved';
+  readonly id: string;
+  readonly fromX: number;
+  readonly fromY: number;
+  readonly toX: number;
+  readonly toY: number;
+}
+
+export interface AISystemResult {
+  readonly players: Player[];
+  readonly namingStats: NamingStats;
+  readonly effects: readonly AIUnitMovedEffect[];
+}
+
 export class AISystem {
   private constructor() {
     // Static utility class
   }
 
-  static runAITurn(players: Player[], map: Tile[][], namingStats: NamingStats): { players: Player[]; namingStats: NamingStats } {
-    eventBus.emit('aiTurnStarted');
+  static runAITurn(players: Player[], map: Tile[][], namingStats: NamingStats): AISystemResult {
     let currentNamingStats = { ...namingStats };
+    const effects: AIUnitMovedEffect[] = [];
 
     const updatedPlayers = players.map((p) => ({
       ...p,
@@ -77,7 +90,6 @@ export class AISystem {
               };
               player.settlements.push(newSettlement);
               player.units.splice(unitIndex, 1);
-              eventBus.emit('settlementFounded', newSettlement);
               unitRemoved = true;
             }
           }
@@ -97,10 +109,12 @@ export class AISystem {
             const targetTile = targetRow?.[nx];
             if (targetTile) {
               if (unit.movesRemaining >= targetTile.movementCost) {
+                const fromX = unit.position.x;
+                const fromY = unit.position.y;
                 unit.position.x = nx;
                 unit.position.y = ny;
                 unit.movesRemaining -= targetTile.movementCost;
-                eventBus.emit('unitMoved', unit);
+                effects.push({ type: 'unitMoved', id: unit.id, fromX, fromY, toX: nx, toY: ny });
               }
             }
           }
@@ -109,8 +123,7 @@ export class AISystem {
       }
     }
 
-    eventBus.emit('aiTurnCompleted', updatedPlayers);
-    return { players: updatedPlayers, namingStats: currentNamingStats };
+    return { players: updatedPlayers, namingStats: currentNamingStats, effects };
   }
 
   private static findNearestTarget(

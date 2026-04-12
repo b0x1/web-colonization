@@ -2,7 +2,7 @@ import React, { useMemo } from 'react';
 import { GoodType } from '../../game/entities/types';
 import type { Tile } from '../../game/entities/Tile';
 import type { Settlement } from '../../game/entities/Settlement';
-import { ProductionSystem } from '../../game/systems/ProductionSystem';
+import { getSettlementProduction } from '../../game/state/gameStore';
 import { GoodBox } from './components/GoodBox';
 
 interface Props {
@@ -32,7 +32,7 @@ const FINISHED_GOODS = [
 
 export const InventoryPanel: React.FC<Props> = ({ settlement, map }) => {
   const { netProduction } = useMemo(
-    () => ProductionSystem.calculateSettlementProduction(settlement, map),
+    () => getSettlementProduction(settlement, map),
     [settlement, map]
   );
 

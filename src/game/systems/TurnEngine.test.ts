@@ -53,7 +53,7 @@ describe('TurnEngine', () => {
       const unit = createUnit('u1', 'p2', 'Test Unit', UnitType.SOLDIER, 0, 0, 1);
       ai.units.push(unit);
 
-      const { players: updatedPlayers } = AISystem.runAITurn([human, ai], map, {});
+      const { players: updatedPlayers, effects } = AISystem.runAITurn([human, ai], map, {});
       const updatedUnit = updatedPlayers[1].units[0];
 
       // Unit should move from (0,0) towards (5,5)
@@ -61,6 +61,9 @@ describe('TurnEngine', () => {
       expect(updatedUnit.position.x).toBe(1);
       expect(updatedUnit.position.y).toBe(1);
       expect(updatedUnit.movesRemaining).toBe(0);
+      expect(effects).toEqual([
+        { type: 'unitMoved', id: 'u1', fromX: 0, fromY: 0, toX: 1, toY: 1 },
+      ]);
     });
 
     it('should found a settlement if AI COLONIST is on PLAINS and no adjacent friendly settlement', () => {

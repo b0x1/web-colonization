@@ -5,7 +5,7 @@ import reactRefresh from 'eslint-plugin-react-refresh';
 import tseslint from 'typescript-eslint';
 
 export default tseslint.config(
-  { ignores: ['dist'] },
+  { ignores: ['dist', 'coverage'] },
   js.configs.recommended,
   ...tseslint.configs.strict,
   ...tseslint.configs.stylistic,
@@ -42,6 +42,10 @@ export default tseslint.config(
       '@typescript-eslint/no-explicit-any': 'error',
       '@typescript-eslint/no-non-null-assertion': 'error',
       '@typescript-eslint/no-dynamic-delete': 'error',
+      '@typescript-eslint/consistent-type-imports': ['error', {
+        prefer: 'type-imports',
+        disallowTypeAnnotations: false,
+      }],
 
       // Unsafe operations — requires type-aware linting
       '@typescript-eslint/no-unsafe-argument': 'error',
@@ -105,14 +109,43 @@ export default tseslint.config(
         patterns: [
           { group: ['phaser'], message: 'Systems and entities must not import Phaser.' },
           { group: ['react', 'react-dom'], message: 'Systems and entities must not import React.' },
+          { group: ['zustand'], message: 'Systems and entities must not import Zustand.' },
+          { group: ['**/game/state/**'], message: 'Systems and entities must not import state or store code.' },
           { group: ['**/ui/**'], message: 'No upward layer import into systems/entities.' },
           { group: ['**/scenes/**'], message: 'No upward layer import into systems/entities.' },
+        ],
+      }],
+      'no-restricted-globals': ['error', {
+        name: 'document',
+        message: 'Systems and entities must not use DOM globals.',
+      }, {
+        name: 'window',
+        message: 'Systems and entities must not use DOM globals.',
+      }, {
+        name: 'localStorage',
+        message: 'Systems and entities must not use browser storage globals.',
+      }],
+    },
+  },
+
+  // Layer: entities are plain data only
+  {
+    files: ['src/game/entities/**/*.ts'],
+    rules: {
+      'no-restricted-imports': ['error', {
+        patterns: [
+          { group: ['**/game/systems/**'], message: 'Entities must not import systems.' },
+          { group: ['**/game/state/**'], message: 'Entities must not import state.' },
+          { group: ['**/game/map/**'], message: 'Entities must not import map helpers.' },
+          { group: ['**/game/rendering/**'], message: 'Entities must not import rendering code.' },
+          { group: ['**/ui/**'], message: 'Entities must not import UI.' },
+          { group: ['**/scenes/**'], message: 'Entities must not import scenes.' },
         ],
       }],
     },
   },
 
-  // Layer: UI must not import Phaser or scenes
+  // Layer: UI must not import Phaser, scenes, or systems
   {
     files: ['src/ui/**/*.{ts,tsx}'],
     rules: {
@@ -120,18 +153,21 @@ export default tseslint.config(
         patterns: [
           { group: ['phaser'], message: 'UI layer must not import Phaser.' },
           { group: ['**/scenes/**'], message: 'UI must not import scenes.' },
+          { group: ['**/game/systems/**'], message: 'UI must not call systems directly.' },
         ],
       }],
     },
   },
 
-  // Layer: scenes must not import React
+  // Layer: scenes must not import React, UI, or systems
   {
     files: ['src/scenes/**/*.ts'],
     rules: {
       'no-restricted-imports': ['error', {
         patterns: [
           { group: ['react', 'react-dom'], message: 'Scenes must not import React.' },
+          { group: ['**/ui/**'], message: 'Scenes must not import UI.' },
+          { group: ['**/game/systems/**'], message: 'Scenes must not import systems directly.' },
         ],
       }],
     },
@@ -141,13 +177,11 @@ export default tseslint.config(
   {
     files: ['**/*.test.ts', '**/*.test.tsx'],
     rules: {
-      '@typescript-eslint/no-explicit-any': 'off',
       '@typescript-eslint/no-unsafe-assignment': 'off',
       '@typescript-eslint/no-unsafe-call': 'off',
       '@typescript-eslint/no-unsafe-member-access': 'off',
       '@typescript-eslint/no-unsafe-return': 'off',
       '@typescript-eslint/no-unsafe-argument': 'off',
-      '@typescript-eslint/no-non-null-assertion': 'off',
       '@typescript-eslint/unbound-method': 'off',
       '@typescript-eslint/restrict-template-expressions': 'off',
       '@typescript-eslint/no-confusing-void-expression': 'off',

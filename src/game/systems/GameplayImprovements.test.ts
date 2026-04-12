@@ -17,11 +17,15 @@ describe('TurnEngine Production', () => {
     settlement.workforce.set(unit.id, JobType.FARMER);
     player.settlements.push(settlement);
 
-    const { players: updatedPlayers } = TurnEngine.runProduction([player], [], {});
+    const { players: updatedPlayers, effects } = TurnEngine.runProduction([player], [], {});
     const updatedUnit = updatedPlayers[0].settlements[0].units[0];
 
     expect(updatedUnit.turnsInJob).toBe(COLONY_CONSTANTS.EXPERT_PROMOTION_TURNS);
     expect(updatedUnit.specialty).toBe(JobType.FARMER);
+    expect(effects).toContainEqual({
+      type: 'notification',
+      message: `${unit.type} has become an expert ${JobType.FARMER}!`,
+    });
   });
 
   it('should produce refined goods (Blacksmith: Ore -> Tools)', () => {

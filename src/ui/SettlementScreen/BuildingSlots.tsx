@@ -1,5 +1,6 @@
 import React from 'react';
-import { BuildingType, JobType } from '../../game/entities/types';
+import type { JobType } from '../../game/entities/types';
+import { BuildingType } from '../../game/entities/types';
 import { useGameStore } from '../../game/state/gameStore';
 import { JOB_PRODUCTION_RULES } from '../../game/rules/ProductionRules';
 import { Sprite } from '../Sprite';

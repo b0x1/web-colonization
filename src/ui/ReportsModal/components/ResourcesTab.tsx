@@ -5,7 +5,7 @@ import { Flag } from '../../Flag';
 import { ReportTable } from './ReportTable';
 import type { Position } from '../../../game/entities/Position';
 import type { Tile } from '../../../game/entities/Tile';
-import { ProductionSystem } from '../../../game/systems/ProductionSystem';
+import { getSettlementProduction } from '../../../game/state/gameStore';
 
 interface Props {
   displayedPlayers: Player[];
@@ -28,7 +28,7 @@ export const ResourcesTab: React.FC<Props> = ({ displayedPlayers, onSettlementCl
     <ReportTable headers={headers}>
       {displayedPlayers.map((player) =>
         player.settlements.map((settlement) => {
-          const { netProduction } = ProductionSystem.calculateSettlementProduction(settlement, map);
+          const { netProduction } = getSettlementProduction(settlement, map);
           return (
             <tr
               key={settlement.id}
