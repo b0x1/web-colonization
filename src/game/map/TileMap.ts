@@ -13,9 +13,8 @@ export class TileMap {
   }
 
   public getTerrainAt(pos: Position): TerrainType | null {
-    if (pos.x < 0 || pos.x >= this.width || pos.y < 0 || pos.y >= this.height) {
-      return null;
-    }
-    return this.data[pos.y][pos.x];
+    const row = this.data[pos.y];
+    if (!row) return null;
+    return row[pos.x] ?? null;
   }
 }

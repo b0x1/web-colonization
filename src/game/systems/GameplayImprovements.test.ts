@@ -18,7 +18,8 @@ describe('TurnEngine Production', () => {
     player.settlements.push(settlement);
 
     const { players: updatedPlayers, effects } = TurnEngine.runProduction([player], [], {}, () => 0.5, (p) => `${p}-test`);
-    const updatedUnit = updatedPlayers[0].settlements[0].units[0];
+    const updatedUnit = updatedPlayers[0]?.settlements[0]?.units[0];
+    if (!updatedUnit) throw new Error('Unit not found');
 
     expect(updatedUnit.turnsInJob).toBe(COLONY_CONSTANTS.EXPERT_PROMOTION_TURNS);
     expect(updatedUnit.specialty).toBe(JobType.FARMER);
@@ -40,7 +41,8 @@ describe('TurnEngine Production', () => {
     player.settlements.push(settlement);
 
     const { players: updatedPlayers } = TurnEngine.runProduction([player], [], {}, () => 0.5, (p) => `${p}-test`);
-    const updatedSettlement = updatedPlayers[0].settlements[0];
+    const updatedSettlement = updatedPlayers[0]?.settlements[0];
+    if (!updatedSettlement) throw new Error('Settlement not found');
 
     // Production per worker is 3
     expect(updatedSettlement.inventory.get(GoodType.ORE)).toBe(7);
@@ -63,7 +65,8 @@ describe('TurnEngine Production', () => {
     player.settlements.push(settlement);
 
     const { players: updatedPlayers } = TurnEngine.runProduction([player], [], {}, () => 0.5, (p) => `${p}-test`);
-    const updatedSettlement = updatedPlayers[0].settlements[0];
+    const updatedSettlement = updatedPlayers[0]?.settlements[0];
+    if (!updatedSettlement) throw new Error('Settlement not found');
 
     // 38 + 3 = 41 hammers. 41 - 40 = 1 hammer remaining.
     expect(updatedSettlement.hammers).toBe(1);
@@ -79,11 +82,13 @@ describe('TurnEngine Production', () => {
     player.settlements.push(settlement);
 
     const { players: updatedPlayers } = TurnEngine.runProduction([player], [], {}, () => 0.5, (p) => `${p}-test`);
-    const updatedSettlement = updatedPlayers[0].settlements[0];
+    const updatedPlayer0 = updatedPlayers[0];
+    const updatedSettlement = updatedPlayer0?.settlements[0];
+    if (!updatedSettlement) throw new Error('Settlement not found');
 
     expect(updatedSettlement.population).toBe(1); // Population is workforce size
     expect(updatedSettlement.inventory.get(GoodType.FOOD)).toBe(5); // 205 - 200 (threshold)
     expect(updatedSettlement.units.length).toBe(0);
-    expect(updatedPlayers[0].units.length).toBe(1); // Born unit is outside
+    expect(updatedPlayer0.units.length).toBe(1); // Born unit is outside
   });
 });

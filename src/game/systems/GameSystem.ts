@@ -61,6 +61,8 @@ export class GameSystem {
 
     const startingGold = nation === Nation.NETHERLANDS ? 200 : 100;
     const nationData = NATION_BONUSES[nation];
+    if (!nationData) throw new Error(`Invalid nation: ${nation}`);
+
     let namingStats: NamingStats = {};
 
     const humanPlayer: Player = {
@@ -73,14 +75,18 @@ export class GameSystem {
       settlements: [],
     };
 
+    const width = dimensions.width;
+    const height = dimensions.height;
+
     // Starting position search
-    let startX = Math.floor(dimensions.width / 2);
-    let startY = Math.floor(dimensions.height / 2);
+    let startX = Math.floor(width / 2);
+    let startY = Math.floor(height / 2);
     let found = false;
 
-    for (let y = 10; y < dimensions.height - 10; y++) {
-      for (let x = 10; x < dimensions.width - 10; x++) {
-        if (map[y][x].terrainType !== TerrainType.OCEAN && map[y][x].terrainType !== TerrainType.COAST) {
+    for (let y = 10; y < height - 10; y++) {
+      for (let x = 10; x < width - 10; x++) {
+        const tile = map[y]?.[x];
+        if (tile && tile.terrainType !== TerrainType.OCEAN && tile.terrainType !== TerrainType.COAST) {
           startX = x;
           startY = y;
           found = true;
@@ -116,8 +122,9 @@ export class GameSystem {
           for (let dx = -d; dx <= d; dx++) {
             const nx = startX + dx;
             const ny = startY + dy;
-            if (ny >= 0 && ny < dimensions.height && nx >= 0 && nx < dimensions.width) {
-              if (map[ny][nx].terrainType === TerrainType.OCEAN) {
+            const tile = map[ny]?.[nx];
+            if (tile) {
+              if (tile.terrainType === TerrainType.OCEAN) {
                 shipX = nx;
                 shipY = ny;
                 found = true;
@@ -167,16 +174,19 @@ export class GameSystem {
     humanPlayer.units = units;
 
     const players = [humanPlayer];
-    const allNations = Object.keys(Nation) as Nation[];
-    const europeanNations = allNations.filter(n => NATION_BONUSES[n].culture === 'EUROPEAN');
+    const allNations = Object.values(Nation);
+    const europeanNations = allNations.filter(n => NATION_BONUSES[n]?.culture === 'EUROPEAN');
 
     // Create European AI Players
     const availableEuropeanNations = europeanNations.filter(n => n !== nation);
     for (let i = 0; i < aiCount; i++) {
       const aiNation = availableEuropeanNations.splice(Math.floor(random() * availableEuropeanNations.length), 1)[0] ?? Nation.PORTUGAL;
+      const aiNationData = NATION_BONUSES[aiNation];
+      if (!aiNationData) continue;
+
       const aiPlayer: Player = {
         id: `ai-euro-${i}`,
-        name: `${NATION_BONUSES[aiNation].name} AI`,
+        name: `${aiNationData.name} AI`,
         isHuman: false,
         gold: 100,
         nation: aiNation,
@@ -188,12 +198,12 @@ export class GameSystem {
       let aiStartX = 1;
       let aiStartY = 1;
       let aiFound = false;
-      const quadrantX = i % 2 === 0 ? 5 : dimensions.width - 15;
-      const quadrantY = i < 2 ? 5 : dimensions.height - 15;
+      const quadrantX = i % 2 === 0 ? 5 : width - 15;
+      const quadrantY = i < 2 ? 5 : height - 15;
 
       for (let y = quadrantY; y < quadrantY + 10; y++) {
         for (let x = quadrantX; x < quadrantX + 10; x++) {
-        const tile = map[y]?.[x] as Tile | undefined;
+        const tile = map[y]?.[x];
         if (tile && tile.terrainType !== TerrainType.OCEAN && tile.terrainType !== TerrainType.COAST) {
             aiStartX = x;
             aiStartY = y;
@@ -223,6 +233,9 @@ export class GameSystem {
     });
 
     settlementsByNation.forEach((settlements, nativeNation) => {
+      const nativeNationData = NATION_BONUSES[nativeNation];
+      if (!nativeNationData) return;
+
       const renamedSettlements = settlements.map(s => {
         const { name, updatedStats } = NamingSystem.getNextName(nativeNation, 'settlement', namingStats);
         namingStats = updatedStats;
@@ -237,7 +250,7 @@ export class GameSystem {
 
       const aiPlayer: Player = {
         id: `ai-native-${nativeNation}`,
-        name: NATION_BONUSES[nativeNation].name,
+        name: nativeNationData.name,
         isHuman: false,
         gold: 0,
         nation: nativeNation,
@@ -245,10 +258,11 @@ export class GameSystem {
         settlements: renamedSettlements,
       };
       // Give each native nation a villager at their first settlement
-      if (renamedSettlements.length > 0) {
+      const nativeStartSettlement = renamedSettlements[0];
+      if (nativeStartSettlement) {
         const { name: nativeUnitName, updatedStats: nativeUnitStats } = NamingSystem.getNextName(nativeNation, 'unit', namingStats);
         namingStats = nativeUnitStats;
-        aiPlayer.units.push(this.createBaseUnit(`ai-native-${nativeNation}-u1`, aiPlayer.id, nativeUnitName, UnitType.VILLAGER, renamedSettlements[0].position, 3));
+        aiPlayer.units.push(this.createBaseUnit(`ai-native-${nativeNation}-u1`, aiPlayer.id, nativeUnitName, UnitType.VILLAGER, nativeStartSettlement.position, 3));
       }
       players.push(aiPlayer);
     });

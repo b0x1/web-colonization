@@ -35,12 +35,14 @@ export const createSelectionSlice: StateCreator<
           const prevUnitIdx = player.units.findIndex(u => u.id === state.selectedUnitId);
           if (prevUnitIdx !== -1) {
             const prevUnit = player.units[prevUnitIdx];
-            const settlement = player.settlements.find(s => isSame(s.position, prevUnit.position));
-            if (settlement) {
-              if (!settlement.units.some(u => u.id === prevUnit.id)) {
-                settlement.units.push({ ...prevUnit });
+            if (prevUnit) {
+              const settlement = player.settlements.find(s => isSame(s.position, prevUnit.position));
+              if (settlement) {
+                if (!settlement.units.some(u => u.id === prevUnit.id)) {
+                  settlement.units.push({ ...prevUnit });
+                }
+                player.units.splice(prevUnitIdx, 1);
               }
-              player.units.splice(prevUnitIdx, 1);
             }
           }
         }
@@ -53,10 +55,12 @@ export const createSelectionSlice: StateCreator<
               // Only move out if it's NOT in the workforce (available)
               if (!s.workforce.has(unitId)) {
                 const unit = s.units[uIdx];
-                if (!player.units.some(u => u.id === unitId)) {
-                  player.units.push({ ...unit });
+                if (unit) {
+                  if (!player.units.some(u => u.id === unitId)) {
+                    player.units.push({ ...unit });
+                  }
+                  s.units.splice(uIdx, 1);
                 }
-                s.units.splice(uIdx, 1);
               }
               break;
             }

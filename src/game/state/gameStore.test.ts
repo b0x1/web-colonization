@@ -32,7 +32,8 @@ describe('gameStore', () => {
       useGameStore.getState().moveUnit('u1', { x: 1, y: 0 });
 
       const updatedPlayer = useGameStore.getState().players[0];
-      const updatedUnit = updatedPlayer.units[0];
+      const updatedUnit = updatedPlayer?.units[0];
+      if (!updatedUnit) throw new Error('Unit not found');
       expect(updatedUnit.position.x).toBe(1);
       expect(updatedUnit.position.y).toBe(0);
       expect(updatedUnit.movesRemaining).toBe(2);
@@ -52,7 +53,8 @@ describe('gameStore', () => {
       useGameStore.getState().moveUnit('u1', { x: 1, y: 0 });
 
       const updatedPlayer = useGameStore.getState().players[0];
-      const updatedUnit = updatedPlayer.units[0];
+      const updatedUnit = updatedPlayer?.units[0];
+      if (!updatedUnit) throw new Error('Unit not found');
       expect(updatedUnit.position.x).toBe(0);
       expect(updatedUnit.position.y).toBe(0);
       expect(updatedUnit.movesRemaining).toBe(1);
@@ -130,17 +132,11 @@ describe('gameStore', () => {
 
       const updatedP2 = useGameStore.getState().players.find((player) => player.id === 'p2');
       expect(updatedP2).toBeDefined();
-      if (!updatedP2) {
-        return;
-      }
-      expect(updatedP2.units[0].movesRemaining).toBe(2);
+      expect(updatedP2?.units[0]?.movesRemaining).toBe(2);
 
       const updatedP1 = useGameStore.getState().players.find((player) => player.id === 'p1');
       expect(updatedP1).toBeDefined();
-      if (!updatedP1) {
-        return;
-      }
-      expect(updatedP1.units[0].movesRemaining).toBe(0);
+      expect(updatedP1?.units[0]?.movesRemaining).toBe(0);
     });
   });
 });

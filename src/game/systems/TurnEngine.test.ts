@@ -32,7 +32,8 @@ describe('TurnEngine', () => {
       player.settlements.push(settlement);
 
       const { players: updatedPlayers } = TurnEngine.runProduction([player], [], {}, () => 0.5, (p) => `${p}-test`);
-      const updatedSettlement = updatedPlayers[0].settlements[0];
+      const updatedSettlement = updatedPlayers[0]?.settlements[0];
+      if (!updatedSettlement) throw new Error('Settlement not found');
 
       // Farmer produces 3 FOOD.
       // Pop 1 consumes 2 FOOD.
@@ -46,7 +47,8 @@ describe('TurnEngine', () => {
       const map = createMap(10, 10);
       // All GRASSLAND by default
       // Set (5,5) as PLAINS (target)
-      map[5][5].terrainType = TerrainType.PLAINS;
+      const tile = map[5]?.[5];
+      if (tile) tile.terrainType = TerrainType.PLAINS;
 
       const human = createPlayer('p1', 'Human', true, 0, Nation.SPAIN);
       const ai = createPlayer('p2', 'AI', false, 0, Nation.NORSEMEN);
@@ -54,7 +56,8 @@ describe('TurnEngine', () => {
       ai.units.push(unit);
 
       const { players: updatedPlayers, effects } = AISystem.runAITurn([human, ai], map, {}, () => 0.5, (p) => `${p}-test`);
-      const updatedUnit = updatedPlayers[1].units[0];
+      const updatedUnit = updatedPlayers[1]?.units[0];
+      if (!updatedUnit) throw new Error('Unit not found');
 
       // Unit should move from (0,0) towards (5,5)
       // One step diagonally towards (5,5) is (1,1)
@@ -68,7 +71,8 @@ describe('TurnEngine', () => {
 
     it('should found a settlement if AI COLONIST is on PLAINS and no adjacent friendly settlement', () => {
       const map = createMap(10, 10);
-      map[2][2].terrainType = TerrainType.PLAINS;
+      const tile = map[2]?.[2];
+      if (tile) tile.terrainType = TerrainType.PLAINS;
 
       const ai = createPlayer('p1', 'AI', false, 0, Nation.PORTUGAL);
       const unit = createUnit('u1', 'p1', 'Test Unit', UnitType.COLONIST, 2, 2, 1);
@@ -76,16 +80,18 @@ describe('TurnEngine', () => {
 
       const { players: updatedPlayers } = AISystem.runAITurn([ai], map, {}, () => 0.5, (p) => `${p}-test`);
       const updatedAI = updatedPlayers[0];
+      if (!updatedAI) throw new Error('AI player not found');
 
       expect(updatedAI.settlements.length).toBe(1);
       expect(updatedAI.units.length).toBe(0);
-      expect(updatedAI.settlements[0].position.x).toBe(2);
-      expect(updatedAI.settlements[0].position.y).toBe(2);
+      expect(updatedAI.settlements[0]?.position.x).toBe(2);
+      expect(updatedAI.settlements[0]?.position.y).toBe(2);
     });
 
     it('should not found a settlement if there is an adjacent friendly settlement', () => {
         const map = createMap(10, 10);
-        map[2][2].terrainType = TerrainType.PLAINS;
+        const tile = map[2]?.[2];
+        if (tile) tile.terrainType = TerrainType.PLAINS;
 
         const ai = createPlayer('p1', 'AI', false, 0, Nation.NETHERLANDS);
         const settlement = createSettlement('c1', 'p1', 'Col1', 3, 3, 1, 'EUROPEAN', 'STATE');
@@ -95,11 +101,12 @@ describe('TurnEngine', () => {
 
         const { players: updatedPlayers } = AISystem.runAITurn([ai], map, {}, () => 0.5, (p) => `${p}-test`);
         const updatedAI = updatedPlayers[0];
+        if (!updatedAI) throw new Error('AI player not found');
 
         expect(updatedAI.settlements.length).toBe(1); // Only the existing one
         expect(updatedAI.units.length).toBe(1);
-        expect(updatedAI.units[0].position.x).toBe(2);
-        expect(updatedAI.units[0].position.y).toBe(2);
+        expect(updatedAI.units[0]?.position.x).toBe(2);
+        expect(updatedAI.units[0]?.position.y).toBe(2);
       });
   });
 });

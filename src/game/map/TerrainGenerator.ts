@@ -86,7 +86,9 @@ export class TerrainGenerator {
       const x = margin + Math.floor(this.random() * (this.width - 2 * margin));
       const y = margin + Math.floor(this.random() * (this.height - 2 * margin));
 
-      if (terrain[y][x] === TerrainType.OCEAN || terrain[y][x] === TerrainType.COAST) {
+      const row = terrain[y];
+      const type = row?.[x];
+      if (type === undefined || type === TerrainType.OCEAN || type === TerrainType.COAST) {
         continue;
       }
 
@@ -99,7 +101,9 @@ export class TerrainGenerator {
       if (tooClose) continue;
 
       const nationKey = nativeNations[Math.floor(this.random() * nativeNations.length)];
+      if (!nationKey) continue;
       const nationData = NATION_BONUSES[nationKey];
+      if (!nationData) continue;
       const id = `settlement-native-${settlements.length}-${Math.floor(this.random() * 1000000)}`;
       const name = `${nationData.name} Settlement`;
 

@@ -46,13 +46,14 @@ export const createUnitSlice: StateCreator<
       if (!player) return;
 
       const unitIndex = player.units.findIndex((u) => u.id === unitId);
-      if (unitIndex === -1) return;
       const unit = player.units[unitIndex];
+      if (!unit) return;
 
-      if (UnitSystem.canMoveTo(unit, to.x, to.y, state.map)) {
-        const targetTile = state.map[to.y][to.x];
+      if (UnitSystem.canMoveTo(unit as unknown as import('../../entities/Unit').Unit, to.x, to.y, state.map)) {
+        const targetTile = state.map[to.y]?.[to.x];
+        if (!targetTile) return;
         unit.position = { ...to };
-        unit.movesRemaining -= MovementSystem.getMovementCost(unit, targetTile);
+        unit.movesRemaining -= MovementSystem.getMovementCost(unit as unknown as import('../../entities/Unit').Unit, targetTile);
 
         // Check if entering own settlement
         const settlement = player.settlements.find(s => isSame(s.position, to));
@@ -73,12 +74,13 @@ export const createUnitSlice: StateCreator<
       const unit = player?.units.find((u) => u.id === unitId);
       if (!player || !unit) return;
 
+      const price = state.europePrices[good];
       const { goldGained, newPrice, actualSellAmount } = EconomySystem.sellGood(
         player,
-        unit,
+        unit as unknown as import('../../entities/Unit').Unit,
         good,
         amount,
-        state.europePrices[good]
+        price
       );
 
       if (actualSellAmount <= 0) return;

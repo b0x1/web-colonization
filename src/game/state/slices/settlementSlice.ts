@@ -1,4 +1,4 @@
-/* eslint-disable @typescript-eslint/no-explicit-any, @typescript-eslint/no-unsafe-argument, @typescript-eslint/no-non-null-assertion */
+/* eslint-disable @typescript-eslint/no-explicit-any, @typescript-eslint/no-unsafe-argument */
 import type { StateCreator } from 'zustand';
 import type { GameState } from '../types';
 import { BuildingType } from '../../entities/types';
@@ -24,8 +24,8 @@ export const createSettlementSlice: StateCreator<
       if (!player) return;
 
       const unitIndex = player.units.findIndex((u) => u.id === unitId);
-      if (unitIndex === -1) return;
       const unit = player.units[unitIndex];
+      if (!unit) return;
 
       const allSettlements = state.players.flatMap((p) => p.settlements);
 
@@ -77,8 +77,8 @@ export const createSettlementSlice: StateCreator<
             settlement.workforce.delete(unitId);
             // Move unit back to player units if it was in the settlement
             const uIdx = settlement.units.findIndex(u => u.id === unitId);
-            if (uIdx !== -1) {
-              const unit = settlement.units[uIdx];
+            const unit = settlement.units[uIdx];
+            if (unit) {
               const player = state.players.find(pl => pl.id === settlement.ownerId);
               if (player && !player.units.some(u => u.id === unitId)) {
                 player.units.push({ ...unit });
@@ -91,12 +91,13 @@ export const createSettlementSlice: StateCreator<
             if (!unit) {
               const player = state.players.find(pl => pl.id === settlement.ownerId);
               const pUnitIdx = player?.units.findIndex(u => u.id === unitId) ?? -1;
-              if (pUnitIdx !== -1) {
-                unit = player!.units[pUnitIdx];
+              const pUnit = player?.units[pUnitIdx];
+              if (pUnit) {
+                unit = pUnit;
                 // Move to settlement units if assigned
-                settlement.units.push({ ...unit });
-                player!.units.splice(pUnitIdx, 1);
-                if (state.selectedUnitId === unitId) state.selectedUnitId = null;
+                settlement.units.push({ ...pUnit });
+              player.units.splice(pUnitIdx, 1);
+              if (state.selectedUnitId === unitId) state.selectedUnitId = null;
               }
             }
 

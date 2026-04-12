@@ -41,7 +41,9 @@ describe('Europe Trade', () => {
 
     const { players, europePrices } = useGameStore.getState();
     const player = players[0];
+    if (!player) throw new Error('Player not found');
     const ship = player.units[0];
+    if (!ship) throw new Error('Ship not found');
 
     // Initial gold 1000, sold 10 LUMBER at 2g each = +20g
     expect(player.gold).toBe(1020);
@@ -56,6 +58,7 @@ describe('Europe Trade', () => {
 
     const { players, europePrices } = useGameStore.getState();
     const player = players[0];
+    if (!player) throw new Error('Player not found');
 
     // Initial gold 1000, sold 21 LUMBER at 2g each = +42g
     expect(player.gold).toBe(1042);
@@ -69,7 +72,9 @@ describe('Europe Trade', () => {
 
     const { players } = useGameStore.getState();
     const player = players[0];
+    if (!player) throw new Error('Player not found');
     const ship = player.units[0];
+    if (!ship) throw new Error('Ship not found');
 
     // Initial gold 1000, bought 10 MUSKETS at 8g each = -80g
     expect(player.gold).toBe(920);
@@ -81,13 +86,14 @@ describe('Europe Trade', () => {
 
     // Give ship 50 muskets
     useGameStore.setState((state) => {
-        state.players[0].units[0].cargo.set(GoodType.MUSKETS, 50);
+        state.players[0]?.units[0]?.cargo.set(GoodType.MUSKETS, 50);
     });
 
     recruitUnit(UnitType.SOLDIER);
 
     const { players } = useGameStore.getState();
     const player = players[0];
+    if (!player) throw new Error('Player not found');
     const ship = player.units.find((unit) => unit.type === UnitType.SHIP);
 
     expect(ship).toBeDefined();
@@ -111,6 +117,7 @@ describe('Europe Trade', () => {
 
     const { players } = useGameStore.getState();
     const player = players[0];
+    if (!player) throw new Error('Player not found');
 
     // Gold should not change
     expect(player.gold).toBe(1000);

@@ -29,13 +29,21 @@ export class UnitRenderer {
         if (inSettlement && selectedUnitId !== unit.id) return;
 
         const key = toKey(unit.position);
-        if (!(unitsByTile[key] as Unit[] | undefined)) unitsByTile[key] = [];
-        unitsByTile[key].push(unit);
+        let list = unitsByTile[key];
+        if (!list) {
+          list = [];
+          unitsByTile[key] = list;
+        }
+        list.push(unit);
       });
     });
 
     Object.entries(unitsByTile).forEach(([key, units]) => {
-      const [tx, ty] = key.split(',').map(Number);
+      const parts = key.split(',');
+      const tx = Number(parts[0]);
+      const ty = Number(parts[1]);
+      if (isNaN(tx) || isNaN(ty)) return;
+
       const { x: worldX, y: worldY } = this.terrainRenderer.tileToWorld({ x: tx, y: ty });
 
       units.forEach((unit, index) => {

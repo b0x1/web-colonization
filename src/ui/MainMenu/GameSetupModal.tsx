@@ -43,26 +43,30 @@ export const GameSetupModal: React.FC = () => {
 
         <label className={labelClass}>Select Nation</label>
         <div className="grid grid-cols-2 gap-3 mb-8">
-          {(Object.keys(Nation) as Nation[]).map((n) => (
-            <div
-              key={n}
-              onClick={() => { setNation(n); }}
-              title={NATION_BONUSES[n].description}
-              className={`p-4 rounded-lg cursor-pointer transition-all border-2 flex flex-row items-center gap-4 ${
-                nation === n
-                  ? 'bg-blue-600 border-white shadow-lg transform scale-[1.02]'
-                  : 'bg-slate-900/50 border-transparent hover:border-slate-600'
-              }`}
-            >
-              <Flag nation={n} size={40} className="shrink-0" />
-              <div className="flex flex-col gap-1 overflow-hidden">
-                <div className="font-black uppercase tracking-wider text-sm truncate">{NATION_BONUSES[n].name}</div>
-                <div className={`text-[10px] font-bold leading-tight ${nation === n ? 'text-blue-100' : 'text-slate-500'}`}>
-                  {NATION_BONUSES[n].bonus}
+          {(Object.values(Nation)).map((n) => {
+            const bonus = NATION_BONUSES[n];
+            if (!bonus) return null;
+            return (
+              <div
+                key={n}
+                onClick={() => { setNation(n); }}
+                title={bonus.description}
+                className={`p-4 rounded-lg cursor-pointer transition-all border-2 flex flex-row items-center gap-4 ${
+                  nation === n
+                    ? 'bg-blue-600 border-white shadow-lg transform scale-[1.02]'
+                    : 'bg-slate-900/50 border-transparent hover:border-slate-600'
+                }`}
+              >
+                <Flag nation={n} size={40} className="shrink-0" />
+                <div className="flex flex-col gap-1 overflow-hidden">
+                  <div className="font-black uppercase tracking-wider text-sm truncate">{bonus.name}</div>
+                  <div className={`text-[10px] font-bold leading-tight ${nation === n ? 'text-blue-100' : 'text-slate-500'}`}>
+                    {bonus.bonus}
+                  </div>
                 </div>
               </div>
-            </div>
-          ))}
+            );
+          })}
         </div>
 
         <div className="flex gap-4 mb-8">

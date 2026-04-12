@@ -18,7 +18,9 @@ export class UnitSystem {
     if (availableUnits.length === 0) return undefined;
 
     const currentUnit = player.units.find((u) => u.id === currentUnitId);
-    if (!currentUnit) return availableUnits[0];
+    const firstAvailable = availableUnits[0];
+    if (!firstAvailable) return undefined;
+    if (!currentUnit) return firstAvailable;
 
     return availableUnits.reduce((prev, curr) => {
       if (isSame(curr.position, currentUnit.position)) {
@@ -36,7 +38,7 @@ export class UnitSystem {
       if (isSame(prev.position, currentUnit.position)) return prev;
 
       return distCurr < distPrev ? curr : prev;
-    }, availableUnits[0]);
+    }, firstAvailable);
   }
 
   static canMoveTo(unit: Unit, toX: number, toY: number, map: Tile[][]): boolean {

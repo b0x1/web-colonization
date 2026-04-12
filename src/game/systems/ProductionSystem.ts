@@ -73,10 +73,12 @@ export class ProductionSystem {
       } else {
         // Tile-based
         const parts = (assignment).split(',');
-        if (parts.length === 2) {
-          const tx = parseInt(parts[0]);
-          const ty = parseInt(parts[1]);
-          const tile = map[ty]?.[tx] as Tile | undefined;
+        const p0 = parts[0];
+        const p1 = parts[1];
+        if (p0 !== undefined && p1 !== undefined) {
+          const tx = parseInt(p0, 10);
+          const ty = parseInt(p1, 10);
+          const tile = map[ty]?.[tx];
           const good = tile ? TERRAIN_PRODUCTION_RULES[tile.terrainType] : null;
           if (good) {
             netProduction.set(good, (netProduction.get(good) ?? 0) + amount);

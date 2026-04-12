@@ -50,7 +50,7 @@ export const MarketPanel: React.FC = () => {
                         min="1"
                         className="w-12 bg-transparent text-white text-xs font-mono focus:outline-none px-1 text-center"
                         placeholder="Qty"
-                        value={buyAmounts[good] || ''}
+                        value={buyAmounts[good] ?? ''}
                         onChange={(e) =>
                           { setBuyAmounts({ ...buyAmounts, [good]: parseInt(e.target.value) }); }
                         }
