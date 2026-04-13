@@ -56,7 +56,7 @@ export const createTurnSlice: StateCreator<
       const currentPhaseIndex = phases.indexOf(state.phase);
 
       if (currentPhaseIndex < phases.length - 1) {
-        state.phase = phases[currentPhaseIndex + 1];
+        state.phase = phases[currentPhaseIndex + 1] ?? TurnPhase.MOVEMENT;
         return;
       }
 
@@ -68,6 +68,7 @@ export const createTurnSlice: StateCreator<
       const currentPlayerIndex = state.players.findIndex((p) => p.id === state.currentPlayerId);
       const nextPlayerIndex = (currentPlayerIndex + 1) % state.players.length;
       const nextPlayer = state.players[nextPlayerIndex];
+      if (!nextPlayer) return;
 
       const nextTurn = nextPlayerIndex === 0 ? state.turn + 1 : state.turn;
 

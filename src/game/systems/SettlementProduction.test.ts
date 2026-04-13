@@ -16,7 +16,8 @@ describe('Settlement Production and Building Logic', () => {
     player.settlements.push(settlement);
 
     const { players: updatedPlayers } = TurnEngine.runProduction([player], [], {}, () => 0.5, (p) => `${p}-test`);
-    const updatedSettlement = updatedPlayers[0].settlements[0];
+    const updatedSettlement = updatedPlayers[0]?.settlements[0];
+    if (!updatedSettlement) throw new Error('Settlement not found');
 
     // Lumberjack produces 3 LUMBER.
     // Pop 1 consumes 2 FOOD.
@@ -36,14 +37,16 @@ describe('Settlement Production and Building Logic', () => {
 
     const map: Tile[][] = [];
     for (let y = 0; y < 10; y++) {
-      map[y] = [];
+      const row: Tile[] = [];
       for (let x = 0; x < 10; x++) {
-        map[y][x] = { id: `${x}-${y}`, position: { x, y }, terrainType: TerrainType.GRASSLAND, movementCost: 1, hasResource: null };
+        row.push({ id: `${x}-${y}`, position: { x, y }, terrainType: TerrainType.GRASSLAND, movementCost: 1, hasResource: null });
       }
+      map.push(row);
     }
 
     const { players: updatedPlayers } = TurnEngine.runProduction([player], map, {}, () => 0.5, (p) => `${p}-test`);
-    const updatedSettlement = updatedPlayers[0].settlements[0];
+    const updatedSettlement = updatedPlayers[0]?.settlements[0];
+    if (!updatedSettlement) throw new Error('Settlement not found');
 
     // 1 worker on Grassland produces 3 FOOD.
     // Consumption: 1 pop * 2 = 2 FOOD.
@@ -59,7 +62,8 @@ describe('Settlement Production and Building Logic', () => {
     player.settlements.push(settlement);
 
     const { players: updatedPlayers } = TurnEngine.runProduction([player], [], {}, () => 0.5, (p) => `${p}-test`);
-    const updatedSettlement = updatedPlayers[0].settlements[0];
+    const updatedSettlement = updatedPlayers[0]?.settlements[0];
+    if (!updatedSettlement) throw new Error('Settlement not found');
 
     // Lumber Mill gives +2 LUMBER. Iron Works gives +2 ORE.
     expect(updatedSettlement.inventory.get(GoodType.LUMBER)).toBe(2);
@@ -74,13 +78,13 @@ describe('Settlement Production and Building Logic', () => {
 
     // No warehouse, cap is 200
     let { players: updatedPlayers } = TurnEngine.runProduction([player], [], {}, () => 0.5, (p) => `${p}-test`);
-    expect(updatedPlayers[0].settlements[0].inventory.get(GoodType.LUMBER)).toBe(200);
+    expect(updatedPlayers[0]?.settlements[0]?.inventory.get(GoodType.LUMBER)).toBe(200);
 
     // With warehouse, cap is 400
     settlement.buildings.push(BuildingType.WAREHOUSE);
     settlement.inventory.set(GoodType.LUMBER, 350);
     ({ players: updatedPlayers } = TurnEngine.runProduction([player], [], {}, () => 0.5, (p) => `${p}-test`));
-    expect(updatedPlayers[0].settlements[0].inventory.get(GoodType.LUMBER)).toBe(350);
+    expect(updatedPlayers[0]?.settlements[0]?.inventory.get(GoodType.LUMBER)).toBe(350);
   });
 
   it('processes printing press population growth', () => {
@@ -91,7 +95,9 @@ describe('Settlement Production and Building Logic', () => {
 
     const { players: updatedPlayers } = TurnEngine.runProduction([player], [], {}, () => 0.5, (p) => `${p}-test`);
     // Population is workforce size. Printing press adds a unit to player.units.
-    expect(updatedPlayers[0].settlements[0].population).toBe(1);
-    expect(updatedPlayers[0].units.length).toBe(1);
+    const updatedPlayer0 = updatedPlayers[0];
+    if (!updatedPlayer0) throw new Error('Player not found');
+    expect(updatedPlayer0.settlements[0]?.population).toBe(1);
+    expect(updatedPlayer0.units.length).toBe(1);
   });
 });

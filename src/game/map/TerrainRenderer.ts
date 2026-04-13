@@ -59,7 +59,7 @@ export class TerrainRenderer {
     playerSettlements: Settlement[] = [],
   ): void {
     const height = tiles.length;
-    const width = tiles[0]?.length || 0;
+    const width = tiles[0]?.length ?? 0;
 
     if (this.tilemap?.width !== width || this.tilemap.height !== height) {
       this.destroyTilemap();
@@ -142,10 +142,11 @@ export class TerrainRenderer {
     const { x: worldX, y: worldY } = worldPos;
 
     const checkOcean = (tx: number, ty: number) => {
-      if (ty < 0 || ty >= tiles.length || tx < 0 || tx >= tiles[ty].length) {
-        return false;
-      }
-      return tiles[ty][tx].terrainType === TerrainType.OCEAN;
+      const row = tiles[ty];
+      if (!row) return false;
+      const tile = row[tx];
+      if (!tile) return false;
+      return tile.terrainType === TerrainType.OCEAN;
     };
 
     // North

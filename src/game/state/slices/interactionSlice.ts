@@ -37,17 +37,22 @@ export const createInteractionSlice: StateCreator<
       if (!foreignPlayer) return;
 
       const sIdx = foreignPlayer.settlements.findIndex(s => s.id === settlementId);
+      const settlement = foreignPlayer.settlements[sIdx];
+      if (!settlement) return;
 
       const { updatedSettlement, updatedUnit } = ForeignInteractionSystem.trade(
-        foreignPlayer.settlements[sIdx],
-        unit,
+        settlement as unknown as import('../../entities/Settlement').Settlement,
+        unit as unknown as import('../../entities/Unit').Unit,
         goodOffered,
         random
       );
 
-      foreignPlayer.settlements[sIdx] = updatedSettlement;
+      foreignPlayer.settlements[sIdx] = updatedSettlement as unknown as import('../../entities/Settlement').Settlement;
       const uIdx = player.units.findIndex(u => u.id === unitId);
-      player.units[uIdx] = updatedUnit;
+      const playerUnit = player.units[uIdx];
+      if (playerUnit) {
+        player.units[uIdx] = updatedUnit as unknown as import('../../entities/Unit').Unit;
+      }
     });
   },
 
@@ -61,15 +66,20 @@ export const createInteractionSlice: StateCreator<
       if (!foreignPlayer) return;
 
       const sIdx = foreignPlayer.settlements.findIndex(s => s.id === settlementId);
+      const settlement = foreignPlayer.settlements[sIdx];
+      if (!settlement) return;
 
       const { updatedSettlement, updatedUnit } = ForeignInteractionSystem.learn(
-        foreignPlayer.settlements[sIdx],
-        unit
+        settlement as unknown as import('../../entities/Settlement').Settlement,
+        unit as unknown as import('../../entities/Unit').Unit
       );
 
-      foreignPlayer.settlements[sIdx] = updatedSettlement;
+      foreignPlayer.settlements[sIdx] = updatedSettlement as unknown as import('../../entities/Settlement').Settlement;
       const uIdx = player.units.findIndex(u => u.id === unitId);
-      player.units[uIdx] = updatedUnit;
+      const playerUnit = player.units[uIdx];
+      if (playerUnit) {
+        player.units[uIdx] = updatedUnit as unknown as import('../../entities/Unit').Unit;
+      }
     });
   },
 
@@ -107,8 +117,9 @@ export const createInteractionSlice: StateCreator<
 
       if (!defender) return;
 
-      const defenderTile = state.map[target.y][target.x];
-      const result = CombatSystem.resolveCombat(attacker, defender, defenderTile, defenderSettlement, random);
+      const defenderTile = state.map[target.y]?.[target.x];
+      if (!defenderTile) return;
+      const result = CombatSystem.resolveCombat(attacker as any, defender, defenderTile, defenderSettlement, random);
 
       if (result.winner === 'attacker') {
         const defenderPlayer = selectUnitOwner(state, defender.id);
@@ -123,22 +134,19 @@ export const createInteractionSlice: StateCreator<
         if (capturedSettlementPlayer && capturedSettlementPlayer.id !== state.currentPlayerId) {
           const sIdx = capturedSettlementPlayer.settlements.findIndex(s => s.id === defender.id);
            const s = capturedSettlementPlayer.settlements[sIdx];
-           if (s.population > 1) {
-              s.population -= 1;
+           if (s) {
+             if (s.population > 1) {
+                s.population -= 1;
+             }
+
+             attacker.position = { ...target };
+             attacker.movesRemaining = 0;
+
+             s.ownerId = player.id;
+             s.units.forEach(u => u.ownerId = player.id);
+             player.settlements.push(s as any);
+             capturedSettlementPlayer.settlements.splice(sIdx, 1);
            }
-         }
-
-         if (capturedSettlementPlayer && capturedSettlementPlayer.id !== state.currentPlayerId) {
-            const sIdx = capturedSettlementPlayer.settlements.findIndex(s => s.id === defender.id);
-            const s = capturedSettlementPlayer.settlements[sIdx];
-
-            attacker.position = { ...target };
-            attacker.movesRemaining = 0;
-
-            s.ownerId = player.id;
-            s.units.forEach(u => u.ownerId = player.id);
-            player.settlements.push(s);
-            capturedSettlementPlayer.settlements.splice(sIdx, 1);
          }
       } else {
         const aIdx = player.units.findIndex(u => u.id === attackerId);

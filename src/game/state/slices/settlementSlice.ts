@@ -1,4 +1,4 @@
-/* eslint-disable @typescript-eslint/no-explicit-any, @typescript-eslint/no-unsafe-argument, @typescript-eslint/no-non-null-assertion */
+/* eslint-disable @typescript-eslint/no-explicit-any, @typescript-eslint/no-unsafe-argument */
 import type { StateCreator } from 'zustand';
 import type { GameState } from '../types';
 import { BuildingType } from '../../entities/types';
@@ -26,8 +26,8 @@ export const createSettlementSlice: StateCreator<
       if (!player) return;
 
       const unitIndex = player.units.findIndex((u) => u.id === unitId);
-      if (unitIndex === -1) return;
       const unit = player.units[unitIndex];
+      if (!unit) return;
 
       const allSettlements = TraversalUtils.getAllSettlements(state.players);
 
@@ -79,8 +79,8 @@ export const createSettlementSlice: StateCreator<
           settlement.workforce.delete(unitId);
           // Move unit back to player units if it was in the settlement
           const uIdx = settlement.units.findIndex(u => u.id === unitId);
-          if (uIdx !== -1) {
-            const unit = settlement.units[uIdx];
+          const unit = settlement.units[uIdx];
+          if (unit) {
             if (owner && !owner.units.some(u => u.id === unitId)) {
               owner.units.push({ ...unit });
             }
@@ -88,18 +88,17 @@ export const createSettlementSlice: StateCreator<
           }
         } else {
           // Check in settlement units or player units
-          let unit = settlement.units.find((u) => u.id === unitId);
+          const unit = settlement.units.find((u) => u.id === unitId);
           if (!unit) {
             const pUnitIdx = owner?.units.findIndex(u => u.id === unitId) ?? -1;
-            if (pUnitIdx !== -1) {
-              unit = owner!.units[pUnitIdx];
+            const pUnit = owner?.units[pUnitIdx];
+            if (pUnit) {
               // Move to settlement units if assigned
-              settlement.units.push({ ...unit });
-              owner!.units.splice(pUnitIdx, 1);
+              settlement.units.push({ ...pUnit });
+              owner.units.splice(pUnitIdx, 1);
               if (state.selectedUnitId === unitId) state.selectedUnitId = null;
             }
           }
-
           if (unit) {
             settlement.workforce.set(unitId, job as any);
           }

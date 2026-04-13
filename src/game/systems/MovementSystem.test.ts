@@ -29,8 +29,11 @@ describe('MovementSystem', () => {
 
   it('should handle different movement costs', () => {
     const map = createMap(10, 10);
-    map[5][6].terrainType = TerrainType.FOREST;
-    map[5][6].movementCost = 2;
+    const tile = map[5]?.[6];
+    if (tile) {
+      tile.terrainType = TerrainType.FOREST;
+      tile.movementCost = 2;
+    }
 
     const unit = createUnit('u1', 'p1', 'Test Unit', UnitType.COLONIST, 5, 5, 1);
     const reachable = MovementSystem.getReachableTiles(unit, map);
@@ -42,7 +45,10 @@ describe('MovementSystem', () => {
 
   it('should restrict SHIP to OCEAN/COAST/MOUNTAINS', () => {
     const map = createMap(10, 10, TerrainType.PLAINS);
-    map[5][6].terrainType = TerrainType.OCEAN;
+    const tile = map[5]?.[6];
+    if (tile) {
+      tile.terrainType = TerrainType.OCEAN;
+    }
 
     const ship = createUnit('s1', 'p1', 'Test Unit', UnitType.SHIP, 5, 5, 1);
     const reachable = MovementSystem.getReachableTiles(ship, map);
@@ -55,7 +61,10 @@ describe('MovementSystem', () => {
 
   it('should restrict non-SHIP from OCEAN', () => {
     const map = createMap(10, 10, TerrainType.OCEAN);
-    map[5][6].terrainType = TerrainType.PLAINS;
+    const tile = map[5]?.[6];
+    if (tile) {
+      tile.terrainType = TerrainType.PLAINS;
+    }
 
     const colonist = createUnit('u1', 'p1', 'Test Unit', UnitType.COLONIST, 5, 5, 1);
     const reachable = MovementSystem.getReachableTiles(colonist, map);
@@ -68,7 +77,10 @@ describe('MovementSystem', () => {
 
   it('should restrict land units from COAST', () => {
     const map = createMap(10, 10, TerrainType.COAST);
-    map[5][6].terrainType = TerrainType.PLAINS;
+    const tile = map[5]?.[6];
+    if (tile) {
+      tile.terrainType = TerrainType.PLAINS;
+    }
 
     const colonist = createUnit('u1', 'p1', 'Test Unit', UnitType.COLONIST, 5, 5, 1);
     const reachable = MovementSystem.getReachableTiles(colonist, map);

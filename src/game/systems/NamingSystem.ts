@@ -92,18 +92,21 @@ export class NamingSystem {
   static getNextName(nation: Nation, type: 'settlement' | 'unit' | 'ship', stats: NamingStats): { name: string; updatedStats: NamingStats } {
     const nationKey = nation as string;
     const lists = NAME_LISTS[nationKey] ?? NAME_LISTS[Nation.ENGLAND]; // Fallback to England if missing
+    if (!lists) throw new Error('Default name list missing');
     const list = lists[type] ?? lists.unit;
+    if (!list) throw new Error(`Name list for type ${type} missing`);
 
-    const currentIndex = (stats[nationKey] as { settlement: number; unit: number; ship: number } | undefined)?.[type] ?? 0;
+    const currentIndex = stats[nationKey]?.[type] ?? 0;
     const nameIndex = currentIndex % list.length;
     const cycle = Math.floor(currentIndex / list.length);
 
-    let name = list[nameIndex];
+    const baseName = list[nameIndex] ?? 'Unnamed';
+    let name = baseName;
     if (cycle > 0) {
-      name = `${name} ${this.toRoman(cycle + 1)}`;
+      name = `${baseName} ${this.toRoman(cycle + 1)}`;
     }
 
-    const currentStats = stats[nationKey] as { settlement: number; unit: number; ship: number } | undefined;
+    const currentStats = stats[nationKey];
     const updatedStats = {
       ...stats,
       [nationKey]: {

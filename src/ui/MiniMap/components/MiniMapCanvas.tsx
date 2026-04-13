@@ -18,7 +18,7 @@ export const MiniMapCanvas: React.FC<Props> = ({ map, viewport, onMapClick }) =>
       if (!ctx) return;
 
       const height = map.length;
-      const width = map[0].length;
+      const width = map[0]?.length ?? 0;
 
       canvas.width = width;
       canvas.height = height;
@@ -27,8 +27,11 @@ export const MiniMapCanvas: React.FC<Props> = ({ map, viewport, onMapClick }) =>
       const data = imageData.data;
 
       for (let y = 0; y < height; y++) {
+        const row = map[y];
+        if (!row) continue;
         for (let x = 0; x < width; x++) {
-          const tile = map[y][x];
+          const tile = row[x];
+          if (!tile) continue;
           let color = [0, 0, 0];
 
           switch (tile.terrainType) {
@@ -44,9 +47,9 @@ export const MiniMapCanvas: React.FC<Props> = ({ map, viewport, onMapClick }) =>
           }
 
           const index = (y * width + x) * 4;
-          data[index] = color[0];
-          data[index + 1] = color[1];
-          data[index + 2] = color[2];
+          data[index] = color[0] ?? 0;
+          data[index + 1] = color[1] ?? 0;
+          data[index + 2] = color[2] ?? 0;
           data[index + 3] = 255;
         }
       }
@@ -55,7 +58,7 @@ export const MiniMapCanvas: React.FC<Props> = ({ map, viewport, onMapClick }) =>
   }, [map]);
 
   const mapHeight = map.length;
-  const mapWidth = map[0] ? map[0].length : 1;
+  const mapWidth = map[0]?.length ?? 1;
 
   const rectStyle = {
     left: `${(viewport.x / mapWidth) * 100}%`,

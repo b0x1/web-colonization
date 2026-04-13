@@ -70,7 +70,7 @@ export const MiniMap: React.FC = () => {
   if (isMainMenuOpen || map.length === 0) return null;
 
   const mapHeight = map.length;
-  const mapWidth = map[0].length;
+  const mapWidth = map[0]?.length ?? 1;
 
   const handlePointerAction = (e: React.PointerEvent<HTMLDivElement>) => {
     if (e.buttons !== 1 && e.type !== 'pointerdown') return;

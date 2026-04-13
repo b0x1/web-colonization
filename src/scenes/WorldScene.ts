@@ -47,7 +47,7 @@ export class WorldScene extends Phaser.Scene {
 
     const state = useGameStore.getState();
     const tiles = state.map;
-    const mapWidth = tiles[0].length;
+    const mapWidth = tiles[0]?.length ?? 0;
     const mapHeight = tiles.length;
 
     this.tileMap = new TileMap(mapWidth, mapHeight, tiles.map(row => row.map(t => t.terrainType)));

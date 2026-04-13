@@ -123,8 +123,10 @@ export class InputHandler {
       }
     } else if (unitsAtTile.length === 1) {
       const unit = unitsAtTile[0];
-      eventBus.emit('settlementSelected', null);
-      eventBus.emit('unitSelected', unit.id);
+      if (unit) {
+        eventBus.emit('settlementSelected', null);
+        eventBus.emit('unitSelected', unit.id);
+      }
     } else if (unitsAtTile.length > 1) {
       eventBus.emit('settlementSelected', null);
       eventBus.emit('unitSelected', null);

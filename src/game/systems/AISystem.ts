@@ -57,8 +57,13 @@ export class AISystem {  // eslint-disable-line @typescript-eslint/no-extraneous
       if (player.isHuman) continue;
 
       let unitIndex = 0;
-      while (unitIndex < player.units.length) {
-        const unit = player.units[unitIndex];
+      const playerUnits = player.units;
+      while (unitIndex < playerUnits.length) {
+        const unit = playerUnits[unitIndex];
+        if (!unit) {
+          unitIndex++;
+          continue;
+        }
 
         if (unit.movesRemaining <= 0) {
           unitIndex++;
@@ -68,12 +73,12 @@ export class AISystem {  // eslint-disable-line @typescript-eslint/no-extraneous
         let unitRemoved = false;
 
         if (unit.type === UnitType.COLONIST || unit.type === UnitType.VILLAGER) {
-          const row = map[unit.position.y] as Tile[] | undefined;
-          const currentTile = row?.[unit.position.x];
+          const pos = unit.position;
+          const currentTile = map[pos.y]?.[pos.x];
           const nationData = NATION_BONUSES[player.nation];
-          if (currentTile && (currentTile.terrainType === TerrainType.PLAINS || currentTile.terrainType === TerrainType.GRASSLAND || currentTile.terrainType === TerrainType.PRAIRIE)) {
+          if (nationData && currentTile && (currentTile.terrainType === TerrainType.PLAINS || currentTile.terrainType === TerrainType.GRASSLAND || currentTile.terrainType === TerrainType.PRAIRIE)) {
             const hasAdjacentSettlement = TraversalUtils.getAllSettlements(updatedPlayers).some(
-              (c) => distance(c.position, unit.position) <= 1,
+              (c) => distance(c.position, pos) <= 1,
             );
             if (!hasAdjacentSettlement) {
               const { name: settlementName, updatedStats } = NamingSystem.getNextName(player.nation, 'settlement', currentNamingStats);
@@ -83,7 +88,7 @@ export class AISystem {  // eslint-disable-line @typescript-eslint/no-extraneous
                 id: generateId('settlement-ai'),
                 ownerId: player.id,
                 name: settlementName,
-                position: { ...unit.position },
+                position: { ...pos },
                 population: 1,
                 culture: nationData.culture,
                 organization: nationData.organization,
@@ -97,7 +102,7 @@ export class AISystem {  // eslint-disable-line @typescript-eslint/no-extraneous
                 hammers: 0,
               };
               player.settlements.push(newSettlement);
-              player.units.splice(unitIndex, 1);
+              playerUnits.splice(unitIndex, 1);
               unitRemoved = true;
             }
           }
@@ -113,8 +118,7 @@ export class AISystem {  // eslint-disable-line @typescript-eslint/no-extraneous
             const nx = unit.position.x + dx;
             const ny = unit.position.y + dy;
 
-            const targetRow = map[ny] as Tile[] | undefined;
-            const targetTile = targetRow?.[nx];
+            const targetTile = map[ny]?.[nx];
             if (targetTile) {
               if (unit.movesRemaining >= targetTile.movementCost) {
                 const fromX = unit.position.x;
@@ -143,10 +147,11 @@ export class AISystem {  // eslint-disable-line @typescript-eslint/no-extraneous
     let minDistance = Infinity;
 
     for (let y = 0; y < map.length; y++) {
-      const row = map[y] as Tile[] | undefined;
+      const row = map[y];
       if (!row) continue;
       for (let x = 0; x < row.length; x++) {
         const tile = row[x];
+        if (!tile) continue;
         const isTargetType =
           tile.terrainType === TerrainType.PLAINS || tile.hasResource === ResourceType.FOREST;
         if (!isTargetType) continue;

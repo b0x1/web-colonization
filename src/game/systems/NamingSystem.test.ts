@@ -36,7 +36,7 @@ describe('NamingSystem', () => {
             expect(name).toContain(' II');
         }
     }
-    expect(stats[nation].settlement).toBe(150);
+    expect(stats[nation]?.settlement).toBe(150);
   });
 
   it('should handle units and ships', () => {

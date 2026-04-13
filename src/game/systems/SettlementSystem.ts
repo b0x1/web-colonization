@@ -23,6 +23,7 @@ export class SettlementSystem {
     generateId: (prefix: string) => string
   ): Settlement {
     const nationData = NATION_BONUSES[player.nation];
+    if (!nationData) throw new Error(`Invalid nation: ${player.nation}`);
     const neighbors = getNeighbors(unit.position, map[0]?.length ?? 0, map.length);
     const randomNeighbor = neighbors[Math.floor(random() * (neighbors.length))] as { x: number; y: number } | undefined;
 
@@ -56,11 +57,12 @@ export class SettlementSystem {
     allSettlements: Settlement[]
   ): boolean {
     const nationData = NATION_BONUSES[player.nation];
+    if (!nationData) return false;
     if (nationData.culture === 'EUROPEAN' && unit.type !== UnitType.COLONIST) return false;
     if (nationData.culture === 'NATIVE' && unit.type !== UnitType.VILLAGER) return false;
 
     // Check terrain
-    const tile = map[unit.position.y]?.[unit.position.x] as Tile | undefined;
+    const tile = map[unit.position.y]?.[unit.position.x];
     if (!tile) return false;
     if (
       tile.terrainType === TerrainType.OCEAN ||
