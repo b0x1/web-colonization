@@ -47,7 +47,6 @@ export class AISystem {  // eslint-disable-line @typescript-eslint/no-extraneous
         buildings: [...c.buildings],
         productionQueue: [...c.productionQueue],
         inventory: new Map(c.inventory),
-        workforce: new Map(c.workforce),
         units: c.units.map(u => ({ ...u, cargo: new Map(u.cargo) })),
         goods: new Map(c.goods),
       }))
@@ -95,8 +94,7 @@ export class AISystem {  // eslint-disable-line @typescript-eslint/no-extraneous
                 buildings: [],
                 inventory: new Map(),
                 productionQueue: [],
-                workforce: new Map(),
-                units: [],
+                units: [{ ...unit, occupation: { kind: 'FIELD_WORK', tileX: pos.x, tileY: pos.y } }],
                 attitude: Attitude.NEUTRAL,
                 goods: new Map(),
                 hammers: 0,

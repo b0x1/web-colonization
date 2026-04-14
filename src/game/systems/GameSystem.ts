@@ -162,7 +162,6 @@ export class GameSystem {
         buildings: [],
         inventory: new Map(),
         productionQueue: [],
-        workforce: new Map(),
         units: [],
         attitude: 'NEUTRAL',
         goods: new Map(),
@@ -281,6 +280,7 @@ export class GameSystem {
       maxMoves: moves,
       isSkipping: false,
       cargo: new Map(),
+      occupation: { kind: 'RURE', state: 'MOVING' },
       turnsInJob: 0,
     };
   }

@@ -49,10 +49,7 @@ export const BuildingSlots: React.FC<Props> = ({ settlementId, ownedBuildings })
     <div className="grid grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3">
       {BUILDINGS_LIST.filter(b => ownedBuildings.includes(b.type)).map((b) => {
         const associatedJob = Object.values(JOB_PRODUCTION_RULES).find(rule => rule.requiredBuildings.includes(b.type))?.jobType;
-        const workers = Array.from(settlement.workforce.entries())
-          .filter(([_, assignment]) => assignment === associatedJob)
-          .map(([id]) => settlement.units.find(u => u.id === id))
-          .filter(Boolean);
+        const workers = settlement.units.filter((u) => u.occupation === associatedJob);
 
         return (
           <div
@@ -75,7 +72,7 @@ export const BuildingSlots: React.FC<Props> = ({ settlementId, ownedBuildings })
                       key={unit.id}
                       draggable
                       onDragStart={(e) => { handleDragStart(e, unit.id); }}
-                      title={`${unit.type}${unit.specialty ? ` (Expert ${unit.specialty})` : ''}`}
+                      title={`${unit.type}${unit.expertise ? ` (Expert ${unit.expertise})` : ''}`}
                       className="w-10 h-10 bg-blue-600/40 rounded border border-blue-400/30 shadow-sm flex items-center justify-center relative overflow-hidden cursor-grab active:cursor-grabbing"
                     >
                       <Sprite type={unit.type} category="units" size={40} />

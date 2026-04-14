@@ -27,11 +27,20 @@ describe('TurnEngine', () => {
       const player = createPlayer('p1', 'Player 1', true, 0, Nation.FRANCE);
       const settlement = createSettlement('c1', 'p1', 'Settlement 1', 2, 2, 1, 'EUROPEAN', 'STATE');
       const unit = createUnit('u1', 'p1', 'Test Unit', UnitType.COLONIST, 2, 2, 1);
+      unit.occupation = { kind: 'FIELD_WORK', tileX: 2, tileY: 1 }; // Neighbors produce food on Grassland
       settlement.units.push(unit);
-      settlement.workforce.set(unit.id, JobType.FARMER);
       player.settlements.push(settlement);
 
-      const { players: updatedPlayers } = TurnEngine.runProduction([player], [], {}, () => 0.5, (p) => `${p}-test`);
+      const map: Tile[][] = [];
+      for (let y = 0; y < 10; y++) {
+        const row: Tile[] = [];
+        for (let x = 0; x < 10; x++) {
+          row.push(createTile(`${x}-${y}`, x, y, TerrainType.GRASSLAND, 1));
+        }
+        map.push(row);
+      }
+
+      const { players: updatedPlayers } = TurnEngine.runProduction([player], map, {}, () => 0.5, (p) => `${p}-test`);
       const updatedSettlement = updatedPlayers[0]?.settlements[0];
       if (!updatedSettlement) throw new Error('Settlement not found');
 

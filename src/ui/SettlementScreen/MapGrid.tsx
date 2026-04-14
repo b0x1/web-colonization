@@ -40,10 +40,12 @@ export const MapGrid: React.FC<Props> = ({ settlementId }) => {
       {tiles.map((tile, i) => {
         if (!tile) return <div key={i} className="aspect-square bg-black/20" />;
 
-        const workers = Array.from(settlement.workforce.entries())
-          .filter(([_, assignment]) => assignment === toKey(tile.position))
-          .map(([id]) => settlement.units.find(u => u.id === id))
-          .filter(Boolean);
+        const workers = settlement.units.filter((u) =>
+          typeof u.occupation === 'object' &&
+          u.occupation.kind === 'FIELD_WORK' &&
+          u.occupation.tileX === tile.position.x &&
+          u.occupation.tileY === tile.position.y
+        );
 
         const isSettlementTile = isSame(tile.position, settlement.position);
 
