@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useMemo } from 'react';
 import { useGameStore } from '../../game/state/gameStore';
 import { Sprite } from '../Sprite';
 import { isSame, toKey, type Position } from '../../game/entities/Position';
@@ -9,7 +9,23 @@ interface Props {
 
 export const MapGrid: React.FC<Props> = ({ settlementId }) => {
   const { map, players, assignJob } = useGameStore();
-  const settlement = players.flatMap(p => p.settlements).find(s => s.id === settlementId);
+  const settlement = useMemo(() => players.flatMap(p => p.settlements).find(s => s.id === settlementId), [players, settlementId]);
+
+  const workersByTile = useMemo(() => {
+    if (!settlement) return new Map<string, string[]>();
+    const groups = new Map<string, string[]>();
+    settlement.workforce.forEach((tileKey, unitId) => {
+      const list = groups.get(tileKey) ?? [];
+      list.push(unitId);
+      groups.set(tileKey, list);
+    });
+    return groups;
+  }, [settlement?.workforce]);
+
+  const unitMap = useMemo(() => {
+    if (!settlement) return new Map<string, (typeof settlement.units)[0]>();
+    return new Map(settlement.units.map(u => [u.id, u]));
+  }, [settlement?.units]);
 
   if (!settlement) return null;
 
@@ -40,10 +56,9 @@ export const MapGrid: React.FC<Props> = ({ settlementId }) => {
       {tiles.map((tile, i) => {
         if (!tile) return <div key={i} className="aspect-square bg-black/20" />;
 
-        const workers = Array.from(settlement.workforce.entries())
-          .filter(([_, assignment]) => assignment === toKey(tile.position))
-          .map(([id]) => settlement.units.find(u => u.id === id))
-          .filter(Boolean);
+        const tileKey = toKey(tile.position);
+        const workerIds = workersByTile.get(tileKey) ?? [];
+        const workers = workerIds.map(id => unitMap.get(id)).filter(Boolean);
 
         const isSettlementTile = isSame(tile.position, settlement.position);
 

@@ -4,6 +4,8 @@ import { BuildingType, GoodType, JobType } from '../entities/types';
 import { JOB_PRODUCTION_RULES, TERRAIN_PRODUCTION_RULES } from '../rules/ProductionRules';
 import { COLONY_CONSTANTS } from '../constants';
 
+const ALL_GOOD_TYPES = Object.values(GoodType);
+
 /* eslint-disable-next-line @typescript-eslint/no-extraneous-class */
 export class ProductionSystem {
   private constructor() {
@@ -18,12 +20,15 @@ export class ProductionSystem {
     const netProduction = new Map<GoodType, number>();
     let hammersProduced = 0;
 
-    // Initialize with 0
-    Object.values(GoodType).forEach((good) => netProduction.set(good, 0));
+    // Optimization: Pre-initialize with ALL_GOOD_TYPES to avoid repeated Object.values calls
+    ALL_GOOD_TYPES.forEach((good) => netProduction.set(good, 0));
+
+    // Optimization: Index units by ID for O(1) lookup in the workforce loop
+    const unitMap = new Map(settlement.units.map(u => [u.id, u]));
 
     // 1. Workforce production
     settlement.workforce.forEach((assignment, unitId) => {
-      const unit = settlement.units.find((u) => u.id === unitId);
+      const unit = unitMap.get(unitId);
       let amount = COLONY_CONSTANTS.PRODUCTION_PER_WORKER;
 
       if (unit?.specialty === assignment) {
@@ -96,7 +101,7 @@ export class ProductionSystem {
     }
 
     // 3. Food consumption
-    const foodConsumption = settlement.workforce.size * 2;
+    const foodConsumption = settlement.workforce.size * COLONY_CONSTANTS.FOOD_CONSUMPTION_PER_CITIZEN;
     netProduction.set(GoodType.FOOD, (netProduction.get(GoodType.FOOD) ?? 0) - foodConsumption);
 
     return { netProduction, hammersProduced };
