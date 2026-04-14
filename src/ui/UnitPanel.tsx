@@ -91,10 +91,12 @@ export const UnitPanel: React.FC = () => {
     if (!selectedTile || !settlementAtTile || settlementAtTile.ownerId !== player?.id) {
       return unitsAtTile;
     }
-    const availableUnitsInSettlement = settlementAtTile.units.filter((u) =>
-      u.occupation.kind === 'RURE' ||
-      (u.occupation.kind === 'FIELD_WORK' && u.occupation.tileX === settlementAtTile.position.x && u.occupation.tileY === settlementAtTile.position.y)
-    );
+    const availableUnitsInSettlement = settlementAtTile.units.filter((u) => {
+      const occ = u.occupation;
+      if (typeof occ !== 'object') return false;
+      if (occ.kind === 'RURE') return true;
+      return occ.tileX === settlementAtTile.position.x && occ.tileY === settlementAtTile.position.y;
+    });
     const merged: Unit[] = [...unitsAtTile];
     for (const au of availableUnitsInSettlement) {
       if (!merged.some((u) => u.id === au.id)) {

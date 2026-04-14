@@ -106,10 +106,12 @@ export class InputHandler {
     const settlementAtTile = state.players.flatMap((p) => p.settlements).find((c) => isSame(c.position, pos));
 
     if (settlementAtTile && settlementAtTile.ownerId === player?.id) {
-       const availableUnitsInSettlement = settlementAtTile.units.filter((u) =>
-         u.occupation.kind === 'RURE' ||
-         (u.occupation.kind === 'FIELD_WORK' && u.occupation.tileX === settlementAtTile.position.x && u.occupation.tileY === settlementAtTile.position.y)
-       );
+       const availableUnitsInSettlement = settlementAtTile.units.filter((u) => {
+         const occ = u.occupation;
+         if (typeof occ !== 'object') return false;
+         if (occ.kind === 'RURE') return true;
+         return occ.tileX === settlementAtTile.position.x && occ.tileY === settlementAtTile.position.y;
+       });
        unitsAtTile.push(...availableUnitsInSettlement);
     }
 

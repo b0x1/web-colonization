@@ -14,10 +14,12 @@ export const AvailableUnits: React.FC<Props> = ({ settlementId, units }) => {
   const settlement = players.flatMap(p => p.settlements).find(s => s.id === settlementId);
   if (!settlement) return null;
 
-  const availableUnits = units.filter(u =>
-    u.occupation.kind === 'RURE' ||
-    (u.occupation.kind === 'FIELD_WORK' && u.occupation.tileX === settlement.position.x && u.occupation.tileY === settlement.position.y)
-  );
+  const availableUnits = units.filter(u => {
+    const occ = u.occupation;
+    if (typeof occ !== 'object') return false;
+    if (occ.kind === 'RURE') return true;
+    return occ.tileX === settlement.position.x && occ.tileY === settlement.position.y;
+  });
 
   const handleDragStart = (e: React.DragEvent, unitId: string) => {
     e.dataTransfer.setData('unitId', unitId);

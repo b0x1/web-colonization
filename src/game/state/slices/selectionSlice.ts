@@ -56,8 +56,9 @@ export const createSelectionSlice: StateCreator<
               if (unit) {
                 // Only move out if it's NOT in the workforce (available)
                 // available is FIELD_WORK at the settlement tile or RURE
-                const isAvailable = unit.occupation.kind === 'RURE' ||
-                  (unit.occupation.kind === 'FIELD_WORK' && unit.occupation.tileX === s.position.x && unit.occupation.tileY === s.position.y);
+                const occ = unit.occupation;
+                const isAvailable = typeof occ === 'object' &&
+                  (occ.kind === 'RURE' || (occ.tileX === s.position.x && occ.tileY === s.position.y));
 
                 if (isAvailable) {
                   if (!player.units.some(u => u.id === unitId)) {
