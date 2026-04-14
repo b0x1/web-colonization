@@ -1,27 +1,11 @@
 import { describe, it, expect } from 'vitest';
 import { TurnEngine } from './TurnEngine';
-import { AISystem } from './AISystem';
 import { createPlayer } from './../entities/Player';
-import { createTile } from './../entities/Tile';
 import { createSettlement } from './../entities/Settlement';
 import { createUnit } from './../entities/Unit';
-import { TerrainType, GoodType, UnitType, JobType, Nation } from './../entities/types';
-
-import type { Tile } from '../entities/Tile';
+import { GoodType, UnitType, JobType, Nation } from './../entities/types';
 
 describe('TurnEngine', () => {
-  const createMap = (width: number, height: number): Tile[][] => {
-    const map: Tile[][] = [];
-    for (let y = 0; y < height; y++) {
-      const row: Tile[] = [];
-      for (let x = 0; x < width; x++) {
-        row.push(createTile(`${x}-${y}`, x, y, TerrainType.GRASSLAND, 1));
-      }
-      map.push(row);
-    }
-    return map;
-  };
-
   describe('runProduction', () => {
     it('should calculate food based on workforce and population consumption', () => {
       const player = createPlayer('p1', 'Player 1', true, 0, Nation.FRANCE);
