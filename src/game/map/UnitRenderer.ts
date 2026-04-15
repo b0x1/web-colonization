@@ -2,7 +2,7 @@ import type Phaser from 'phaser';
 import type { Unit } from '../entities/Unit';
 import type { Player } from '../entities/Player';
 import type { TerrainRenderer } from './TerrainRenderer';
-import { isSame, toKey } from '../entities/Position';
+import { toKey } from '../entities/Position';
 
 export class UnitRenderer {
   public unitSprites: Phaser.GameObjects.Group;
@@ -22,13 +22,22 @@ export class UnitRenderer {
 
     const unitsByTile: Record<string, Unit[]> = {};
 
+    // Optimization: Pre-calculate settlement positions per player for O(1) lookup
+    const playerSettlementPositions = new Map<string, Set<string>>();
+    players.forEach(p => {
+      const set = new Set<string>();
+      p.settlements.forEach(s => set.add(toKey(s.position)));
+      playerSettlementPositions.set(p.id, set);
+    });
+
     players.forEach((player) => {
+      const mySettlements = playerSettlementPositions.get(player.id);
       player.units.forEach((unit) => {
         // Skip rendering units that are in a settlement (except if currently selected, though gameStore logic handles that too)
-        const inSettlement = player.settlements.some(s => isSame(s.position, unit.position));
+        const key = toKey(unit.position);
+        const inSettlement = mySettlements?.has(key) ?? false;
         if (inSettlement && selectedUnitId !== unit.id) return;
 
-        const key = toKey(unit.position);
         let list = unitsByTile[key];
         if (!list) {
           list = [];
