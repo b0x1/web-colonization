@@ -1,7 +1,8 @@
-import React from 'react';
+import React, { useMemo } from 'react';
 import { useGameStore } from '../../game/state/gameStore';
 import { Sprite } from '../Sprite';
 import { isSame, toKey, type Position } from '../../game/entities/Position';
+import type { Unit } from '../../game/entities/Unit';
 
 interface Props {
   settlementId: string;
@@ -9,7 +10,25 @@ interface Props {
 
 export const MapGrid: React.FC<Props> = ({ settlementId }) => {
   const { map, players, assignJob } = useGameStore();
-  const settlement = players.flatMap(p => p.settlements).find(s => s.id === settlementId);
+  const settlement = useMemo(() => players.flatMap(p => p.settlements).find(s => s.id === settlementId), [players, settlementId]);
+
+  const workersByTile = useMemo(() => {
+    if (!settlement) return new Map<string, string[]>();
+    const groups = new Map<string, string[]>();
+    settlement.workforce.forEach((tileKey, unitId) => {
+      const list = groups.get(tileKey) ?? [];
+      list.push(unitId);
+      groups.set(tileKey, list);
+    });
+    return groups;
+  }, [settlement]);
+
+  const unitMap = useMemo(() => {
+    const map = new Map<string, Unit>();
+    if (!settlement) return map;
+    settlement.units.forEach(u => map.set(u.id, u));
+    return map;
+  }, [settlement]);
 
   if (!settlement) return null;
 
@@ -40,10 +59,11 @@ export const MapGrid: React.FC<Props> = ({ settlementId }) => {
       {tiles.map((tile, i) => {
         if (!tile) return <div key={i} className="aspect-square bg-black/20" />;
 
-        const workers = Array.from(settlement.workforce.entries())
-          .filter(([_, assignment]) => assignment === toKey(tile.position))
-          .map(([id]) => settlement.units.find(u => u.id === id))
-          .filter(Boolean);
+        const tileKey = toKey(tile.position);
+        const workerIds = workersByTile.get(tileKey) ?? [];
+        const workers = workerIds
+          .map(id => unitMap.get(id))
+          .filter((u): u is NonNullable<typeof u> => u !== undefined);
 
         const isSettlementTile = isSame(tile.position, settlement.position);
 
@@ -79,9 +99,7 @@ export const MapGrid: React.FC<Props> = ({ settlementId }) => {
             </div>
             {workers.length > 0 && (
               <div className="flex flex-wrap gap-0.5 justify-center p-1 z-20">
-                {workers.map(unit => {
-                  if (!unit) return null;
-                  return (
+                {workers.map(unit => (
                    <div
                     key={unit.id}
                     draggable
@@ -91,7 +109,7 @@ export const MapGrid: React.FC<Props> = ({ settlementId }) => {
                   >
                      <Sprite type={unit.type} category="units" size={40} />
                   </div>
-                );})}
+                ))}
               </div>
             )}
             {isSettlementTile && <div className="absolute inset-0 border-2 border-yellow-500/30 pointer-events-none" />}
