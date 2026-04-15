@@ -39,6 +39,7 @@ export const GameSetupModal: React.FC = () => {
           type="text"
           value={playerName}
           onChange={(e) => { setPlayerName(e.target.value); }}
+          maxLength={24}
         />
 
         <label className={labelClass}>Select Nation</label>
@@ -97,8 +98,9 @@ export const GameSetupModal: React.FC = () => {
         </div>
 
         <button
-          className="w-full py-4 bg-green-600 hover:bg-green-500 text-white font-black text-xl uppercase tracking-widest rounded shadow-xl transition-all transform active:scale-[0.98] cursor-pointer"
+          className="w-full py-4 bg-green-600 hover:bg-green-500 text-white font-black text-xl uppercase tracking-widest rounded shadow-xl transition-all transform active:scale-[0.98] cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
           onClick={() => { initGame({ playerName, nation, mapSize, aiCount }); }}
+          disabled={!playerName.trim()}
         >
           Start Game
         </button>
