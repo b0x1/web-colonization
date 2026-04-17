@@ -27,7 +27,9 @@ export class GameSystem {
     players: Player[];
     namingStats: NamingStats;
   } {
-    const { playerName, nation, mapSize, aiCount, random, generateId } = params;
+    const { nation, mapSize, aiCount, random, generateId } = params;
+    // Sanitize player name: trim, cap length, and provide fallback
+    const playerName = (params.playerName || 'Colonist').trim().slice(0, 24);
     const dimensions = {
       Small: { width: 40, height: 30 },
       Medium: { width: 80, height: 60 },
