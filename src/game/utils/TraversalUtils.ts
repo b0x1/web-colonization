@@ -129,7 +129,8 @@ export class TraversalUtils {
         for (const unit of settlement.units) {
           if (isSame(unit.position, pos)) {
             // Only include available units (RURE occupation)
-            if (typeof unit.occupation === 'object' && unit.occupation.kind === 'RURE') {
+            // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
+            if (typeof unit.occupation === 'object' && unit.occupation?.kind === 'RURE') {
               units.push(unit);
             }
           }
