@@ -27,7 +27,7 @@ export class ProductionSystem {
     settlement.units.forEach((unit) => {
       let amount = COLONY_CONSTANTS.PRODUCTION_PER_WORKER;
 
-      if (!unit.occupation) return;
+      if (!unit.occupation) return; // eslint-disable-line @typescript-eslint/no-unnecessary-condition
 
       if (typeof unit.occupation === 'string') {
         const job = unit.occupation;
