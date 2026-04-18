@@ -95,25 +95,6 @@ export const UnitPanel: React.FC = () => {
     return unitsAtTile;
   }, [selectedTile, unitsAtTile]);
 
-  useEffect(() => {
-    if (unit || !selectedTile || isMainMenuOpen || isAnyModalOpen) return;
-
-    const availableUnits = unitsForTileSelector;
-    const hasSettlement = !!settlementAtTile;
-
-    // If exactly one unit and no settlement, auto-select it
-    if (availableUnits.length === 1 && !hasSettlement) {
-      const targetUnit = availableUnits[0];
-      if (targetUnit) {
-        selectUnit(targetUnit.id);
-      }
-    }
-    // If only settlement and no units, auto-select it
-    else if (availableUnits.length === 0 && hasSettlement) {
-      useGameStore.getState().selectSettlement(settlementAtTile.id);
-    }
-  }, [unit, selectedTile, unitsForTileSelector, settlementAtTile, selectUnit, isMainMenuOpen, isAnyModalOpen]);
-
   if (isMainMenuOpen) return null;
 
   // Only show selector if there is ambiguity (more than one option)
