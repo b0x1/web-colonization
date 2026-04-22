@@ -1,5 +1,6 @@
-/* eslint-disable @typescript-eslint/no-explicit-any, @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-argument, @typescript-eslint/restrict-plus-operands, @typescript-eslint/no-floating-promises */
+/* eslint-disable @typescript-eslint/no-explicit-any, @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-argument, @typescript-eslint/restrict-plus-operands */
 import React, { useState, useEffect } from 'react';
+import { MAP_CONSTANTS } from '../game/constants';
 
 interface SpriteProps {
   type: string;
@@ -9,8 +10,31 @@ interface SpriteProps {
 }
 
 const manifestCache: Record<string, any> = {};
+const pendingManifests: Record<string, Promise<any> | undefined> = {};
+const sheetSizeCache = new WeakMap<object, { w: number; h: number }>();
 
-export const Sprite: React.FC<SpriteProps> = ({ type, category, size = 64, className = '' }) => {
+const calculateSheetSize = (m: any) => {
+  const cached = sheetSizeCache.get(m);
+  if (cached) return cached;
+
+  let maxX = 0;
+  let maxY = 0;
+  Object.values(m).forEach((v: any) => {
+    maxX = Math.max(maxX, v.x + v.w);
+    maxY = Math.max(maxY, v.y + v.h);
+  });
+  const size = { w: maxX, h: maxY };
+  sheetSizeCache.set(m, size);
+  return size;
+};
+
+/**
+ * ⚡ Bolt: Optimized Sprite component.
+ * Uses WeakMap to cache sheet size calculations (O(1) after first run).
+ * Prevents redundant fetch calls for the same manifest.
+ * Wrapped in React.memo to skip re-renders if props haven't changed.
+ */
+export const Sprite: React.FC<SpriteProps> = React.memo(({ type, category, size = MAP_CONSTANTS.TILE_SIZE, className = '' }) => {
   const [manifest, setManifest] = useState(manifestCache[category]);
 
   useEffect(() => {
@@ -19,39 +43,33 @@ export const Sprite: React.FC<SpriteProps> = ({ type, category, size = 64, class
       return;
     }
 
-    fetch(`/webcol/${category}.json`)
+    const promise = (pendingManifests[category] ??= fetch(`/webcol/${category}.json`)
       .then((res) => res.json())
       .then((data) => {
         manifestCache[category] = data;
-        setManifest(data);
-      });
+        pendingManifests[category] = undefined;
+        return data as unknown;
+      }));
+
+    void promise.then((data) => {
+      setManifest(data);
+    });
   }, [category]);
 
   const coords = manifest?.[type];
 
   if (!coords) {
     if (manifest) {
-       console.warn(`Sprite type "${type}" not found in category "${category}"`);  // eslint-disable-line no-console
+      console.warn(`Sprite type "${type}" not found in category "${category}"`); // eslint-disable-line no-console
     }
     return null;
   }
-
-  // Dynamically calculate total sheet size if not already in cache
-  const calculateSheetSize = (m: any) => {
-    let maxX = 0;
-    let maxY = 0;
-    Object.values(m).forEach((v: any) => {
-      maxX = Math.max(maxX, v.x + v.w);
-      maxY = Math.max(maxY, v.y + v.h);
-    });
-    return { w: maxX, h: maxY };
-  };
 
   const sheetSize = calculateSheetSize(manifest);
   const totalWidth = sheetSize.w;
   const totalHeight = sheetSize.h;
 
-  const scale = size / 64;
+  const scale = size / MAP_CONSTANTS.TILE_SIZE;
 
   return (
     <div
@@ -67,4 +85,6 @@ export const Sprite: React.FC<SpriteProps> = ({ type, category, size = 64, class
       title={type}
     />
   );
-};
+});
+
+Sprite.displayName = 'Sprite';
