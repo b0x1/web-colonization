@@ -17,7 +17,7 @@ describe('TurnEngine Production', () => {
     settlement.units.push(unit);
     player.settlements.push(settlement);
 
-    const { players: updatedPlayers, effects } = TurnEngine.runProduction([player], [], {}, () => 0.5, (p) => `${p}-test`);
+    const { players: updatedPlayers, effects } = TurnEngine.runProduction([player], [], {}, (p) => `${p}-test`);
     const updatedUnit = updatedPlayers[0]?.settlements[0]?.units[0];
     if (!updatedUnit) throw new Error('Unit not found');
 
@@ -40,7 +40,7 @@ describe('TurnEngine Production', () => {
     settlement.units.push(unit);
     player.settlements.push(settlement);
 
-    const { players: updatedPlayers } = TurnEngine.runProduction([player], [], {}, () => 0.5, (p) => `${p}-test`);
+    const { players: updatedPlayers } = TurnEngine.runProduction([player], [], {}, (p) => `${p}-test`);
     const updatedSettlement = updatedPlayers[0]?.settlements[0];
     if (!updatedSettlement) throw new Error('Settlement not found');
 
@@ -64,7 +64,7 @@ describe('TurnEngine Production', () => {
     settlement.units.push(unit);
     player.settlements.push(settlement);
 
-    const { players: updatedPlayers } = TurnEngine.runProduction([player], [], {}, () => 0.5, (p) => `${p}-test`);
+    const { players: updatedPlayers } = TurnEngine.runProduction([player], [], {}, (p) => `${p}-test`);
     const updatedSettlement = updatedPlayers[0]?.settlements[0];
     if (!updatedSettlement) throw new Error('Settlement not found');
 
@@ -81,7 +81,7 @@ describe('TurnEngine Production', () => {
     settlement.inventory.set(GoodType.FOOD, 205);
     player.settlements.push(settlement);
 
-    const { players: updatedPlayers } = TurnEngine.runProduction([player], [], {}, () => 0.5, (p) => `${p}-test`);
+    const { players: updatedPlayers } = TurnEngine.runProduction([player], [], {}, (p) => `${p}-test`);
     const updatedPlayer0 = updatedPlayers[0];
     const updatedSettlement = updatedPlayer0?.settlements[0];
     if (!updatedSettlement) throw new Error('Settlement not found');

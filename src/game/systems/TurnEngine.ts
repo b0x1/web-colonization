@@ -164,8 +164,8 @@ export class TurnEngine {
       // Check resource availability
       const currentTools = settlement.inventory.get(GoodType.TOOLS) ?? 0;
       const currentMuskets = settlement.inventory.get(GoodType.MUSKETS) ?? 0;
-      const toolsNeeded = 'tools' in cost ? cost.tools : 0;
-      const musketsNeeded = 'muskets' in cost ? cost.muskets : 0;
+      const toolsNeeded = (cost as { tools?: number }).tools ?? 0;
+      const musketsNeeded = (cost as { muskets?: number }).muskets ?? 0;
 
       if (currentTools >= toolsNeeded && currentMuskets >= musketsNeeded) {
         if (settlement.hammers >= cost.hammers) {
