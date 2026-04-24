@@ -101,7 +101,6 @@ export const createTurnSlice: StateCreator<
         state.players,
         state.map,
         state.namingStats,
-        random,
         generateId,
       );
       set((s) => {
