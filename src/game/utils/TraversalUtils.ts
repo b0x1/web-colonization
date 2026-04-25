@@ -146,9 +146,6 @@ export class TraversalUtils {
   static isUnitAvailable(unit: Unit, settlementPosition?: Position): boolean {
     const occ = unit.occupation;
 
-    // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
-    if (!occ) return false;
-
     if (typeof occ !== 'object') {
       return false;
     }
@@ -157,8 +154,7 @@ export class TraversalUtils {
       return true;
     }
 
-    // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
-    if (occ.kind === 'FIELD_WORK' && settlementPosition) {
+    if (settlementPosition) {
       return occ.tileX === settlementPosition.x && occ.tileY === settlementPosition.y;
     }
     return false;

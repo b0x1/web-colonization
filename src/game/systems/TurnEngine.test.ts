@@ -40,7 +40,7 @@ describe('TurnEngine', () => {
         map.push(row);
       }
 
-      const { players: updatedPlayers } = TurnEngine.runProduction([player], map, {}, () => 0.5, (p) => `${p}-test`);
+      const { players: updatedPlayers } = TurnEngine.runProduction([player], map, {}, (p) => `${p}-test`);
       const updatedSettlement = updatedPlayers[0]?.settlements[0];
       if (!updatedSettlement) throw new Error('Settlement not found');
 

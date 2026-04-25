@@ -67,10 +67,11 @@ export function createSettlement(
 export function calculatePopulation(settlement: Settlement): number {
   return settlement.units.filter((u) => {
     const occ = u.occupation;
+    // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
+    if (!occ) return false;
     // JobType is a string
     if (typeof occ === 'string') return true;
     // FieldWork and Rure are objects
-    // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
-    return occ?.kind === 'FIELD_WORK';
+    return occ.kind === 'FIELD_WORK';
   }).length;
 }

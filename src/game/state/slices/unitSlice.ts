@@ -2,6 +2,7 @@ import type { StateCreator } from 'zustand';
 import type { GameState } from '../types';
 import { UnitType, GoodType, Nation } from '../../entities/types';
 import type { Position } from '../../entities/Position';
+import { createUnit } from '../../entities/Unit';
 import { TraversalUtils } from '../../utils/TraversalUtils';
 import { UnitSystem } from '../../systems/UnitSystem';
 import { MovementSystem } from '../../systems/MovementSystem';
@@ -9,6 +10,7 @@ import { EconomySystem } from '../../systems/EconomySystem';
 import { NamingSystem } from '../../systems/NamingSystem';
 import { RECRUITMENT_COSTS } from '../../constants';
 import { selectCurrentPlayer } from '../selectors';
+import { generateId } from '../utils';
 
 export interface UnitSlice {
   europePrices: Record<GoodType, number>;
@@ -143,19 +145,15 @@ export const createUnitSlice: StateCreator<
       const { name: newUnitName, updatedStats } = NamingSystem.getNextName(player.nation, unitType === UnitType.SHIP ? 'ship' : 'unit', state.namingStats);
       state.namingStats = updatedStats;
 
-      player.units.push({
-        id: `unit-${Date.now()}-${Math.floor(Math.random() * 1000)}`,
-        ownerId: player.id,
-        name: newUnitName,
-        type: unitType,
-        position: { ...selectedUnit.position },
-        movesRemaining: 1,
-        maxMoves: 1,
-        isSkipping: false,
-        cargo: new Map(),
-        occupation: { kind: 'RURE', state: 'MOVING' },
-        turnsInJob: 0,
-      });
+      player.units.push(createUnit(
+        generateId('unit'),
+        player.id,
+        newUnitName,
+        unitType,
+        selectedUnit.position.x,
+        selectedUnit.position.y,
+        1
+      ));
     });
   },
 });

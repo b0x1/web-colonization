@@ -15,7 +15,7 @@ describe('Settlement Production and Building Logic', () => {
     settlement.units.push(unit);
     player.settlements.push(settlement);
 
-    const { players: updatedPlayers } = TurnEngine.runProduction([player], [], {}, () => 0.5, (p) => `${p}-test`);
+    const { players: updatedPlayers } = TurnEngine.runProduction([player], [], {}, (p) => `${p}-test`);
     const updatedSettlement = updatedPlayers[0]?.settlements[0];
     if (!updatedSettlement) throw new Error('Settlement not found');
 
@@ -44,7 +44,7 @@ describe('Settlement Production and Building Logic', () => {
       map.push(row);
     }
 
-    const { players: updatedPlayers } = TurnEngine.runProduction([player], map, {}, () => 0.5, (p) => `${p}-test`);
+    const { players: updatedPlayers } = TurnEngine.runProduction([player], map, {}, (p) => `${p}-test`);
     const updatedSettlement = updatedPlayers[0]?.settlements[0];
     if (!updatedSettlement) throw new Error('Settlement not found');
 
@@ -61,7 +61,7 @@ describe('Settlement Production and Building Logic', () => {
     settlement.buildings.push(BuildingType.IRON_WORKS);
     player.settlements.push(settlement);
 
-    const { players: updatedPlayers } = TurnEngine.runProduction([player], [], {}, () => 0.5, (p) => `${p}-test`);
+    const { players: updatedPlayers } = TurnEngine.runProduction([player], [], {}, (p) => `${p}-test`);
     const updatedSettlement = updatedPlayers[0]?.settlements[0];
     if (!updatedSettlement) throw new Error('Settlement not found');
 
@@ -77,13 +77,13 @@ describe('Settlement Production and Building Logic', () => {
     player.settlements.push(settlement);
 
     // No warehouse, cap is 200
-    let { players: updatedPlayers } = TurnEngine.runProduction([player], [], {}, () => 0.5, (p) => `${p}-test`);
+    let { players: updatedPlayers } = TurnEngine.runProduction([player], [], {}, (p) => `${p}-test`);
     expect(updatedPlayers[0]?.settlements[0]?.inventory.get(GoodType.LUMBER)).toBe(200);
 
     // With warehouse, cap is 400
     settlement.buildings.push(BuildingType.WAREHOUSE);
     settlement.inventory.set(GoodType.LUMBER, 350);
-    ({ players: updatedPlayers } = TurnEngine.runProduction([player], [], {}, () => 0.5, (p) => `${p}-test`));
+    ({ players: updatedPlayers } = TurnEngine.runProduction([player], [], {}, (p) => `${p}-test`));
     expect(updatedPlayers[0]?.settlements[0]?.inventory.get(GoodType.LUMBER)).toBe(350);
   });
 
@@ -98,7 +98,7 @@ describe('Settlement Production and Building Logic', () => {
 
     // Should not throw
     expect(() => {
-      TurnEngine.runProduction([player], [], {}, () => 0.5, (p) => `${p}-test`);
+      TurnEngine.runProduction([player], [], {}, (p) => `${p}-test`);
     }).not.toThrow();
   });
 
@@ -108,7 +108,7 @@ describe('Settlement Production and Building Logic', () => {
     settlement.buildings.push(BuildingType.PRINTING_PRESS);
     player.settlements.push(settlement);
 
-    const { players: updatedPlayers } = TurnEngine.runProduction([player], [], {}, () => 0.5, (p) => `${p}-test`);
+    const { players: updatedPlayers } = TurnEngine.runProduction([player], [], {}, (p) => `${p}-test`);
     // Population is units inside. Printing press adds a unit to player.units (outside).
     const updatedPlayer0 = updatedPlayers[0];
     if (!updatedPlayer0) throw new Error('Player not found');
