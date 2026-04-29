@@ -46,6 +46,7 @@ interface Props {
 }
 
 export const BuildingSlots: React.FC<Props> = ({ settlementId, ownedBuildings }) => {
+<<<<<<< HEAD
   const assignJob = useGameStore(state => state.assignJob);
   const settlement = useGameStore(state => selectSettlementById(state, settlementId));
   const units = settlement?.units;
@@ -63,6 +64,16 @@ export const BuildingSlots: React.FC<Props> = ({ settlementId, ownedBuildings })
     });
     return map;
   }, [units]);
+||||||| 68a4bb6
+  const { assignJob, players } = useGameStore();
+  const settlement = players.flatMap(p => p.settlements).find(s => s.id === settlementId);
+=======
+  const { assignJob } = useGameStore();
+  // ⚡ Turbo: Use targeted selector to avoid re-renders when other players or unrelated settlement data changes
+  const settlement = useGameStore(state =>
+    state.players.flatMap(p => p.settlements).find(s => s.id === settlementId)
+  );
+>>>>>>> main
 
   if (!settlement) return null;
 
