@@ -1,12 +1,20 @@
 import { defineConfig } from 'vitest/config';
 import react from '@vitejs/plugin-react';
 import tailwindcss from '@tailwindcss/vite';
+import { resolve } from 'node:path';
 
 const ReactCompilerConfig = {
   target: '19',
 };
 
 export default defineConfig({
+  resolve: {
+    alias: {
+      '@client': resolve(__dirname, 'src/client'),
+      '@server': resolve(__dirname, 'src/server'),
+      '@shared': resolve(__dirname, 'src/shared'),
+    },
+  },
   plugins: [
     react({
       // @ts-expect-error - react-compiler is supported via babel but types might be outdated

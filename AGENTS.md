@@ -6,7 +6,13 @@ Read this first. Then read `ARCHITECTURE.md`. Then read `SKILLS.md`.
 
 ## BIG RULE
 
-Four layer. No climb up.
+First split by runtime. Then keep layer wall.
+
+- Client: UI, Phaser scenes, client store, EventBus. No authority.
+- Server: authority only. Own all game-changing command result.
+- Shared domain: entity + system + protocol. Pure TypeScript only.
+
+Inside shared game code keep four layer. No climb up.
 
 - UI: read store. render only. no Phaser. no game rule.
 - Scene: draw. input. no rule. talk by EventBus only.
@@ -17,6 +23,8 @@ If touched file break layer, fix now.
 If scene do rule, move to system.
 If component do rule, move to store or system.
 If system need browser or Phaser to test, code wrong.
+If client change world state direct, move to server command.
+If server need EventBus, React, Phaser, Zustand, or DOM, code wrong.
 
 ---
 
@@ -25,9 +33,10 @@ If system need browser or Phaser to test, code wrong.
 1. Read file first.
 2. Say clean-up plan, not only new thing plan.
 3. Look for old bad code in touched file. Fix now.
-4. Magic number or string go `src/game/constants.ts`.
+4. Magic number or string go `src/shared/game/constants.ts`.
 5. Touch system logic, add or update test.
 6. One logical change per commit. Refactor separate from feature.
+7. New game-changing action goes through shared command + server handler.
 
 ---
 
@@ -55,7 +64,14 @@ If unsure, choose simple, typed, boring path.
 - No `__tests__` folder.
 
 Good:
-`src/game/systems/CombatSystem.ts` -> `src/game/systems/CombatSystem.test.ts`
+`src/shared/game/systems/CombatSystem.ts` -> `src/shared/game/systems/CombatSystem.test.ts`
+
+Good split:
+`src/client/ui/*` -> client React UI
+`src/client/scenes/*` -> client Phaser scenes
+`src/client/game/*` -> client transport/store/view state/render glue
+`src/server/game/*` -> authoritative command handling
+`src/shared/game/*` -> protocol, entities, systems, constants
 
 ---
 

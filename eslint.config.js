@@ -101,18 +101,17 @@ export default tseslint.config(
     },
   },
 
-  // Layer: systems + entities must not import framework code
+  // Shared systems + entities must not import framework code
   {
-    files: ['src/game/systems/**/*.ts', 'src/game/entities/**/*.ts'],
+    files: ['src/shared/game/systems/**/*.ts', 'src/shared/game/entities/**/*.ts'],
     rules: {
       'no-restricted-imports': ['error', {
         patterns: [
           { group: ['phaser'], message: 'Systems and entities must not import Phaser.' },
           { group: ['react', 'react-dom'], message: 'Systems and entities must not import React.' },
           { group: ['zustand'], message: 'Systems and entities must not import Zustand.' },
-          { group: ['**/game/state/**'], message: 'Systems and entities must not import state or store code.' },
-          { group: ['**/ui/**'], message: 'No upward layer import into systems/entities.' },
-          { group: ['**/scenes/**'], message: 'No upward layer import into systems/entities.' },
+          { group: ['@client/**'], message: 'Systems and entities must not import client code.' },
+          { group: ['@server/**'], message: 'Systems and entities must not import server code.' },
         ],
       }],
       'no-restricted-globals': ['error', {
@@ -130,16 +129,13 @@ export default tseslint.config(
 
   // Layer: entities are plain data only
   {
-    files: ['src/game/entities/**/*.ts'],
+    files: ['src/shared/game/entities/**/*.ts'],
     rules: {
       'no-restricted-imports': ['error', {
         patterns: [
-          { group: ['**/game/systems/**'], message: 'Entities must not import systems.' },
-          { group: ['**/game/state/**'], message: 'Entities must not import state.' },
-          { group: ['**/game/map/**'], message: 'Entities must not import map helpers.' },
-          { group: ['**/game/rendering/**'], message: 'Entities must not import rendering code.' },
-          { group: ['**/ui/**'], message: 'Entities must not import UI.' },
-          { group: ['**/scenes/**'], message: 'Entities must not import scenes.' },
+          { group: ['@shared/game/systems/**'], message: 'Entities must not import systems.' },
+          { group: ['@client/**'], message: 'Entities must not import client code.' },
+          { group: ['@server/**'], message: 'Entities must not import server code.' },
         ],
       }],
     },
@@ -147,13 +143,14 @@ export default tseslint.config(
 
   // Layer: UI must not import Phaser, scenes, or systems
   {
-    files: ['src/ui/**/*.{ts,tsx}'],
+    files: ['src/client/ui/**/*.{ts,tsx}'],
     rules: {
       'no-restricted-imports': ['error', {
         patterns: [
           { group: ['phaser'], message: 'UI layer must not import Phaser.' },
-          { group: ['**/scenes/**'], message: 'UI must not import scenes.' },
-          { group: ['**/game/systems/**'], message: 'UI must not call systems directly.' },
+          { group: ['@client/scenes/**'], message: 'UI must not import scenes.' },
+          { group: ['@shared/game/systems/**'], message: 'UI must not call systems directly.' },
+          { group: ['@server/**'], message: 'UI must not import server runtime code directly.' },
         ],
       }],
     },
@@ -161,14 +158,66 @@ export default tseslint.config(
 
   // Layer: scenes must not import React, UI, or systems
   {
-    files: ['src/scenes/**/*.ts'],
+    files: ['src/client/scenes/**/*.ts'],
     rules: {
       'no-restricted-imports': ['error', {
         patterns: [
           { group: ['react', 'react-dom'], message: 'Scenes must not import React.' },
-          { group: ['**/ui/**'], message: 'Scenes must not import UI.' },
-          { group: ['**/game/systems/**'], message: 'Scenes must not import systems directly.' },
+          { group: ['@client/ui/**'], message: 'Scenes must not import UI.' },
+          { group: ['@shared/game/systems/**'], message: 'Scenes must not import systems directly.' },
+          { group: ['@server/**'], message: 'Scenes must not import server runtime code directly.' },
         ],
+      }],
+    },
+  },
+
+  // Shared contracts must stay framework-free and runtime-neutral
+  {
+    files: ['src/shared/**/*.ts'],
+    rules: {
+      'no-restricted-imports': ['error', {
+        patterns: [
+          { group: ['phaser'], message: 'Shared code must not import Phaser.' },
+          { group: ['react', 'react-dom'], message: 'Shared code must not import React.' },
+          { group: ['zustand'], message: 'Shared code must not import Zustand.' },
+          { group: ['@client/**'], message: 'Shared code must not import client runtime code.' },
+          { group: ['@server/**'], message: 'Shared code must not import server runtime code.' },
+        ],
+      }],
+      'no-restricted-globals': ['error', {
+        name: 'document',
+        message: 'Shared code must not use DOM globals.',
+      }, {
+        name: 'window',
+        message: 'Shared code must not use DOM globals.',
+      }, {
+        name: 'localStorage',
+        message: 'Shared code must not use browser storage globals.',
+      }],
+    },
+  },
+
+  // Server authority must stay framework-free and client-free
+  {
+    files: ['src/server/**/*.ts'],
+    rules: {
+      'no-restricted-imports': ['error', {
+        patterns: [
+          { group: ['phaser'], message: 'Server code must not import Phaser.' },
+          { group: ['react', 'react-dom'], message: 'Server code must not import React.' },
+          { group: ['zustand'], message: 'Server authority must not depend on Zustand.' },
+          { group: ['@client/**'], message: 'Server code must not import client runtime code.' },
+        ],
+      }],
+      'no-restricted-globals': ['error', {
+        name: 'document',
+        message: 'Server code must not use DOM globals.',
+      }, {
+        name: 'window',
+        message: 'Server code must not use DOM globals.',
+      }, {
+        name: 'localStorage',
+        message: 'Server code must not use browser storage globals.',
       }],
     },
   },

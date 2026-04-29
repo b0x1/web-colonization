@@ -1,28 +1,28 @@
 import { useEffect, useRef } from 'react';
 import * as Phaser from 'phaser';
-import { useGameStore, selectAvailableUnitsCount } from './game/state/gameStore';
-import { useUIStore } from './game/state/uiStore';
-import { eventBus } from './game/state/EventBus';
-import type { Tile } from './game/entities/Tile';
-import { WorldScene } from './scenes/WorldScene';
-import { MainMenuScene } from './scenes/MainMenuScene';
-import { HUD } from './ui/HUD';
-import { UnitPanel } from './ui/UnitPanel';
-import { FieldPanel } from './ui/FieldPanel';
-import { MiniMap } from './ui/MiniMap';
-import { SettlementScreen } from './ui/SettlementScreen/SettlementScreen';
-import { EuropeScreen } from './ui/EuropeScreen/EuropeScreen';
-import { ForeignInteractionModal } from './ui/ForeignInteractionModal/ForeignInteractionModal';
-import { ForeignSettlementModal } from './ui/ForeignSettlementModal';
-import { CombatResultToast } from './ui/CombatResultToast';
-import { SaveLoadModal } from './ui/SaveLoadModal';
-import { ReportsModal } from './ui/ReportsModal';
-import { NotificationToast } from './ui/NotificationToast';
-import { MainMenu } from './ui/MainMenu/MainMenu';
-import { HowToPlayModal } from './ui/MainMenu/HowToPlayModal';
-import { GameSetupModal } from './ui/MainMenu/GameSetupModal';
-import { EndTurnConfirmationModal } from './ui/EndTurnConfirmationModal';
-import { LazyRenderController } from './game/rendering/LazyRenderController';
+import { useGameStore, selectAvailableUnitsCount } from '@client/game/state/gameStore';
+import { useUIStore } from '@client/game/state/uiStore';
+import { eventBus } from '@client/game/state/EventBus';
+import { LazyRenderController } from '@client/game/rendering/LazyRenderController';
+import { MainMenuScene } from '@client/scenes/MainMenuScene';
+import { WorldScene } from '@client/scenes/WorldScene';
+import { CombatResultToast } from '@client/ui/CombatResultToast';
+import { EndTurnConfirmationModal } from '@client/ui/EndTurnConfirmationModal';
+import { EuropeScreen } from '@client/ui/EuropeScreen/EuropeScreen';
+import { FieldPanel } from '@client/ui/FieldPanel';
+import { ForeignInteractionModal } from '@client/ui/ForeignInteractionModal/ForeignInteractionModal';
+import { ForeignSettlementModal } from '@client/ui/ForeignSettlementModal';
+import { HUD } from '@client/ui/HUD';
+import { GameSetupModal } from '@client/ui/MainMenu/GameSetupModal';
+import { HowToPlayModal } from '@client/ui/MainMenu/HowToPlayModal';
+import { MainMenu } from '@client/ui/MainMenu/MainMenu';
+import { MiniMap } from '@client/ui/MiniMap';
+import { NotificationToast } from '@client/ui/NotificationToast';
+import { ReportsModal } from '@client/ui/ReportsModal';
+import { SaveLoadModal } from '@client/ui/SaveLoadModal';
+import { SettlementScreen } from '@client/ui/SettlementScreen/SettlementScreen';
+import { UnitPanel } from '@client/ui/UnitPanel';
+import type { Tile } from '@shared/game/entities/Tile';
 
 function App(): React.ReactElement {
   const gameRef = useRef<Phaser.Game | null>(null);
@@ -91,6 +91,9 @@ function App(): React.ReactElement {
 
       useGameStore.getState().resolveCombat(selectedUnitId, target);
     });
+    const unsubscribeMoveRequested = eventBus.on('moveUnitRequested', ({ id, to }) => {
+      useGameStore.getState().moveUnit(id, to);
+    });
     const unsubscribeTradeRequested = eventBus.on('nativeTradeRequested', (settlementId) => {
       useUIStore.getState().setNativeTradeModalOpen(true, settlementId);
     });
@@ -100,6 +103,7 @@ function App(): React.ReactElement {
       unsubscribeSettlementSelected();
       unsubscribeTileSelected();
       unsubscribeCombatRequested();
+      unsubscribeMoveRequested();
       unsubscribeTradeRequested();
     };
   }, [selectSettlement, selectUnit]);
