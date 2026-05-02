@@ -1,6 +1,6 @@
 import React from 'react';
 import type { Unit } from '@shared/game/entities/Unit';
-import { useGameStore } from '@client/game/state/gameStore';
+import { useGameStore, selectSettlementById } from '@client/game/state/gameStore';
 import { Sprite } from '../Sprite';
 import { TraversalUtils } from '@shared/game/utils/TraversalUtils';
 
@@ -9,10 +9,11 @@ interface Props {
   units: Unit[];
 }
 
-export const AvailableUnits: React.FC<Props> = ({ settlementId, units }) => {
-  const { assignJob, players } = useGameStore();
+const AvailableUnitsBase: React.FC<Props> = ({ settlementId, units }) => {
+  const assignJob = useGameStore(state => state.assignJob);
+  // ⚡ Turbo: Use targeted selector to avoid re-renders when other players or unrelated settlement data changes
+  const settlement = useGameStore(state => selectSettlementById(state, settlementId));
 
-  const settlement = players.flatMap(p => p.settlements).find(s => s.id === settlementId);
   if (!settlement) return null;
 
   const availableUnits = units.filter(u => TraversalUtils.isUnitAvailable(u, settlement.position));
@@ -63,3 +64,5 @@ export const AvailableUnits: React.FC<Props> = ({ settlementId, units }) => {
     </div>
   );
 };
+
+export const AvailableUnits = React.memo(AvailableUnitsBase);

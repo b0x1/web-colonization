@@ -45,7 +45,7 @@ interface Props {
   ownedBuildings: BuildingType[];
 }
 
-export const BuildingSlots: React.FC<Props> = ({ settlementId, ownedBuildings }) => {
+const BuildingSlotsBase: React.FC<Props> = ({ settlementId, ownedBuildings }) => {
   const assignJob = useGameStore(state => state.assignJob);
   // ⚡ Bolt: Use targeted selector to avoid re-renders when other players or unrelated settlement data changes
   const settlement = useGameStore(state => selectSettlementById(state, settlementId));
@@ -120,3 +120,5 @@ export const BuildingSlots: React.FC<Props> = ({ settlementId, ownedBuildings })
     </div>
   );
 };
+
+export const BuildingSlots = React.memo(BuildingSlotsBase);

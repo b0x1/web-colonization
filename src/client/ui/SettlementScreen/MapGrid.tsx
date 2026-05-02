@@ -1,5 +1,5 @@
-import React from 'react';
-import { useGameStore } from '@client/game/state/gameStore';
+import React, { useMemo } from 'react';
+import { useGameStore, selectSettlementById } from '@client/game/state/gameStore';
 import { Sprite } from '../Sprite';
 import { isSame, toKey, type Position } from '@shared/game/entities/Position';
 
@@ -7,14 +7,13 @@ interface Props {
   settlementId: string;
 }
 
-export const MapGrid: React.FC<Props> = ({ settlementId }) => {
-  const { map, assignJob } = useGameStore();
+const MapGridBase: React.FC<Props> = ({ settlementId }) => {
+  const map = useGameStore(state => state.map);
+  const assignJob = useGameStore(state => state.assignJob);
   // ⚡ Turbo: Use targeted selector to avoid re-renders when other players or unrelated settlement data changes
-  const settlement = useGameStore(state =>
-    state.players.flatMap(p => p.settlements).find(s => s.id === settlementId)
-  );
+  const settlement = useGameStore(state => selectSettlementById(state, settlementId));
 
-  const workersByTile = React.useMemo(() => {
+  const workersByTile = useMemo(() => {
     const map = new Map<string, import('@shared/game/entities/Unit').Unit[]>();
     if (!settlement) return map;
 
@@ -28,19 +27,25 @@ export const MapGrid: React.FC<Props> = ({ settlementId }) => {
       }
     });
     return map;
-  }, [settlement]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [settlement?.units]);
+
+  const tiles = useMemo(() => {
+    if (!settlement) return [];
+    const result: ({ position: Position; terrainType: string; hasResource: string | null } | null)[] = [];
+    for (let dy = -1; dy <= 1; dy++) {
+      for (let dx = -1; dx <= 1; dx++) {
+        const tx = settlement.position.x + dx;
+        const ty = settlement.position.y + dy;
+        const tile = map[ty]?.[tx] as { position: Position; terrainType: string; hasResource: string | null } | undefined;
+        result.push(tile ?? null);
+      }
+    }
+    return result;
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [map, settlement?.position.x, settlement?.position.y]);
 
   if (!settlement) return null;
-
-  const tiles: ({ position: Position; terrainType: string; hasResource: string | null } | null)[] = [];
-  for (let dy = -1; dy <= 1; dy++) {
-    for (let dx = -1; dx <= 1; dx++) {
-      const tx = settlement.position.x + dx;
-      const ty = settlement.position.y + dy;
-      const tile = map[ty]?.[tx] as { position: Position; terrainType: string; hasResource: string | null } | undefined;
-      tiles.push(tile ?? null);
-    }
-  }
 
   const handleDrop = (e: React.DragEvent, tilePos: Position) => {
     e.preventDefault();
@@ -115,3 +120,5 @@ export const MapGrid: React.FC<Props> = ({ settlementId }) => {
     </div>
   );
 };
+
+export const MapGrid = React.memo(MapGridBase);
